@@ -101,6 +101,27 @@ def clear_playlist(kodi_path):
         LOG.error(e)
 
 
+# add the movieid to the active playlist movieid is an integer
+def add_playlist(kodi_path, movieid):
+    method = "Playlist.Add"
+    kodi_payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": method,
+        "params": {
+            "playlistid": 1,
+            "item": {
+                "movieid": movieid
+            }
+        }
+    }
+    try:
+        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        LOG.info(kodi_response.text)
+    except Exception as e:
+        LOG.error(e)
+
+
 # play the movie playlist with cinemavision addon, assumes the playlist is already populated
 def play_cinemavision(kodi_path):
     method = "Addons.ExecuteAddon"
@@ -365,3 +386,29 @@ def post_kodi_notification(kodi_path, message):
         LOG.info(kodi_response.text)
     except Exception as e:
         LOG.error(e)
+
+    def handle_skip_movie_intent(self, message):
+        method = "Player.Seek"
+        backward_kw = message.data.get("BackwardKeyword")
+        if backward_kw:
+            dir_skip = "smallbackward"
+        else:
+            dir_skip = "smallforward"
+        self.kodi_payload = {
+            "jsonrpc": "2.0",
+            "method": method,
+            "params": {
+                "playerid": 1,
+                "value": dir_skip
+            },
+            "id": 1
+        }
+        if self.is_kodi_playing():
+            try:
+                kodi_response = requests.post(self.kodi_path, data=json.dumps(self.kodi_payload),
+                                              headers=self.json_header)
+                LOG.info(kodi_response.text)
+            except Exception as e:
+                LOG.error(e)
+        else:
+            LOG.info("There is no movie playing to skip")
