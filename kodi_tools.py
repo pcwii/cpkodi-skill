@@ -7,6 +7,8 @@ import urllib.request
 from mycroft.util.log import getLogger
 from mycroft.util.log import LOG
 
+import helpers
+
 json_header = {'content-type': 'application/json'}
 
 
@@ -387,28 +389,76 @@ def post_kodi_notification(kodi_path, message):
     except Exception as e:
         LOG.error(e)
 
-    def handle_skip_movie_intent(self, message):
-        method = "Player.Seek"
-        backward_kw = message.data.get("BackwardKeyword")
-        if backward_kw:
-            dir_skip = "smallbackward"
-        else:
-            dir_skip = "smallforward"
-        self.kodi_payload = {
-            "jsonrpc": "2.0",
-            "method": method,
-            "params": {
-                "playerid": 1,
-                "value": dir_skip
-            },
-            "id": 1
+def handle_skip_movie_intent(kodi_path, message):
+    method = "Player.Seek"
+    backward_kw = message.data.get("BackwardKeyword")
+    if backward_kw:
+        dir_skip = "smallbackward"
+    else:
+        dir_skip = "smallforward"
+    kodi_payload = {
+        "jsonrpc": "2.0",
+        "method": method,
+        "params": {
+            "playerid": 1,
+            "value": dir_skip
+        },
+        "id": 1
+    }
+    if is_kodi_playing():
+        try:
+            kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload),
+                                          headers=json_header)
+            LOG.info(kodi_response.text)
+        except Exception as e:
+            LOG.error(e)
+    else:
+        LOG.info("There is no movie playing to skip")
+
+
+# play the movie based on movie ID
+def play_film(kodi_path, movieid):
+    clear_playlist(kodi_path)
+    add_playlist(kodi_path, movieid)
+    play_normal(kodi_path)
+
+# find the movies in the library that match the optional search criteria
+def find_movies_with_filter(kodi_path, title=""):
+    title = helpers.numeric_replace(title)
+    found_list = []  # this is a dict
+    movie_list = list_all_movies(kodi_path)
+    title_list = title.replace("-", "").lower().split()
+    for each_movie in movie_list:
+        movie_name = each_movie["label"].replace("-", "")
+        movie_name = self.numeric_replace(movie_name)
+        LOG.info(movie_name)
+        if all(words in movie_name.lower() for words in title_list):
+            LOG.info("Found " + movie_name + " : " + "MovieID: " + str(each_movie["movieid"]))
+            info = {
+                "label": each_movie['label'],
+                "movieid": each_movie['movieid']
+            }
+            found_list.append(info)
+    temp_list = []  # this is a dict
+    for each_movie in found_list:
+        movie_title = str(each_movie['label'])
+        info = {
+            "label": each_movie['label'],
+            "movieid": each_movie['movieid']
         }
-        if self.is_kodi_playing():
-            try:
-                kodi_response = requests.post(self.kodi_path, data=json.dumps(self.kodi_payload),
-                                              headers=self.json_header)
-                LOG.info(kodi_response.text)
-            except Exception as e:
-                LOG.error(e)
+        if movie_title not in str(temp_list):
+            temp_list.append(info)
         else:
-            LOG.info("There is no movie playing to skip")
+            if len(each_movie['label']) == len(movie_title):
+                LOG.info('found duplicate')
+            else:
+                temp_list.append(info)
+    found_list = temp_list
+    return found_list  # returns a dictionary of matched movies
+
+
+# return the id of a movie from the kodi library based on its name
+def get_kodi_movie_id(kodi_path, movie_name):
+    found_list = find_movies_with_filter(kodi_path, movie_name)
+    my_id = found_list[0]["movieid"]
+    return my_id
