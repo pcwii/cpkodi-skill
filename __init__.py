@@ -7,9 +7,9 @@ from mycroft.util.log import LOG
 
 from helpers import yt_tools, cast_tools, kodi_tools, search_tools
 
-
 _author__ = 'PCWii'
-# Release - 20120426
+# Release - '20200603 - Covid-19 Build'
+
 
 class CPKodiSkill(CommonPlaySkill):
     def __init__(self):
@@ -35,12 +35,11 @@ class CPKodiSkill(CommonPlaySkill):
         self.remote_sources = ['youtube', "you tube"]
         self.remote_match = False
         self.device_match = False
+        self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
         self.load_data_files(dirname(__file__))
-        self.settings_change_callback = self.on_websettings_changed
         self.on_websettings_changed()
-
         self.add_event('recognizer_loop:wakeword', self.handle_listen)
         self.add_event('recognizer_loop:utterance', self.handle_utterance)
         self.add_event('speak', self.handle_speak)
@@ -92,7 +91,6 @@ class CPKodiSkill(CommonPlaySkill):
         except Exception as e:
             LOG.error(e)
 
-
     # listening event used for kodi notifications
     def handle_listen(self, message):
         voice_payload = "Listening"
@@ -123,7 +121,6 @@ class CPKodiSkill(CommonPlaySkill):
             except Exception as e:
                 LOG.error(e)
                 self.on_websettings_changed()
-
 
     def CPS_match_query_phrase(self, phrase):
         """
@@ -166,6 +163,7 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('Ready to Play: ' + data["type"])
         LOG.info('Ready to Play: ' + data["subtype"])
         pass
+
 
 def create_skill():
     return CPKodiSkill()
