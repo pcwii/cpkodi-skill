@@ -1,26 +1,11 @@
 from os.path import dirname
 
 from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
+from adapt.intent import IntentBuilder
 
-from mycroft.util.log import getLogger
 from mycroft.util.log import LOG
 
-
-from mycroft.audio import wait_while_speaking
-
-import pafy
-import pychromecast
-from pychromecast.controllers.youtube import YouTubeController
-
-
-import requests
-import re
-import time
-import json
-import random
-import kodi_tools
-import youtube_tools
-import helpers
+from helpers import yt_tools, cast_tools, kodi_tools, search_tools
 
 
 _author__ = 'PCWii'
@@ -53,8 +38,6 @@ class CPKodiSkill(CommonPlaySkill):
 
     def initialize(self):
         self.load_data_files(dirname(__file__))
-        # Check and then monitor for credential changes
-        # self.settings.set_changed_callback(self.on_websettings_changed)
         self.settings_change_callback = self.on_websettings_changed
         self.on_websettings_changed()
 
@@ -147,66 +130,41 @@ class CPKodiSkill(CommonPlaySkill):
             The method is invoked by the PlayBackControlSkill.
         """
         self.log.info('CPKodiSkill received the following phrase: ' + phrase)
-        self.device_match = False
-        self.remote_match = False
-        for device_id in self.device_list:
-            if device_id in phrase:
-                self.device_match = True
-                playback_device = device_id
-        for remote_id in self.remote_sources:
-            if remote_id in phrase:
-                self.remote_match = True
-        if self.remote_match and kodi_tools.check_youtube_present(self.kodi_path):
-            self.youtube_search = youtube_tools.youtube_query_regex(phrase)
-            self.youtube_id = youtube_tools.get_youtube_links(self.youtube_search)
-            if self.youtube_id:
-                self.remote_match = True  # kodi can play remote content with plugin
-        else:
-            self.remote_match = False  # kodi can't play remote content, no plugin
-        # Check if the movie exists before deciding if we can play this request
-        movie_name = self.movie_regex(phrase)  # extract the movie name from the phrase
         try:
-            LOG.info("movie: " + movie_name)
-            results = self.find_movies_with_filter(movie_name)
-            self.movie_list = results
-            self.movie_index = 0
-            LOG.info("possible movies are: " + str(results))
-            if self.device_match and len(results): # One of the playback devices were specified
-                match_level = CPSMatchLevel.EXACT
-            elif self.remote_match:  # A youtube Item was found and is playable
-                match_level = CPSMatchLevel.EXACT
+            request_details = search_tools.get_request_details(phrase)  # extract the movie name from the phrase
+            LOG.info("Requested search: " + request_details[0] + ", of type: " + request_details[1])
+            if "movie" in request_details[1]:
+                results = kodi_tools.get_filtered_movies(self.kodi_path, request_details[0])
+                LOG.info("Possible movies matches are: " + str(results))
+            if results is None:
+                return None  # until a match is found
             else:
-                LOG.info('Couldn\'t find anything to play on kodi')
-            if len(results):
-                data = {"local", playback_device, movie_name, results}
-            elif self.youtube_id:
-                data = {"remote", playback_device, self.youtube_search, self.youtube_id}
+                if len(results) > 0:
+                    match_level = CPSMatchLevel.EXACT
+                    data = {
+                        "library": results,
+                        "request": request_details[0],
+                        "type": request_details[1],
+                        "subtype": request_details[2]
+                    }
+                    LOG.info('Searching Kodi found a matching playable item!')
+                    return phrase, match_level, data
+                else:
+                    return None  # until a match is found
         except Exception as e:
-            LOG.info('an error was detected')
+            LOG.info('An error was detected')
             LOG.error(e)
             self.on_websettings_changed()
-
-        if match_level:
-            return (phrase, match_level, data)
-        else:
-            return None
 
     def CPS_start(self, phrase, data):
         """ Starts playback.
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
         """
-        play_type = data[0]
-        playback_device = data[1]
-        item_name = data[2]
-        results = data[3]
-#        if len(results) == 1:
-#            self.play_film(results[0]['movieid'])
-#        elif len(results):
-#            self.set_context('NavigateContextKeyword', 'NavigateContext')
-#            self.speak_dialog('multiple.results', data={"result": str(len(results))}, expect_response=True)
-#        else:
-#            self.speak_dialog('no.results', data={"result": movie_name}, expect_response=False)
+        LOG.info('Ready to Play: ' + data["library"])
+        LOG.info('Ready to Play: ' + data["request"])
+        LOG.info('Ready to Play: ' + data["type"])
+        LOG.info('Ready to Play: ' + data["subtype"])
         pass
 
 def create_skill():

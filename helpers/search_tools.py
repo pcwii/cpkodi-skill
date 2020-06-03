@@ -1,6 +1,6 @@
-from mycroft.util.log import getLogger
-from mycroft.util.log import LOG
-from mycroft.util.parse import extract_number
+#from mycroft.util.log import getLogger
+#from mycroft.util.log import LOG
+#from mycroft.util.parse import extract_number
 import re
 
 def numeric_replace(in_words=""):
@@ -17,24 +17,19 @@ def numeric_replace(in_words=""):
     return return_string
 
 
-
 # use regex to find any movie names found in the utterance
-def movie_regex(message):
-    film_regex = r"((movie|film) (?P<Film1>.*))| ((movie|film) (?P<Film2>.*)(with|using) (cinemavision))"
-    utt_str = message
+def get_request_details(phrase):
+    request_type = "movie"
+    request_subtype = None
+    film_regex = r"((movie|film) (?P<Film1>.*))"
+    utt_str = phrase
     film_matches = re.finditer(film_regex, utt_str, re.MULTILINE | re.DOTALL)
     for film_match_num, film_match in enumerate(film_matches):
         group_id = "Film1"
-        my_movie = "{group}".format(group=film_match.group(group_id))
-        cv_request = False
-        if my_movie == "None":
-            group_id = "Film2"
-            my_movie = "{group}".format(group=film_match.group(group_id))
-            cv_request = True
-    LOG.info(my_movie)
-    my_movie = re.sub('\W', ' ', my_movie)
-    my_movie = re.sub(' +', ' ', my_movie)
-    return my_movie.strip()
+        request_details = "{group}".format(group=film_match.group(group_id))
+    request_details = re.sub('\W', ' ', request_details)
+    request_details = re.sub(' +', ' ', request_details)
+    return request_details.strip(), request_type, request_subtype  # returns the request details and the request type
 
 
 # check the cursor control utterance for repeat commands
