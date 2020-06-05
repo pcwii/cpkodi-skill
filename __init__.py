@@ -152,10 +152,12 @@ class CPKodiSkill(CommonPlaySkill):
 
     def translate_regex(self, regex):
         # opens the file
-        LOG.info('Regex is checking the following file' + str(regex))
+        self.regexes = {}
+        LOG.info('Regex is checking the following file ' + str(regex))
         if regex not in self.regexes:
             path = self.find_resource(regex + '.regex')
             if path:
+                LOG.info('The regex file: ' + str(path) + ', was found!')
                 with open(path) as f:
                     string = f.read().strip()
                 self.regexes[regex] = string
