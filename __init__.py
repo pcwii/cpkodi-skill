@@ -1,11 +1,11 @@
 from os.path import dirname
+import re
 
 from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
+from mycroft.util.log import LOG
 from adapt.intent import IntentBuilder
 
-from mycroft.util.log import LOG
-
-from helpers import yt_tools, cast_tools, kodi_tools, search_tools
+from helpers import kodi_tools
 
 _author__ = 'PCWii'
 # Release - '20200603 - Covid-19 Build'
@@ -43,21 +43,24 @@ class CPKodiSkill(CommonPlaySkill):
         self.add_event('recognizer_loop:wakeword', self.handle_listen)
         self.add_event('recognizer_loop:utterance', self.handle_utterance)
         self.add_event('speak', self.handle_speak)
-
+        """
+           All basic intents are added here
+           These are non cps intents 
+        """
         # eg. stop the movie
-        stop_film_intent = IntentBuilder("StopFilmIntent"). \
-            require("StopKeyword").one_of("FilmKeyword", "KodiKeyword", "YoutubeKeyword").build()
-        self.register_intent(stop_film_intent, self.handle_stop_film_intent)
+        stop_intent = IntentBuilder("StopIntent"). \
+            require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword").build()
+        self.register_intent(stop_intent, self.handle_stop_intent)
 
         # eg. pause the movie
-        pause_film_intent = IntentBuilder("PauseFilmIntent"). \
-            require("PauseKeyword").one_of("FilmKeyword", "KodiKeyword").build()
-        self.register_intent(pause_film_intent, self.handle_pause_film_intent)
+        pause_intent = IntentBuilder("PauseIntent"). \
+            require("PauseKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword").build()
+        self.register_intent(pause_intent, self.handle_pause_intent)
 
-        # eg. resume the movie
-        resume_film_intent = IntentBuilder("ResumeFilmIntent"). \
-            require("ResumeKeyword").require("FilmKeyword").build()
-        self.register_intent(resume_film_intent, self.handle_resume_film_intent)
+        # eg. resume (unpause) the movie
+        resume_intent = IntentBuilder("ResumeIntent"). \
+            require("ResumeKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword").build()
+        self.register_intent(resume_intent, self.handle_resume_intent)
 
         # eg. turn kodi notifications on
         notification_on_intent = IntentBuilder("NotifyOnIntent"). \
@@ -98,6 +101,7 @@ class CPKodiSkill(CommonPlaySkill):
             try:
                 self.post_kodi_notification(voice_payload)
             except Exception as e:
+                LOG.info('An error was detected in: handle_listen')
                 LOG.error(e)
                 self.on_websettings_changed()
 
@@ -109,6 +113,7 @@ class CPKodiSkill(CommonPlaySkill):
             try:
                 self.post_kodi_notification(voice_payload)
             except Exception as e:
+                LOG.info('An error was detected in: handle_utterance')
                 LOG.error(e)
                 self.on_websettings_changed()
 
@@ -119,39 +124,121 @@ class CPKodiSkill(CommonPlaySkill):
             try:
                 self.post_kodi_notification(voice_payload)
             except Exception as e:
+                LOG.info('An error was detected in: handle_speak')
                 LOG.error(e)
                 self.on_websettings_changed()
+
+    # stop film was requested in the utterance
+    def handle_stop_intent(self, message):
+        try:
+            self.stop_all()
+        except Exception as e:
+            LOG.info('An error was detected in: handle_stop_intent')
+            LOG.error(e)
+            self.on_websettings_changed()
+
+    # pause film was requested in the utterance
+    def handle_pause_intent(self, message):
+        try:
+            self.pause_all()
+        except Exception as e:
+            LOG.info('An error was detected in: handle_pause_intent')
+            LOG.error(e)
+            self.on_websettings_changed()
+
+    # resume the film was requested in the utterance
+    def handle_resume_intent(self, message):
+        try:
+            self.resume_all()
+        except Exception as e:
+            LOG.info('An error was detected in: handle_resume_intent')
+            LOG.error(e)
+            self.on_websettings_changed()
+
+    # turn notifications on requested in the utterance
+    def handle_notification_on_intent(self, message):
+        self.notifier_bool = True
+        self.speak_dialog("notification", data={"result": "On"})
+
+    # turn notifications off requested in the utterance
+    def handle_notification_off_intent(self, message):
+        self.notifier_bool = False
+        self.speak_dialog("notification", data={"result": "Off"})
+
+    def translate_regex(self, regex):
+        if regex not in self.regexes:
+            path = self.find_resource(regex + '.regex')
+            if path:
+                with open(path) as f:
+                    string = f.read().strip()
+                self.regexes[regex] = string
+        return self.regexes[regex]
+
+    def get_request_details(self, phrase):
+        """
+            All requests types are added here and return the requested items
+            A <item>.type.regex should exist in the local/en-us
+        """
+        album_type = re.match(self.translate_regex('album.type'), phrase)
+        artist_type = re.match(self.translate_regex('artist.type'), phrase)
+        movie_type = re.match(self.translate_regex('movie.type'), phrase)
+        song_type = re.match(self.translate_regex('song.type'), phrase)
+        if album_type:
+            request_type = 'album'
+            request_item = album_type.groupdict()['album']
+        elif artist_type:
+            request_type = 'artist'
+            request_item = artist_type.groupdict()['artist']
+        elif movie_type:
+            request_type = 'movie'
+            request_item = movie_type.groupdict()['movie']
+        elif song_type:
+            request_type = 'song'
+            request_item = song_type.groupdict()['song']
+        else:
+            request_type = None
+            request_item = None
+        return request_item, request_type  # returns the request details and the request type
 
     def CPS_match_query_phrase(self, phrase):
         """
             The method is invoked by the PlayBackControlSkill.
         """
-        self.log.info('CPKodiSkill received the following phrase: ' + phrase)
+        LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         try:
-            request_details = search_tools.get_request_details(phrase)  # extract the movie name from the phrase
-            LOG.info("Requested search: " + request_details[0] + ", of type: " + request_details[1])
-            if "movie" in request_details[1]:
-                results = kodi_tools.get_filtered_movies(self.kodi_path, request_details[0])
+            request_item, request_type = self.get_request_details(phrase)  # extract the movie name from the phrase
+            LOG.info("Requested search: " + request_item + ", of type: " + request_type)
+            if "movie" in request_type:
+                results = kodi_tools.get_requested_movies(self.kodi_path, request_item)
                 LOG.info("Possible movies matches are: " + str(results))
+            if "album" in request_type:
+                results = None
+                LOG.info("Searching for albums")
+            if "song" in request_type:
+                results = None
+                LOG.info("Searching for songs")
+            if "artist" in request_type:
+                results = None
+                LOG.info("Searching for Artist")
             if results is None:
-                return None  # until a match is found
+                return None  # no match found by this skill
             else:
                 if len(results) > 0:
                     match_level = CPSMatchLevel.EXACT
                     data = {
                         "library": results,
-                        "request": request_details[0],
-                        "type": request_details[1],
-                        "subtype": request_details[2]
+                        "request": request_item,
+                        "type": request_type
                     }
                     LOG.info('Searching Kodi found a matching playable item!')
                     return phrase, match_level, data
                 else:
                     return None  # until a match is found
         except Exception as e:
-            LOG.info('An error was detected')
+            LOG.info('An error was detected in: CPS_match_query_phrase')
             LOG.error(e)
             self.on_websettings_changed()
+            return None  # until a match is found
 
     def CPS_start(self, phrase, data):
         """ Starts playback.
@@ -161,7 +248,6 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('Ready to Play: ' + data["library"])
         LOG.info('Ready to Play: ' + data["request"])
         LOG.info('Ready to Play: ' + data["type"])
-        LOG.info('Ready to Play: ' + data["subtype"])
         pass
 
 

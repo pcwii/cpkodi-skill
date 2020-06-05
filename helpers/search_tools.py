@@ -19,7 +19,9 @@ def numeric_replace(in_words=""):
 
 # use regex to find any movie names found in the utterance
 def get_request_details(phrase):
-    request_type = "movie"
+    if self.translate(movie.type) in phrase:
+        request_type = "movie"
+    else if "song"
     request_subtype = None
     film_regex = r"((movie|film) (?P<Film1>.*))"
     utt_str = phrase
