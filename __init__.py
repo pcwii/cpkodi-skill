@@ -91,7 +91,7 @@ class CPKodiSkill(CommonPlaySkill):
                 self.kodi_path = "http://" + kodi_user + ":" + kodi_pass + "@" + kodi_ip + ":" + str(kodi_port) + \
                                  "/jsonrpc"
                 LOG.info(self.kodi_path)
-                self.kodi_image_path = "http://" + kodi_ip + ":" + kodi_port + "/image/"
+                self.kodi_image_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/image/"
                 self._is_setup = True
         except Exception as e:
             LOG.error(e)
