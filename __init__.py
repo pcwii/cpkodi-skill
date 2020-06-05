@@ -184,8 +184,8 @@ class CPKodiSkill(CommonPlaySkill):
             request_type = 'movie'
             request_item = movie_type.groupdict()['movie']
         elif song_type:
-            request_type = 'song'
-            request_item = song_type.groupdict()['song']
+            request_type = 'title'
+            request_item = song_type.groupdict()['title']
         else:
             request_type = None
             request_item = None
@@ -207,10 +207,11 @@ class CPKodiSkill(CommonPlaySkill):
             if "movie" in request_type:
                 results = kodi_tools.get_requested_movies(self.kodi_path, request_item)
                 LOG.info("Possible movies matches are: " + str(results))
-            if ("album" in request_type) or ("song" in request_type) or ("artist" in request_type):
+            if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
                 results = kodi_tools.get_requested_music(self.kodi_path, request_item, request_type)
-                LOG.info("Searching for albums")
+                LOG.info("Searching for music")
             if results is None:
+                LOG.info("Found Nothing!")
                 return None  # no match found by this skill
             else:
                 if len(results) > 0:

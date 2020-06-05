@@ -1,1 +1,1 @@
-(the |)(song|single) (?P<song>.+)
+(the |)(song|single) (?P<title>.+)
