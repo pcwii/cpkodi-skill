@@ -151,12 +151,16 @@ class CPKodiSkill(CommonPlaySkill):
         self.speak_dialog("notification", data={"result": "Off"})
 
     def translate_regex(self, regex):
+        # opens the file
+        LOG.info('Regex is checking the following file' + str(regex))
         if regex not in self.regexes:
             path = self.find_resource(regex + '.regex')
             if path:
                 with open(path) as f:
                     string = f.read().strip()
                 self.regexes[regex] = string
+            else:
+                LOG.info('The regex file: ' + str(path) + ', was not found')
         return self.regexes[regex]
 
     def get_request_details(self, phrase):
