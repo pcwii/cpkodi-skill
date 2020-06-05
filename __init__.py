@@ -5,7 +5,7 @@ from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.util.log import LOG
 from adapt.intent import IntentBuilder
 
-from helpers import kodi_tools
+from .helpers import kodi_tools
 
 _author__ = 'PCWii'
 # Release - '20200603 - Covid-19 Build'
