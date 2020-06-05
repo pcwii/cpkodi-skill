@@ -15,6 +15,7 @@ class CPKodiSkill(CommonPlaySkill):
     def __init__(self):
         super(CPKodiSkill, self).__init__('CPKodiSkill')
         self.kodi_path = ""
+        self.kodi_image_path = ""
         self.youtube_id = []
         self.youtube_search = ""
         self.kodi_payload = ""
@@ -90,6 +91,7 @@ class CPKodiSkill(CommonPlaySkill):
                 self.kodi_path = "http://" + kodi_user + ":" + kodi_pass + "@" + kodi_ip + ":" + str(kodi_port) + \
                                  "/jsonrpc"
                 LOG.info(self.kodi_path)
+                self.kodi_image_path = "http://" + kodi_ip + ":" + kodi_port + "/image/"
                 self._is_setup = True
         except Exception as e:
             LOG.error(e)
@@ -199,6 +201,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_type = None
             request_item = None
         return request_item, request_type  # returns the request details and the request type
+
 
     def CPS_match_query_phrase(self, phrase):
         """
