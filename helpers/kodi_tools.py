@@ -171,3 +171,61 @@ def format_image_url(raw_url):
     clean_url = clean_url.replace('/', '%252f')
     clean_url = clean_url.replace(' ', '%2520')
     return clean_url
+
+
+def clear_playlist(kodi_path):
+    json_header = {'content-type': 'application/json'}
+    method = "Playlist.Clear"
+    kodi_payload = {
+        "jsonrpc": "2.0",
+        "method": method,
+        "id": 1,
+        "params": {
+            "playlistid": 1
+        }
+    }
+    try:
+        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+    except Exception as e:
+        return e
+
+
+# add the songid to the active playlist songid is an integer
+def add_song_playlist(kodi_path, songid):
+    json_header = {'content-type': 'application/json'}
+    method = "Playlist.Add"
+    kodi_payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": method,
+        "params": {
+            "playlistid": 1,
+            "item": {
+                "songid": songid
+            }
+        }
+    }
+    try:
+        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+    except Exception as e:
+        return e
+
+
+def play_normal(kodi_path):
+    json_header = {'content-type': 'application/json'}
+    method = "player.open"
+    kodi_payload = {
+        "jsonrpc": "2.0",
+        "method": method,
+        "params": {
+            "item": {
+                "playlistid": 1
+            }
+        },
+        "id": 1
+    }
+    try:
+        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload),headers=json_header)
+    except Exception as e:
+        return e
+

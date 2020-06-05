@@ -239,7 +239,16 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('cpKodi Library: ' + str(data["library"]))
         LOG.info('cpKodi Request: ' + str(data["request"]))
         LOG.info('cpKodi Type: ' + str(data["type"]))
+        self.queue_and_play_music(data["library"])
         pass
+
+    def queue_and_play_music(self, music_playlist):
+        kodi_tools.clear_playlist(self.kodi_path)
+        self.music_dict = []
+        for each_song in music_playlist:
+            LOG.info("Adding to Kodi Playlist: " + str(each_song["label"]) +", ID: "+ str(each_song["songid"]))
+            self.add_song_playlist(each_song["songid"])
+        self.play_normal()
 
 
 def create_skill():
