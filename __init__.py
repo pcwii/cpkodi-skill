@@ -16,28 +16,10 @@ class CPKodiSkill(CommonPlaySkill):
         super(CPKodiSkill, self).__init__('CPKodiSkill')
         self.kodi_path = ""
         self.kodi_image_path = ""
-        self.youtube_id = []
-        self.youtube_search = ""
-        self.kodi_payload = ""
-        self.cv_payload = ""
-        self.list_payload = ""
-        self.json_header = {'content-type': 'application/json'}
-        self.json_response = ""
-        self.cv_response = ""
-        self.list_response = ""
         self._is_setup = False
-        self.playing_status = False
         self.notifier_bool = False
-        self.movie_list = []
         self.regexes = {}
-        self.movie_index = 0
-        self.cv_request = False
-        self.use_cv = False
-        self.device_list = ['chromecast', 'kodi'] #list the devices that can operate this skill
-        self.remote_sources = ['youtube', "you tube"]
-        self.remote_match = False
-        self.device_match = False
-        self.settings_change_callback = self.on_websettings_changed
+        #self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
         self.load_data_files(dirname(__file__))
