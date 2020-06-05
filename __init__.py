@@ -29,6 +29,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.playing_status = False
         self.notifier_bool = False
         self.movie_list = []
+        self.regexes = {}
         self.movie_index = 0
         self.cv_request = False
         self.use_cv = False
