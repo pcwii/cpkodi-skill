@@ -153,17 +153,16 @@ class CPKodiSkill(CommonPlaySkill):
     def translate_regex(self, regex):
         # opens the file
         self.regexes = {}
-        LOG.info('Regex is checking the following file ' + str(regex))
         if regex not in self.regexes:
             path = self.find_resource(regex + '.regex')
             if path:
-                LOG.info('The regex file: ' + str(path) + ', was found!')
                 with open(path) as f:
                     string = f.read().strip()
-                LOG.info('returning the following regex: ' + str(string))
                 self.regexes[regex] = string
             else:
-                LOG.info('The regex file: ' + str(path) + ', was not found')
+                return None
+        else:
+            return None
         return self.regexes[regex]
 
     def get_request_details(self, phrase):
@@ -242,9 +241,9 @@ class CPKodiSkill(CommonPlaySkill):
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
         """
-        LOG.info('Ready to Play: ' + data["library"])
-        LOG.info('Ready to Play: ' + data["request"])
-        LOG.info('Ready to Play: ' + data["type"])
+        LOG.info('Ready to Play: ' + str(data["library"]))
+        LOG.info('Ready to Play: ' + str(data["request"]))
+        LOG.info('Ready to Play: ' + str(data["type"]))
         pass
 
 
