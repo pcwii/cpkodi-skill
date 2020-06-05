@@ -207,15 +207,9 @@ class CPKodiSkill(CommonPlaySkill):
             if "movie" in request_type:
                 results = kodi_tools.get_requested_movies(self.kodi_path, request_item)
                 LOG.info("Possible movies matches are: " + str(results))
-            if "album" in request_type:
-                results = None
+            if ("album" in request_type) or ("song" in request_type) or ("artist" in request_type):
+                results = kodi_tools.get_requested_music(self.kodi_path, request_item, request_type)
                 LOG.info("Searching for albums")
-            if "song" in request_type:
-                results = None
-                LOG.info("Searching for songs")
-            if "artist" in request_type:
-                results = None
-                LOG.info("Searching for Artist")
             if results is None:
                 return None  # no match found by this skill
             else:
@@ -241,9 +235,9 @@ class CPKodiSkill(CommonPlaySkill):
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
         """
-        LOG.info('Ready to Play: ' + str(data["library"]))
-        LOG.info('Ready to Play: ' + str(data["request"]))
-        LOG.info('Ready to Play: ' + str(data["type"]))
+        LOG.info('cpKodi Library: ' + str(data["library"]))
+        LOG.info('cpKodi Request: ' + str(data["request"]))
+        LOG.info('cpKodi Type: ' + str(data["type"]))
         pass
 
 
