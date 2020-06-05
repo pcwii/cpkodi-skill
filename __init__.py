@@ -160,6 +160,7 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info('The regex file: ' + str(path) + ', was found!')
                 with open(path) as f:
                     string = f.read().strip()
+                LOG.info('returning the following regex: ' + str(string))
                 self.regexes[regex] = string
             else:
                 LOG.info('The regex file: ' + str(path) + ', was not found')
