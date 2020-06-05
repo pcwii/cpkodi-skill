@@ -193,7 +193,7 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         try:
             request_item, request_type = self.get_request_details(phrase)  # extract the movie name from the phrase
-            LOG.info("Requested search: " + request_item + ", of type: " + request_type)
+            LOG.info("Requested search: " + str(request_item) + ", of type: " + str(request_type))
             if "movie" in request_type:
                 results = kodi_tools.get_requested_movies(self.kodi_path, request_item)
                 LOG.info("Possible movies matches are: " + str(results))
@@ -224,7 +224,7 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('An error was detected in: CPS_match_query_phrase')
             LOG.error(e)
             self.on_websettings_changed()
-            return None  # until a match is found
+            #return None  # until a match is found
 
     def CPS_start(self, phrase, data):
         """ Starts playback.
