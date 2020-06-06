@@ -191,7 +191,7 @@ def clear_playlist(kodi_path):
 
 
 # add the songid to the active playlist songid is an integer
-def add_song_playlist(kodi_path, songid):
+def add_song_playlist(kodi_path, songid_dict):
     json_header = {'content-type': 'application/json'}
     method = "Playlist.Add"
     kodi_payload = {
@@ -201,7 +201,7 @@ def add_song_playlist(kodi_path, songid):
         "params": {
             "playlistid": 1,
             "item": {
-                "songid": songid
+                "songid": songid_dict
             }
         }
     }

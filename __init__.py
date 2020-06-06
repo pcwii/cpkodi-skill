@@ -244,10 +244,12 @@ class CPKodiSkill(CommonPlaySkill):
 
     def queue_and_play_music(self, music_playlist):
         kodi_tools.clear_playlist(self.kodi_path)
-        self.music_dict = []
+        playlist_dict = []
         for each_song in music_playlist:
-            LOG.info("Adding to Kodi Playlist: " + str(each_song["label"]) +", ID: "+ str(each_song["songid"]))
-            self.add_song_playlist(each_song["songid"])
+            song_id = str(each_song["songid"])
+            playlist_dict.append(song_id)
+        LOG.info("Adding to Kodi Playlist: " + str(playlist_dict))
+        kodi_tools.add_song_playlist(self.kodi_path, playlist_dict)
         self.play_normal()
 
 
