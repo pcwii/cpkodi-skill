@@ -250,7 +250,7 @@ class CPKodiSkill(CommonPlaySkill):
             playlist_dict.append(song_id)
         LOG.info("Adding to Kodi Playlist: " + str(playlist_dict))
         result = kodi_tools.add_song_playlist(self.kodi_path, playlist_dict)
-        self.play_normal()
+        #self.play_normal()
 
 
 def create_skill():

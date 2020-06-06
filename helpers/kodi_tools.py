@@ -3,6 +3,7 @@ import json
 import re
 import urllib.parse
 
+
 def get_requested_movies(kodi_path, search_item):
     """
         Searches the Kodi Library for movies that contain all the words in movie_name
@@ -35,7 +36,7 @@ def get_requested_movies(kodi_path, search_item):
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
         movie_list = json.loads(kodi_response.text)["result"]["movies"]
-        ## remove duplicates
+        # remove duplicates
         clean_list = []  # this is a dict
         for each_movie in movie_list:
             movie_title = str(each_movie['label'])
@@ -89,7 +90,7 @@ def get_requested_music(kodi_path, search_item, search_type):
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
         song_list = json.loads(kodi_response.text)["result"]["songs"]
-        ## remove duplicates
+        # remove duplicates
         clean_list = []  # this is a dict
         for each_song in song_list:
             song_title = str(each_song['label'])
