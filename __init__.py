@@ -239,7 +239,7 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('cpKodi Request: ' + str(data["request"]))
         LOG.info('cpKodi Type: ' + str(data["type"]))
         self.queue_and_play_music(data["library"])
-        pass
+        #pass
 
     def queue_and_play_music(self, music_playlist):
         LOG.info(str(music_playlist))
