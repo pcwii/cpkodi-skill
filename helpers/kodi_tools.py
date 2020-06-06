@@ -4,6 +4,24 @@ import re
 import urllib.parse
 
 
+def playlist_clear(kodi_path):
+    json_header = {'content-type': 'application/json'}
+    method = "Playlist.Clear"
+    kodi_payload = {
+        "jsonrpc": "2.0",
+        "method": method,
+        "id": 1,
+        "params": {
+            "playlistid": 1
+        }
+    }
+    try:
+        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        return json.loads(kodi_response.text)["result"]
+    except Exception as e:
+        return e
+
+
 def get_requested_movies(kodi_path, search_item):
     """
         Searches the Kodi Library for movies that contain all the words in movie_name
@@ -174,22 +192,6 @@ def format_image_url(raw_url):
     return clean_url
 
 
-def playlist_clear(kodi_path):
-    json_header = {'content-type': 'application/json'}
-    method = "Playlist.Clear"
-    kodi_payload = {
-        "jsonrpc": "2.0",
-        "method": method,
-        "id": 1,
-        "params": {
-            "playlistid": 1
-        }
-    }
-    try:
-        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
-        return json.loads(kodi_response.text)["result"]
-    except Exception as e:
-        return e
 
 
 # add the songid to the active playlist songid is an integer
