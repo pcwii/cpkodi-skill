@@ -229,7 +229,6 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('An error was detected in: CPS_match_query_phrase')
             LOG.error(e)
             self.on_websettings_changed()
-            #return None  # until a match is found
 
     def CPS_start(self, phrase, data):
         """ Starts playback.
@@ -244,13 +243,13 @@ class CPKodiSkill(CommonPlaySkill):
 
     def queue_and_play_music(self, music_playlist):
         LOG.info(str(music_playlist))
-        kodi_tools.clear_playlist(self.kodi_path)
+        result = kodi_tools.clear_playlist(self.kodi_path)
         playlist_dict = []
         for each_song in music_playlist:
             song_id = str(each_song["songid"])
             playlist_dict.append(song_id)
         LOG.info("Adding to Kodi Playlist: " + str(playlist_dict))
-        kodi_tools.add_song_playlist(self.kodi_path, playlist_dict)
+        result = kodi_tools.add_song_playlist(self.kodi_path, playlist_dict)
         self.play_normal()
 
 
