@@ -1,5 +1,6 @@
 import pychromecast
 from pychromecast.controllers.youtube import YouTubeController
+import time
 
 
 # send a URI to Chromecast and play
@@ -7,7 +8,6 @@ def cast_link(source_link, device_ip):
     cast = pychromecast.Chromecast(device_ip)
     cast.wait()
     mc = cast.media_controller
-    LOG.info(source_link)
     mc.play_media(source_link, 'video/mp4')
     time.sleep(7)  # wait for CC to be ready to play
     mc.block_until_active()

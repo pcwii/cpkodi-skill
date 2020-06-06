@@ -5,7 +5,7 @@ from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.util.log import LOG
 from adapt.intent import IntentBuilder
 
-import helpers as Kodi
+import helpers as kodi
 
 _author__ = 'PCWii'
 # Release - '20200603 - Covid-19 Build'
@@ -19,7 +19,7 @@ class CPKodiSkill(CommonPlaySkill):
         self._is_setup = False
         self.notifier_bool = False
         self.regexes = {}
-        #self.settings_change_callback = self.on_websettings_changed
+        # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
         self.load_data_files(dirname(__file__))
@@ -67,7 +67,7 @@ class CPKodiSkill(CommonPlaySkill):
         kodi_pass = self.settings.get("kodi_pass", "")
         try:
             if kodi_ip and kodi_port:
-                kodi_ip = self.settings["kodi_ip"  ]
+                kodi_ip = self.settings["kodi_ip"]
                 kodi_port = self.settings["kodi_port"]
                 kodi_user = self.settings["kodi_user"]
                 kodi_pass = self.settings["kodi_pass"]
@@ -191,11 +191,11 @@ class CPKodiSkill(CommonPlaySkill):
             request_item = None
         return request_item, request_type  # returns the request details and the request type
 
-
     def CPS_match_query_phrase(self, phrase):
         """
             The method is invoked by the PlayBackControlSkill.
         """
+        results = None
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         try:
             request_item, request_type = self.get_request_details(phrase)  # extract the movie name from the phrase
@@ -205,10 +205,10 @@ class CPKodiSkill(CommonPlaySkill):
             else:
                 LOG.info("Requested search: " + str(request_item) + ", of type: " + str(request_type))
             if "movie" in request_type:
-                results = Kodi.get_requested_movies(self.kodi_path, request_item)
+                results = kodi.get_requested_movies(self.kodi_path, request_item)
                 LOG.info("Possible movies matches are: " + str(results))
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
-                results = Kodi.get_requested_music(self.kodi_path, request_item, request_type)
+                results = kodi.get_requested_music(self.kodi_path, request_item, request_type)
                 LOG.info("Searching for music")
             if results is None:
                 LOG.info("Found Nothing!")
@@ -221,7 +221,7 @@ class CPKodiSkill(CommonPlaySkill):
                         "request": request_item,
                         "type": request_type
                     }
-                    LOG.info('Searching Kodi found a matching playable item!')
+                    LOG.info('Searching kodi found a matching playable item!')
                     return phrase, match_level, data
                 else:
                     return None  # until a match is found
@@ -235,23 +235,24 @@ class CPKodiSkill(CommonPlaySkill):
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
         """
-        LOG.info('cpKodi Library: ' + str(data["library"]))
-        LOG.info('cpKodi Request: ' + str(data["request"]))
-        LOG.info('cpKodi Type: ' + str(data["type"]))
+        LOG.info('cpkodi Library: ' + str(data["library"]))
+        LOG.info('cpkodi Request: ' + str(data["request"]))
+        LOG.info('cpkodi Type: ' + str(data["type"]))
         self.queue_and_play_music(data["library"])
-        #pass
+        # pass
 
     def queue_and_play_music(self, music_playlist):
         LOG.info(str(music_playlist))
         try:
-            result = Kodi.playlist_clear(self.kodi_path)
+            result = kodi.playlist_clear(self.kodi_path)
             playlist_dict = []
             for each_song in music_playlist:
                 song_id = str(each_song["songid"])
                 playlist_dict.append(song_id)
-            LOG.info("Adding to Kodi Playlist: " + str(playlist_dict))
-            result = Kodi.add_song_playlist(self.kodi_path, playlist_dict)
-            #self.play_normal()
+            LOG.info("Adding to kodi Playlist: " + str(playlist_dict))
+            result = kodi.add_song_playlist(self.kodi_path, playlist_dict)
+            # self.play_normal()
+            return result
         except Exception as e:
             LOG.info('An error was detected in: CPS_match_query_phrase')
             LOG.error(e)

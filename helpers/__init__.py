@@ -1,4 +1,4 @@
-from .kodi_tools import playlist_clear
+from .PlaylistClear import playlist_clear
 from .kodi_tools import get_requested_movies
 from .kodi_tools import get_requested_music
 from .kodi_tools import get_active_player
