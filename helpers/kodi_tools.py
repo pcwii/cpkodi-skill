@@ -174,7 +174,7 @@ def format_image_url(raw_url):
     return clean_url
 
 
-def clear_playlist(kodi_path):
+def playlist_clear(kodi_path):
     json_header = {'content-type': 'application/json'}
     method = "Playlist.Clear"
     kodi_payload = {

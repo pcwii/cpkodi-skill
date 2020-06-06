@@ -243,7 +243,7 @@ class CPKodiSkill(CommonPlaySkill):
 
     def queue_and_play_music(self, music_playlist):
         LOG.info(str(music_playlist))
-        #result = kodi_tools.clear_playlist(self.kodi_path)
+        result = kodi_tools.playlist_clear(self.kodi_path)
         #kodi_tools.clear_playlist(self.kodi_path)
         playlist_dict = []
         for each_song in music_playlist:
