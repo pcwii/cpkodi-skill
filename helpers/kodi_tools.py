@@ -4,7 +4,7 @@ import re
 import urllib.parse
 
 
-def playlist_clear(kodi_path):
+def playlist_clear(kodi_path, pl_id=1):
     json_header = {'content-type': 'application/json'}
     method = "Playlist.Clear"
     kodi_payload = {
@@ -12,7 +12,7 @@ def playlist_clear(kodi_path):
         "method": method,
         "id": 1,
         "params": {
-            "playlistid": 1
+            "playlistid": pl_id
         }
     }
     try:
