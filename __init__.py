@@ -206,6 +206,7 @@ class CPKodiSkill(CommonPlaySkill):
             else:
                 LOG.info("Requested search: " + str(request_item) + ", of type: " + str(request_type))
             if "movie" in request_type:
+                LOG.info("Calling get_requested_movies")
                 results = kodi_tools.get_requested_movies(self.kodi_path, request_item)
                 LOG.info("Possible movies matches are: " + str(results))
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
