@@ -3,6 +3,7 @@ import requests
 import json
 #import re
 import splitter
+# requires apt-get install libenchant1c2a
 
 def get_requested_movies(kodi_path, search_item):
     """

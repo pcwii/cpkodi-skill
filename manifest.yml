@@ -6,3 +6,5 @@ dependencies:
     - youtube_dl>=2019.9.1
     - pyenchant
     - compound-word-splitter
+  system:
+    apt-get: libenchant1c2a
