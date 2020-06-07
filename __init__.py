@@ -193,6 +193,12 @@ class CPKodiSkill(CommonPlaySkill):
             request_item = None
         return request_item, request_type  # returns the request details and the request type
 
+    def split_compound(self, sentance):
+        search_words = re.split(r'\W+', str(sentance))
+        separator = " "
+        words_list = splitter.split(separator.join(search_words))
+        return words_list
+
     def CPS_match_query_phrase(self, phrase):
         """
             The method is invoked by the PlayBackControlSkill.
@@ -207,8 +213,9 @@ class CPKodiSkill(CommonPlaySkill):
             else:
                 LOG.info("Requested search: " + str(request_item) + ", of type: " + str(request_type))
             if "movie" in request_type:
-                LOG.info("Calling get_requested_movies: " + str(request_item))
-                results = kodi_tools.get_requested_movies(self.kodi_path, request_item)
+                word_list = self.split_compound(request_item)
+                LOG.info(str(word_list))
+                results = kodi_tools.get_requested_movies(self.kodi_path, word_list)
                 LOG.info("Possible movies matches are: " + str(results))
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
                 results = kodi_tools.get_requested_music(self.kodi_path, request_item, request_type)
