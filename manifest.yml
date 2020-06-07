@@ -4,3 +4,5 @@ dependencies:
     - pychromecast
     - pafy>=0.5.4
     - youtube_dl>=2019.9.1
+    - pyenchant>=3.1.1
+    - compound-word-splitter>=0.4

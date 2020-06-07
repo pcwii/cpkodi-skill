@@ -1,8 +1,6 @@
 from os.path import dirname
 import re
 
-#import .kodi_tools
-#from kodi_tools import *
 from .kodi_tools import *
 
 from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
@@ -201,7 +199,7 @@ class CPKodiSkill(CommonPlaySkill):
         results = None
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         try:
-            request_item, request_type = self.get_request_details(phrase)  # extract the movie name from the phrase
+            request_item, request_type = self.get_request_details(phrase)  # extract the item name from the phrase
             if (request_item is None) or (request_type is None):
                 LOG.info('GetRequest returned None')
                 return None
