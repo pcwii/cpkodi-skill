@@ -5,21 +5,30 @@ import re
 import splitter
 # requires apt-get install libenchant1c2a
 
+
+def split_compound(mystring):
+    search_words = re.split(r'\W+', str(mystring))
+    separator = " "
+    mystring = splitter.split(separator.join(search_words))
+    return mystring
+
+
 def get_requested_movies(kodi_path, search_item):
     """
         Searches the Kodi Library for movies that contain all the words in movie_name
     """
     # search_words = splitter.split(str(search_item))
-    LOG.info("Searching Moviedb for: " + str(search_item))
-    LOG.info("May also look for: " + str(splitter.split(str(search_item))))
-    search_words = re.split(r'\W+', str(search_item))
+    #LOG.info("Searching Moviedb for: " + str(search_item))
+    #LOG.info("May also look for: " + str(splitter.split(str(search_item))))
+    #search_words = re.split(r'\W+', str(search_item))
+    search_words = split_compound(search_item)
     # Build the filter from each word in the movie_name
     filter_key = []
     for each_word in search_words:
         search_key = {
             "field": "title",
             "operator": "contains",
-            "value": each_word
+            "value": each_word.strip
         }
         filter_key.append(search_key)
     # Make the request
