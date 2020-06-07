@@ -1,7 +1,7 @@
 from mycroft.util.log import LOG
 import requests
 import json
-#import re
+import re
 import splitter
 # requires apt-get install libenchant1c2a
 
@@ -9,9 +9,10 @@ def get_requested_movies(kodi_path, search_item):
     """
         Searches the Kodi Library for movies that contain all the words in movie_name
     """
-    search_words = splitter.split(str(search_item))
-    LOG.info(str(search_words))
-    # search_words = re.split(r'\W+', str(search_item))
+    # search_words = splitter.split(str(search_item))
+    LOG.info("Searching Moviedb for: " + str(search_item))
+    LOG.info("May also look for: " + str(splitter.split(str(search_item))))
+    search_words = re.split(r'\W+', str(search_item))
     # Build the filter from each word in the movie_name
     filter_key = []
     for each_word in search_words:
