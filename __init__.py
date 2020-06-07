@@ -248,7 +248,12 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('cpkodi Library: ' + str(data["library"]))
         LOG.info('cpkodi Request: ' + str(data["request"]))
         LOG.info('cpkodi Type: ' + str(data["type"]))
-        self.queue_and_play_music(data["library"])
+        request_type = data["type"]
+        if "movie" in request_type:
+            LOG.info('Ready to Play Movie')
+        if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
+            LOG.info('Ready to Play Music')
+            self.queue_and_play_music(data["library"])
         # pass
 
     def queue_and_play_music(self, music_playlist):
