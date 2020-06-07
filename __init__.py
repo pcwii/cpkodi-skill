@@ -1,5 +1,6 @@
 from os.path import dirname
 import re
+import splitter
 
 from .kodi_tools import *
 
@@ -206,7 +207,7 @@ class CPKodiSkill(CommonPlaySkill):
             else:
                 LOG.info("Requested search: " + str(request_item) + ", of type: " + str(request_type))
             if "movie" in request_type:
-                LOG.info("Calling get_requested_movies")
+                LOG.info("Calling get_requested_movies: " + str(splitter.split(request_item)))
                 results = kodi_tools.get_requested_movies(self.kodi_path, request_item)
                 LOG.info("Possible movies matches are: " + str(results))
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
