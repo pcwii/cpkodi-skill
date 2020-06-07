@@ -2,6 +2,7 @@ from os.path import dirname
 import re
 
 import kodi_tools
+#from kodi_tools import *
 
 from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.util.log import LOG
