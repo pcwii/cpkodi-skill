@@ -5,7 +5,7 @@ from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.util.log import LOG
 from adapt.intent import IntentBuilder
 
-import kodi_tools as kodi
+import kodi_tools
 
 _author__ = 'PCWii'
 # Release - '20200603 - Covid-19 Build'
@@ -205,10 +205,10 @@ class CPKodiSkill(CommonPlaySkill):
             else:
                 LOG.info("Requested search: " + str(request_item) + ", of type: " + str(request_type))
             if "movie" in request_type:
-                results = kodi.get_requested_movies(self.kodi_path, request_item)
+                results = kodi_tools.get_requested_movies(self.kodi_path, request_item)
                 LOG.info("Possible movies matches are: " + str(results))
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
-                results = kodi.get_requested_music(self.kodi_path, request_item, request_type)
+                results = kodi_tools.get_requested_music(self.kodi_path, request_item, request_type)
                 LOG.info("Searching for music")
             if results is None:
                 LOG.info("Found Nothing!")
@@ -244,13 +244,13 @@ class CPKodiSkill(CommonPlaySkill):
     def queue_and_play_music(self, music_playlist):
         LOG.info(str(music_playlist))
         try:
-            result = kodi.playlist_clear(self.kodi_path)
+            result = kodi_tools.playlist_clear(self.kodi_path)
             playlist_dict = []
             for each_song in music_playlist:
                 song_id = str(each_song["songid"])
                 playlist_dict.append(song_id)
             LOG.info("Adding to kodi Playlist: " + str(playlist_dict))
-            result = kodi.add_song_playlist(self.kodi_path, playlist_dict)
+            result = kodi_tools.add_song_playlist(self.kodi_path, playlist_dict)
             # self.play_normal()
             return result
         except Exception as e:
