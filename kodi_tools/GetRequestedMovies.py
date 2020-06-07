@@ -1,3 +1,4 @@
+from mycroft.util.log import LOG
 import requests
 import json
 #import re
@@ -8,6 +9,7 @@ def get_requested_movies(kodi_path, search_item):
         Searches the Kodi Library for movies that contain all the words in movie_name
     """
     search_words = splitter.split(str(search_item))
+    LOG.info(search_words)
     # search_words = re.split(r'\W+', str(search_item))
     # Build the filter from each word in the movie_name
     filter_key = []
