@@ -30,5 +30,3 @@ def add_playlist(kodi_path, songid_dict, media_type):
     except Exception as e:
         return e
 
-
-
