@@ -1,3 +1,4 @@
+# prepare all kodi Tools for use
 from .AddPlaylist import add_playlist
 from .GetActivePlayer import get_active_player
 from .GetPosterURL import get_poster_url

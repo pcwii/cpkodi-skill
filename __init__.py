@@ -270,7 +270,6 @@ class CPKodiSkill(CommonPlaySkill):
                 for each_item in playlist_items:
                     song_id = str(each_item["songid"])
                     playlist_dict.append(song_id)
-
             result = kodi_tools.playlist_clear(self.kodi_path, playlist_type)
             LOG.info("Clear Playlist Result: " + str(result))
             result = kodi_tools.add_playlist(self.kodi_path, playlist_dict, playlist_type)
