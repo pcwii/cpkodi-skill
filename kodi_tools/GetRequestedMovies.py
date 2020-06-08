@@ -37,9 +37,9 @@ def get_requested_movies(kodi_path, search_words):
     }
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
-        print(kodi_response.text)
+        LOG.info(kodi_response.text)
         movie_list = json.loads(kodi_response.text)["result"]["movies"]
-        print('GetReqeustedMovies found: ' + str(movie_list))
+        LOG.info('GetReqeustedMovies found: ' + str(movie_list))
         # remove duplicates
         clean_list = []  # this is a dict
         for each_movie in movie_list:
