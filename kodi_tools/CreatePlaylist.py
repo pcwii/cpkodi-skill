@@ -1,10 +1,11 @@
+from mycroft.util.log import LOG
 import requests
 import json
 
 
 # add the songid to the active playlist songid is an integer
 def create_playlist(kodi_path, songid_dict, media_type):
-    """
+
     if "movie" in media_type:
         pl_id = 1
     if ("album" in media_type) or ("title" in media_type) or ("artist" in media_type):
@@ -25,10 +26,9 @@ def create_playlist(kodi_path, songid_dict, media_type):
             }
         }
         kodi_payload.append(kodi_payload_item)
-        """
     try:
-        # kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
-        kodi_response = "This is a test"
+        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        LOG.info(kodi_response.text)
         return kodi_response
     except Exception as e:
         return e
