@@ -1,4 +1,4 @@
-from .AddSongPlaylist import add_song_playlist
+from .AddPlaylist import add_song_playlist
 from .GetActivePlayer import get_active_player
 from .GetPosterURL import get_poster_url
 from .GetRequestedMovies import get_requested_movies

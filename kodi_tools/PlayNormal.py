@@ -2,7 +2,11 @@ import requests
 import json
 
 
-def play_normal(kodi_path):
+def play_normal(kodi_path, media_type):
+    if "movie" in media_type:
+        pl_id = 1
+    if ("album" in media_type) or ("title" in media_type) or ("artist" in media_type):
+        pl_id = 0
     json_header = {'content-type': 'application/json'}
     method = "player.open"
     kodi_payload = {
@@ -10,7 +14,7 @@ def play_normal(kodi_path):
         "method": method,
         "params": {
             "item": {
-                "playlistid": 1
+                "playlistid": pl_id
             }
         },
         "id": 1

@@ -256,17 +256,27 @@ class CPKodiSkill(CommonPlaySkill):
             self.queue_and_play_music(data["library"])
         # pass
 
-    def queue_and_play_music(self, music_playlist):
-        LOG.info(str(music_playlist))
+    def queue_and_play(self, playlist_items, playlist_type):
+        LOG.info(str(playlist_items))
+        playlist_dict = []
         try:
-            result = kodi_tools.playlist_clear(self.kodi_path)
-            playlist_dict = []
-            for each_song in music_playlist:
-                song_id = str(each_song["songid"])
-                playlist_dict.append(song_id)
-            LOG.info("Adding to kodi Playlist: " + str(playlist_dict))
-            result = kodi_tools.add_song_playlist(self.kodi_path, playlist_dict)
-            # self.play_normal()
+            if "movie" in playlist_type:
+                LOG.info('Preparing to Play Movie')
+                for each_item in playlist_items:
+                    movie_id = str(each_item["movieid"])
+                    playlist_dict.append(movie_id)
+            if ("album" in playlist_type) or ("title" in playlist_type) or ("artist" in playlist_type):
+                LOG.info('Preparing to Play Music')
+                for each_item in playlist_items:
+                    song_id = str(each_item["songid"])
+                    playlist_dict.append(song_id)
+
+            result = kodi_tools.playlist_clear(self.kodi_path, playlist_type)
+            LOG.info("Clear Playlist Result: " + str(result))
+            result = kodi_tools.add_playlist(self.kodi_path, playlist_dict, playlist_type)
+            LOG.info("Add Playlist Result: " + str(result))
+            #result = kodi_tools.play_normal(self.kodi_path, playlist_type)
+            #LOG.info("Play Result: " + str(result))
             return result
         except Exception as e:
             LOG.info('An error was detected in: CPS_match_query_phrase')

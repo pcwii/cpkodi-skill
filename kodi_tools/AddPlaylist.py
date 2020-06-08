@@ -3,7 +3,11 @@ import json
 
 
 # add the songid to the active playlist songid is an integer
-def add_song_playlist(kodi_path, songid_dict):
+def add_song_playlist(kodi_path, songid_dict, media_type):
+    if "movie" in media_type:
+        pl_id = 1
+    if ("album" in media_type) or ("title" in media_type) or ("artist" in media_type):
+        pl_id = 0
     json_header = {'content-type': 'application/json'}
     method = "Playlist.Add"
     kodi_payload = []
@@ -13,7 +17,7 @@ def add_song_playlist(kodi_path, songid_dict):
             "id": 1,
             "method": method,
             "params": {
-                "playlistid": 1,
+                "playlistid": pl_id,
                 "item": {
                     "songid": each_id
                 }
