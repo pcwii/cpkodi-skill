@@ -3,7 +3,7 @@ import json
 
 
 # add the songid to the active playlist songid is an integer
-def add_playlist(kodi_path, songid_dict, media_type):
+def create_playlist(kodi_path, songid_dict, media_type):
     if "movie" in media_type:
         pl_id = 1
     if ("album" in media_type) or ("title" in media_type) or ("artist" in media_type):

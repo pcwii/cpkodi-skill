@@ -272,7 +272,7 @@ class CPKodiSkill(CommonPlaySkill):
                     playlist_dict.append(song_id)
             result = kodi_tools.playlist_clear(self.kodi_path, playlist_type)
             LOG.info("Clear Playlist Result: " + str(result))
-            result = kodi_tools.add_playlist(self.kodi_path, playlist_dict, playlist_type)
+            result = kodi_tools.create_playlist(self.kodi_path, playlist_dict, playlist_type)
             LOG.info("Add Playlist Result: " + str(result))
             #result = kodi_tools.play_normal(self.kodi_path, playlist_type)
             #LOG.info("Play Result: " + str(result))
