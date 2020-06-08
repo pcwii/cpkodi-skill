@@ -210,6 +210,7 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
             LOG.info('CPKodi Skill must be setup at the home.mycroft.ai')
+            self.on_websettings_changed()
             return None
         #try:
         if True:
