@@ -17,7 +17,7 @@ def get_requested_movies(kodi_path, search_words):
         search_key = {
             "field": "title",
             "operator": "contains",
-            "value": each_word.strip()
+            "value": str(each_word).strip()
         }
         filter_key.append(search_key)
     # Make the request
