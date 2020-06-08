@@ -6,7 +6,7 @@ import splitter
 # requires apt-get install libenchant1c2a
 
 
-def get_requested_movies(kodi_path, search_words_dict):
+def get_requested_movies(kodi_path, search_words):
     """
         Searches the Kodi Library for movies that contain all the words in movie_name
     """
