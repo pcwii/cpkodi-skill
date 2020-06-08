@@ -17,11 +17,11 @@ def get_requested_movies(kodi_path, search_words_dict):
     #search_words = split_compound(search_item)
     # Build the filter from each word in the movie_name
     filter_key = []
-    for each_word in search_words_dict:
+    for each_word in search_words:
         search_key = {
             "field": "title",
             "operator": "contains",
-            "value": each_word.strip
+            "value": each_word.strip()
         }
         filter_key.append(search_key)
     # Make the request
