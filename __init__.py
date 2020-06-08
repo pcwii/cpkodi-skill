@@ -205,7 +205,8 @@ class CPKodiSkill(CommonPlaySkill):
         """
         results = None
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
-        try:
+        #try:
+        if True:
             request_item, request_type = self.get_request_details(phrase)  # extract the item name from the phrase
             if (request_item is None) or (request_type is None):
                 LOG.info('GetRequest returned None')
@@ -235,10 +236,10 @@ class CPKodiSkill(CommonPlaySkill):
                     return phrase, match_level, data
                 else:
                     return None  # until a match is found
-        except Exception as e:
-            LOG.info('An error was detected in: CPS_match_query_phrase')
-            LOG.error(e)
-            self.on_websettings_changed()
+        #except Exception as e:
+        #    LOG.info('An error was detected in: CPS_match_query_phrase')
+        #    LOG.error(e)
+        #    self.on_websettings_changed()
 
     def CPS_start(self, phrase, data):
         """ Starts playback.
