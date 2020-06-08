@@ -208,6 +208,9 @@ class CPKodiSkill(CommonPlaySkill):
         """
         results = None
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
+        if not self._is_setup:
+            LOG.info('CPKodi Skill must be setup at the home.mycroft.ai')
+            return None
         #try:
         if True:
             request_item, request_type = self.get_request_details(phrase)  # extract the item name from the phrase
