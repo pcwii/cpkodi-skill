@@ -11,6 +11,7 @@ def get_requested_movies(kodi_path, search_words):
         Searches the Kodi Library for movies that contain all the words in movie_name
     """
     # Build the filter from each word in the movie_name
+    print('get_requested_movies searching for: ' + str(search_words))
     filter_key = []
     for each_word in search_words:
         search_key = {
@@ -35,6 +36,7 @@ def get_requested_movies(kodi_path, search_words):
         }
     }
     try:
+        print
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
         movie_list = json.loads(kodi_response.text)["result"]["movies"]
         print('GetReqeustedMovies found: ' + str(movie_list))
