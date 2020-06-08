@@ -1,7 +1,7 @@
 from os.path import dirname
 import re
 import splitter
-import importlib
+#import importlib
 
 from .kodi_tools import *
 
@@ -22,7 +22,7 @@ class CPKodiSkill(CommonPlaySkill):
         self._is_setup = False
         self.notifier_bool = False
         self.regexes = {}
-        importlib.reload(kodi_tools)
+        #importlib.reload(kodi_tools)
         # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
@@ -65,7 +65,7 @@ class CPKodiSkill(CommonPlaySkill):
     def on_websettings_changed(self):  # called when updating mycroft home page
         # if not self._is_setup:
         LOG.info('Websettings have changed! Updating path data')
-        importlib.reload(kodi_tools)
+        # importlib.reload(kodi_tools)
         kodi_ip = self.settings.get("kodi_ip", "192.168.0.32")
         kodi_port = self.settings.get("kodi_port", "8080")
         kodi_user = self.settings.get("kodi_user", "")
