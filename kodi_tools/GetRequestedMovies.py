@@ -10,11 +10,6 @@ def get_requested_movies(kodi_path, search_words):
     """
         Searches the Kodi Library for movies that contain all the words in movie_name
     """
-    # search_words = splitter.split(str(search_item))
-    #LOG.info("Searching Moviedb for: " + str(search_item))
-    #LOG.info("May also look for: " + str(splitter.split(str(search_item))))
-    #search_words = re.split(r'\W+', str(search_item))
-    #search_words = split_compound(search_item)
     # Build the filter from each word in the movie_name
     filter_key = []
     for each_word in search_words:
