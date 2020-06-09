@@ -1,21 +1,24 @@
 from mycroft.util.log import LOG
-import json
 import requests
+import json
 
 
-def get_active_player(kodi_path):
+def stop_kodi(kodi_path, player_id=1):
+    """
+     Must perform a GetActivePlayer to retrieve player_id
+    """
     json_header = {'content-type': 'application/json'}
-    method = "Player.GetActivePlayers"
+    method = "Player.Stop"
     kodi_payload = {
         "jsonrpc": "2.0",
         "method": method,
+        "params": {
+            "playerid": int(player_id)
+        },
         "id": 1
     }
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
-        active_player_id = json.loads(kodi_response.text)["result"][0]["playerid"]
-        active_player_type = json.loads(kodi_response.text)["result"][0]["type"]
-        return active_player_id, active_player_type
+        LOG.info(kodi_response.text)
     except Exception as e:
-        # print(e)
-        return e
+        LOG.error(e)

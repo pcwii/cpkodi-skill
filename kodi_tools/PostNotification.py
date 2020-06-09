@@ -3,19 +3,23 @@ import json
 import requests
 
 
-def get_active_player(kodi_path):
+def post_notification(kodi_path, message):
     json_header = {'content-type': 'application/json'}
-    method = "Player.GetActivePlayers"
+    method = "GUI.ShowNotification"
+    display_timeout = 5000
     kodi_payload = {
         "jsonrpc": "2.0",
         "method": method,
+        "params": {
+            "title": "Kelsey.AI",
+            "message": str(message),
+            "displaytime": display_timeout,
+        },
         "id": 1
     }
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
-        active_player_id = json.loads(kodi_response.text)["result"][0]["playerid"]
-        active_player_type = json.loads(kodi_response.text)["result"][0]["type"]
-        return active_player_id, active_player_type
+        LOG.info(kodi_response.text)
+        return kodi_response
     except Exception as e:
-        # print(e)
-        return e
+        LOG.error(e)

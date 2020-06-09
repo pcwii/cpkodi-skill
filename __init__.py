@@ -86,7 +86,7 @@ class CPKodiSkill(CommonPlaySkill):
         voice_payload = "Listening"
         if self.notifier_bool:
             try:
-                self.post_kodi_notification(voice_payload)
+                kodi_tools.post_notification(self.kodi_path, voice_payload)
             except Exception as e:
                 LOG.info('An error was detected in: handle_listen')
                 LOG.error(e)
@@ -98,7 +98,7 @@ class CPKodiSkill(CommonPlaySkill):
         voice_payload = utterance
         if self.notifier_bool:
             try:
-                self.post_kodi_notification(voice_payload)
+                kodi_tools.post_notification(self.kodi_path, voice_payload)
             except Exception as e:
                 LOG.info('An error was detected in: handle_utterance')
                 LOG.error(e)
@@ -109,7 +109,7 @@ class CPKodiSkill(CommonPlaySkill):
         voice_payload = message.data.get('utterance')
         if self.notifier_bool:
             try:
-                self.post_kodi_notification(voice_payload)
+                kodi_tools.post_notification(self.kodi_path, voice_payload)
             except Exception as e:
                 LOG.info('An error was detected in: handle_speak')
                 LOG.error(e)
@@ -145,12 +145,12 @@ class CPKodiSkill(CommonPlaySkill):
     # turn notifications on requested in the utterance
     def handle_notification_on_intent(self, message):
         self.notifier_bool = True
-        self.speak_dialog("notification", data={"result": "On"})
+        self.speak_dialog("notification.on")
 
     # turn notifications off requested in the utterance
     def handle_notification_off_intent(self, message):
         self.notifier_bool = False
-        self.speak_dialog("notification", data={"result": "Off"})
+        self.speak_dialog("notification.off")
 
     def translate_regex(self, regex):
         """
