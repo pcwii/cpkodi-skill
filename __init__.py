@@ -7,6 +7,8 @@ from .kodi_tools import *
 from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.util.log import LOG
 from adapt.intent import IntentBuilder
+from mycroft.skills.core import intent_handler, intent_file_handler
+
 
 
 _author__ = 'PCWii'
@@ -118,7 +120,11 @@ class CPKodiSkill(CommonPlaySkill):
     # stop film was requested in the utterance
     def handle_stop_intent(self, message):
         try:
-            self.stop_all()
+            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+            if active_player_id:
+                result = kodi_tools.stop_kodi(self.kodi_path, active_player_id)
+            else:
+                LOG.info('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
             LOG.info('An error was detected in: handle_stop_intent')
             LOG.error(e)
@@ -127,7 +133,11 @@ class CPKodiSkill(CommonPlaySkill):
     # pause film was requested in the utterance
     def handle_pause_intent(self, message):
         try:
-            self.pause_all()
+            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+            if active_player_id:
+                result = kodi_tools.pause_all(self.kodi_path, active_player_id)
+            else:
+                LOG.info('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
             LOG.info('An error was detected in: handle_pause_intent')
             LOG.error(e)
@@ -136,7 +146,11 @@ class CPKodiSkill(CommonPlaySkill):
     # resume the film was requested in the utterance
     def handle_resume_intent(self, message):
         try:
-            self.resume_all()
+            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+            if active_player_id:
+                result = kodi_tools.resume_play(self.kodi_path, active_player_id)
+            else:
+                LOG.info('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
             LOG.info('An error was detected in: handle_resume_intent')
             LOG.error(e)
