@@ -7,7 +7,9 @@ from .kodi_tools import *
 from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.util.log import LOG
 from adapt.intent import IntentBuilder
-from mycroft.skills.core import intent_handler, intent_file_handler
+from mycroft.skills.core import intent_handler
+from mycroft.messagebus import Message
+from mycroft.util.parse import match_one, fuzzy_match
 
 
 
@@ -31,36 +33,6 @@ class CPKodiSkill(CommonPlaySkill):
         self.add_event('recognizer_loop:wakeword', self.handle_listen)
         self.add_event('recognizer_loop:utterance', self.handle_utterance)
         self.add_event('speak', self.handle_speak)
-        """
-           All basic intents are added here
-           These are non cps intents 
-        """
-        # eg. stop the movie
-        stop_intent = IntentBuilder("StopIntent"). \
-            require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword").build()
-        self.register_intent(stop_intent, self.handle_stop_intent)
-
-        # eg. pause the movie
-        pause_intent = IntentBuilder("PauseIntent"). \
-            require("PauseKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword").build()
-        self.register_intent(pause_intent, self.handle_pause_intent)
-
-        # eg. resume (unpause) the movie
-        resume_intent = IntentBuilder("ResumeIntent"). \
-            require("ResumeKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword").build()
-        self.register_intent(resume_intent, self.handle_resume_intent)
-
-        # eg. turn kodi notifications on
-        notification_on_intent = IntentBuilder("NotifyOnIntent"). \
-            require("NotificationKeyword").require("OnKeyword"). \
-            require("KodiKeyword").build()
-        self.register_intent(notification_on_intent, self.handle_notification_on_intent)
-
-        # eg. turn kodi notifications off
-        notification_off_intent = IntentBuilder("NotifyOffIntent"). \
-            require("NotificationKeyword").require("OffKeyword"). \
-            require("KodiKeyword").build()
-        self.register_intent(notification_off_intent, self.handle_notification_off_intent)
 
     def on_websettings_changed(self):  # called when updating mycroft home page
         # if not self._is_setup:
@@ -118,6 +90,7 @@ class CPKodiSkill(CommonPlaySkill):
                 self.on_websettings_changed()
 
     # stop film was requested in the utterance
+    @intent_handler(IntentBuilder('').require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_stop_intent(self, message):
         try:
             active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
@@ -131,6 +104,7 @@ class CPKodiSkill(CommonPlaySkill):
             self.on_websettings_changed()
 
     # pause film was requested in the utterance
+    @intent_handler(IntentBuilder('').require("PauseKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_pause_intent(self, message):
         try:
             active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
@@ -144,6 +118,7 @@ class CPKodiSkill(CommonPlaySkill):
             self.on_websettings_changed()
 
     # resume the film was requested in the utterance
+    @intent_handler(IntentBuilder('').require("ResumeKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_resume_intent(self, message):
         try:
             active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
@@ -157,11 +132,13 @@ class CPKodiSkill(CommonPlaySkill):
             self.on_websettings_changed()
 
     # turn notifications on requested in the utterance
+    @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OnKeyword").require("KodiKeyword"))
     def handle_notification_on_intent(self, message):
         self.notifier_bool = True
         self.speak_dialog("notification.on")
 
     # turn notifications off requested in the utterance
+    @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OffKeyword").require("KodiKeyword"))
     def handle_notification_off_intent(self, message):
         self.notifier_bool = False
         self.speak_dialog("notification.off")
