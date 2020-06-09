@@ -9,15 +9,14 @@ import splitter
 def get_requested_movies(kodi_path, search_words):
     """
         Searches the Kodi Library for movies that contain all the words in movie_name
+        first we build a filter that contains each word in the requested phrase
     """
-    # Build the filter from each word in the movie_name
-    LOG.info('get_requested_movies searching for: ' + str(search_words))
     filter_key = []
     for each_word in search_words:
         search_key = {
             "field": "title",
             "operator": "contains",
-            "value": each_word
+            "value": each_word.strip()
         }
         filter_key.append(search_key)
     # Make the request
@@ -29,6 +28,9 @@ def get_requested_movies(kodi_path, search_words):
         "id": 1,
         "params": {
             "properties": [
+                "file",
+                "thumbnail",
+                "fanart"
             ],
             "filter": {
                 "and": filter_key
@@ -46,7 +48,10 @@ def get_requested_movies(kodi_path, search_words):
             movie_title = str(each_movie['label'])
             info = {
                 "label": each_movie['label'],
-                "movieid": each_movie['movieid']
+                "movieid": each_movie['movieid'],
+                "fanart": each_movie['fanart'],
+                "thumbnail": each_movie['thumbnail'],
+                "filename": each_movie['file']
             }
             if movie_title.lower() not in str(clean_list).lower():
                 clean_list.append(info)
@@ -59,3 +64,55 @@ def get_requested_movies(kodi_path, search_words):
     except Exception as e:
         print(e)
         return None
+
+
+def get_movie_properties(kodi_path, movieID):
+    method = "VideoLibrary.GetMovieDetails"
+    kodi_payload = {
+        "jsonrpc": "2.0",
+        "method": method,
+        "id": 1,
+        "params": {"movieid": movieID,
+                   "properties": [
+                       "art",
+                       #"cast",
+                       #"dateadded",
+                       #"director",
+                       "fanart",
+                       "file",
+                       #"genre",
+                       #"imdbnumber",
+                       #"lastplayed",
+                       #"mpaa",
+                       #"originaltitle",
+                       #"playcount",
+                       #"plot",
+                       #"plotoutline",
+                       #"premiered",
+                       #"rating",
+                       #"runtime",
+                       #"resume",
+                       #"setid",
+                       #"sorttitle",
+                       #"streamdetails",
+                       #"studio",
+                       #"tagline",
+                       "thumbnail",
+                       #"title",
+                       #"trailer",
+                       #"userrating",
+                       #"votes",
+                       #"writer"
+                   ],
+                   }
+    }
+    try:
+        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        movie_path = json.loads(kodi_response.text)["result"]["moviedetails"]["file"]
+        basePath = 'http://'+kodi_ip+':'+kodi_port+'/vfs/'
+        url_path = basePath + urllib.parse.quote(movie_path, safe='')
+        print(url_path)
+        return url_path
+    except Exception as e:
+        print(e)
+        return "NONE"

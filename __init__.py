@@ -1,7 +1,6 @@
 from os.path import dirname
 import re
 import splitter
-#import importlib
 
 from .kodi_tools import *
 
@@ -22,7 +21,6 @@ class CPKodiSkill(CommonPlaySkill):
         self._is_setup = False
         self.notifier_bool = False
         self.regexes = {}
-        #importlib.reload(kodi_tools)
         # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
@@ -65,7 +63,6 @@ class CPKodiSkill(CommonPlaySkill):
     def on_websettings_changed(self):  # called when updating mycroft home page
         # if not self._is_setup:
         LOG.info('Websettings have changed! Updating path data')
-        # importlib.reload(kodi_tools)
         kodi_ip = self.settings.get("kodi_ip", "192.168.0.32")
         kodi_port = self.settings.get("kodi_port", "8080")
         kodi_user = self.settings.get("kodi_user", "")
@@ -156,7 +153,10 @@ class CPKodiSkill(CommonPlaySkill):
         self.speak_dialog("notification", data={"result": "Off"})
 
     def translate_regex(self, regex):
-        # opens the file
+        """
+            All requests types are added here and return the requested items
+            A <item>.type.regex should exist in the local/en-us
+        """
         self.regexes = {}
         if regex not in self.regexes:
             path = self.find_resource(regex + '.regex')
@@ -172,8 +172,8 @@ class CPKodiSkill(CommonPlaySkill):
 
     def get_request_details(self, phrase):
         """
-            All requests types are added here and return the requested items
-            A <item>.type.regex should exist in the local/en-us
+            matches the phrase against a series of regex's
+            all files are .regex
         """
         album_type = re.match(self.translate_regex('album.type'), phrase)
         artist_type = re.match(self.translate_regex('artist.type'), phrase)
@@ -197,6 +197,10 @@ class CPKodiSkill(CommonPlaySkill):
         return request_item, request_type  # returns the request details and the request type
 
     def split_compound(self, sentance):
+        """
+            Used to split compound words that are found in the utterance
+            This will make it easier to confirm that all words are found in the search
+        """
         search_words = re.split(r'\W+', str(sentance))
         separator = " "
         words_list = splitter.split(separator.join(search_words))
@@ -212,8 +216,7 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('CPKodi Skill must be setup at the home.mycroft.ai')
             self.on_websettings_changed()
             return None
-        #try:
-        if True:
+        try:
             request_item, request_type = self.get_request_details(phrase)  # extract the item name from the phrase
             if (request_item is None) or (request_type is None):
                 LOG.info('GetRequest returned None')
@@ -243,10 +246,10 @@ class CPKodiSkill(CommonPlaySkill):
                     return phrase, match_level, data
                 else:
                     return None  # until a match is found
-        #except Exception as e:
-        #    LOG.info('An error was detected in: CPS_match_query_phrase')
-        #    LOG.error(e)
-        #    self.on_websettings_changed()
+        except Exception as e:
+            LOG.info('An error was detected in: CPS_match_query_phrase')
+            LOG.error(e)
+            self.on_websettings_changed()
 
     def CPS_start(self, phrase, data):
         """ Starts playback.
