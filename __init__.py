@@ -161,6 +161,7 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_move_cursor_intent(self, message):  # a request was made to move the kodi cursor
         self.set_context('MoveKeyword', 'move')  # in future the user does not have to say the move keyword
         self.set_context('CursorKeyword', 'cursor')  # in future the user does not have to say the cursor keyword
+        direction_kw = None
         if "UpKeyword" in message.data:
             direction_kw = "Up"  # these english words are required by the kodi api
         if "DownKeyword" in message.data:
