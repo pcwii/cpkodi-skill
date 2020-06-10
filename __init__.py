@@ -7,7 +7,7 @@ from .kodi_tools import *
 from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.util.log import LOG
 from adapt.intent import IntentBuilder
-from mycroft.skills.core import intent_handler
+from mycroft.skills.core import intent_handler, intent_file_handler
 from mycroft.messagebus import Message
 from mycroft.util.parse import match_one, fuzzy_match
 
@@ -90,7 +90,7 @@ class CPKodiSkill(CommonPlaySkill):
                 self.on_websettings_changed()
 
     # stop film was requested in the utterance
-    @intent_handler(IntentBuilder('').require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
+    @intent_handler(IntentBuilder("").require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_stop_intent(self, message):
         try:
             active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
@@ -104,7 +104,7 @@ class CPKodiSkill(CommonPlaySkill):
             self.on_websettings_changed()
 
     # pause film was requested in the utterance
-    @intent_handler(IntentBuilder('').require("PauseKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
+    @intent_handler(IntentBuilder("").require("PauseKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_pause_intent(self, message):
         try:
             active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
