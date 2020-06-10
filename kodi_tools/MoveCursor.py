@@ -3,22 +3,18 @@ import json
 import requests
 
 
-def post_notification(kodi_path, message):
+# activate the kodi root menu system
+def move_cursor(kodi_path, direction_kw):
     json_header = {'content-type': 'application/json'}
-    method = "GUI.ShowNotification"
-    display_timeout = 5000
+    method = "Input." + direction_kw
     kodi_payload = {
         "jsonrpc": "2.0",
         "method": method,
-        "params": {
-            "title": "Kelsey.AI",
-            "message": str(message),
-            "displaytime": display_timeout,
-        },
         "id": 1
     }
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
         return kodi_response
     except Exception as e:
-        return e
+        LOG.error(e)
+        return None

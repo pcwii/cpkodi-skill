@@ -20,5 +20,6 @@ def stop_kodi(kodi_path, player_id=1):
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
         LOG.info(kodi_response.text)
+        return kodi_response
     except Exception as e:
         LOG.error(e)

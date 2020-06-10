@@ -1,6 +1,7 @@
 from os.path import dirname
 import re
 import splitter
+import time
 
 from .kodi_tools import *
 
@@ -109,6 +110,9 @@ class CPKodiSkill(CommonPlaySkill):
             active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
             if active_player_id:
                 result = kodi_tools.pause_all(self.kodi_path, active_player_id)
+                if "OK" in result.text:
+                    LOG.info("paused")
+                    # Todo speak kodi is paused
             else:
                 LOG.info('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
@@ -123,6 +127,9 @@ class CPKodiSkill(CommonPlaySkill):
             active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
             if active_player_id:
                 result = kodi_tools.resume_play(self.kodi_path, active_player_id)
+                if "OK" in result.text:
+                    LOG.info("Resumed")
+                    # Todo speak kodi has resumed
             else:
                 LOG.info('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
@@ -141,6 +148,36 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_notification_off_intent(self, message):
         self.notifier_bool = False
         self.speak_dialog("notification.off")
+
+    # move cursor utterance processing
+    @intent_handler(IntentBuilder('').require('MoveKeyword').require('CursorKeyword').
+                    one_of('UpKeyword', 'DownKeyword', 'LeftKeyword', 'RightKeyword', 'EnterKeyword',
+                           'SelectKeyword', 'BackKeyword'))
+    def handle_move_cursor_intent(self, message):  # a request was made to move the kodi cursor
+        self.set_context('MoveKeyword', 'move')  # in future the user does not have to say the move keyword
+        self.set_context('CursorKeyword', 'cursor')  # in future the user does not have to say the cursor keyword
+        if "UpKeyword" in message.data:
+            direction_kw = "Up"  # these english words are required by the kodi api
+        if "DownKeyword" in message.data:
+            direction_kw = "Down"  # these english words are required by the kodi api
+        if "LeftKeyword" in message.data:
+            direction_kw = "Left"  # these english words are required by the kodi api
+        if "RightKeyword" in message.data:
+            direction_kw = "Right"  # these english words are required by the kodi api
+        if "EnterKeyword" in message.data:
+            direction_kw = "Enter"  # these english words are required by the kodi api
+        if "SelectKeyword" in message.data:
+            direction_kw = "Select"  # these english words are required by the kodi api
+        if "BackKeyword" in message.data:
+            direction_kw = "Back"  # these english words are required by the kodi api
+        repeat_count = self.repeat_regex(message.data.get('utterance'))
+        LOG.info('utterance: ' + str(message.data.get('utterance')))
+        LOG.info('repeat_count: ' + str(repeat_count))
+        if direction_kw:
+            for each_count in range(0, int(repeat_count)):
+                response = kodi_tools.move_cursor(self.kodi_path, direction_kw)
+                if "OK" in response.text:
+                    self.speak_dialog("direction", data={"result": direction_kw}, expect_response=True)
 
     def translate_regex(self, regex):
         """
