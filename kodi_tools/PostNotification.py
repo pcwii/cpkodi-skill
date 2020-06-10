@@ -19,7 +19,6 @@ def post_notification(kodi_path, message):
     }
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
-        LOG.info(kodi_response.text)
-        return kodi_response
+        return kodi_response.text
     except Exception as e:
-        LOG.error(e)
+        return e
