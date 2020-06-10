@@ -287,14 +287,13 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('cpkodi Request: ' + str(data["request"]))
         LOG.info('cpkodi Type: ' + str(data["type"]))
         request_type = data["type"]
-        self.queue_and_play(data["library"], request_type)
-        # Todo start conversation context around the movies that were returned.
-        # options are list, play all
-        # pass
-
-    def queue_and_play(self, playlist_items, playlist_type):
-        LOG.info(str(playlist_items))
+        # self.queue_and_play(data["library"], request_type)
+        playlist_items = data["library"]
+        playlist_type = request_type
+        playlist_count = len(data["library"])
+        LOG.info(str(playlist_items), str(playlist_type), str(playlist_count))
         playlist_dict = []
+        # Todo Determine what to do if more than one movie is returned
         try:
             if "movie" in playlist_type:
                 LOG.info('Preparing to Play Movie')
@@ -307,16 +306,24 @@ class CPKodiSkill(CommonPlaySkill):
                     song_id = str(each_item["songid"])
                     playlist_dict.append(song_id)
             result = kodi_tools.playlist_clear(self.kodi_path, playlist_type)
-            LOG.info("Clear Playlist Result: " + str(result))
-            result = kodi_tools.create_playlist(self.kodi_path, playlist_dict, playlist_type)
-            LOG.info("Add Playlist Result: " + str(result))
-            #result = kodi_tools.play_normal(self.kodi_path, playlist_type)
-            #LOG.info("Play Result: " + str(result))
-            return result
+            if "OK" in result.text:
+                result = None
+                LOG.info("Clear Playlist Successful")
+                result = kodi_tools.create_playlist(self.kodi_path, playlist_dict, playlist_type)
+            if "OK" in result.text:
+                LOG.info("Add Playlist Successful")
         except Exception as e:
             LOG.info('An error was detected in: CPS_match_query_phrase')
             LOG.error(e)
             self.on_websettings_changed()
+
+        # Todo start conversation context around the movies that were returned.
+        # options are list, play all
+        # pass
+
+    def queue_and_play(self, playlist_items, playlist_type):
+        LOG.info('Do Nothing Here Yet')
+        #
 
 
 def create_skill():
