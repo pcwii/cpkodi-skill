@@ -12,7 +12,6 @@ from mycroft.messagebus import Message
 from mycroft.util.parse import match_one, fuzzy_match
 
 
-
 _author__ = 'PCWii'
 # Release - '20200603 - Covid-19 Build'
 
@@ -251,11 +250,9 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('cpkodi Request: ' + str(data["request"]))
         LOG.info('cpkodi Type: ' + str(data["type"]))
         request_type = data["type"]
-        #if "movie" in request_type:
-        #    LOG.info('Ready to Play Movie')
-        #if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
-        #    LOG.info('Ready to Play Music')
         self.queue_and_play(data["library"], request_type)
+        # Todo start conversation context around the movies that were returned.
+        # options are list, play all
         # pass
 
     def queue_and_play(self, playlist_items, playlist_type):

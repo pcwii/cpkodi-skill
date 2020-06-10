@@ -1,18 +1,16 @@
-# Do Not Used This Skill - UnderDevelopment
-# Use https://github.com/pcwii/kodi-skill.git
-# <img src='https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/tv.svg' card_color='#40DBB0' width='50' height='50' style='vertical-align:bottom'/> Common Play Kodi Control
-Control KODI open source media center with Mycroft.ai
+#This is currently unde active development
+# <img src='https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/tv.svg' card_color='#40DBB0' width='50' height='50' style='vertical-align:bottom'/> CP Kodi Control
+Control KODI open source media center with Mycroft.ai using the Common Play architecture
 
 ## About 
 Utilize the kodi API and Python library for controlling the KODI open source media center with Mycroft.ai. The control is mostly geared towards videos/movies but is capable of handling cursor navigation as well.
 The Kodi Skill uses conversational dialog to help you to control your KODI instance more naturally. 
 
 ## Examples 
-* "play the movie guardians of the galaxy with / on kodi"
-* "ask kodi to play the movie guardians of the galaxy"
-* "play the film planet of the apes with / on kodi"
-* "ask kodi to play the film planet of the apes"
-* "ask kodi to play a random movie"
+* "play the movie guardians of the galaxy"
+* "play the movie guardians of the galaxy"
+* "play the film planet of the apes"
+* "play a random movie"
 * "turn kodi subtitles on"
 * "turn kodi subtitles off"
 * "skip kodi forward"
@@ -33,20 +31,21 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 * "move the kodi cursor down twice"
 * "update the kodi library"
 * "clean the kodi library"
-* "ask kodi to list recently added movies"
-* "ask kodi to list the movies by genre"
-* "ask kodi to list the movies by studio"
-* "list kodi movie sets"
-* "list kodi movies by title"
-* "list kodi movies by actor"
-* "list all kodi movies"
+* "list recently added movies"
+* "list the movies by genre"
+* "list the movies by studio"
+* "list movie sets"
+* "list movies by title"
+* "list movies by actor"
+* "list all movies"
 ## Conversational Context
 ** If mycroft.ai locates more than one movie that matches your request it will permit you to itterate through your requests
 using conversational context.
 * eg. "hey mycroft:"
-* Request: "ask kodi to play the move Iron Man"
-* Response: "I have located 3 movies with the name Iron Man, would you like me to list them?"
-* Request: "yes" / "no"
+* Request: "play the move Iron Man"
+* Response: "I have located 3 movies with the name Iron Man, 
+* Response: "To list them say, List, to Play them say, Play"
+* Request: "list" / "play"
 * Response: "Iron Man, to Skip, say Next, say play, to play, or Cancel, to stop"
 * Request: "next" / "skip"
 * Response: "Iron Man 2"
@@ -63,7 +62,6 @@ playback of the movie that was selected.
 * Request: "Stop kodi"
 ## Credits 
 * PCWii
-* Original work forked from https://github.com/Cadair/mycroft-kodi
 ## Category
 **Media**
 ## Tags
@@ -76,27 +74,10 @@ Tested on platform_picroft (others untested)
 - [KODI API](https://kodi.wiki/index.php?title=JSON-RPC_API/v8)
 - [CinemaVision](https://kodi.wiki/view/Add-on:CinemaVision)
 ## Installation Notes
-- SSH and run: msm install https://github.com/pcwii/kodi-skill.git
+- SSH and run: msm install https://github.com/pcwii/cpkodi-skill.git
 - Configure Kodi to “allow remote control via HTTP”, under the Kodi settings:services
 - Configure Kodi to “allow remote control from applications on other systems”, under the Kodi settings:services
 - Under Kodi settings:services note the port number (8080)
 - Configure home.mycroft.ai to set your kodi instance ip address and port number
 ## Todo
-- ~~Convert all kodipydent functions to json requests~~ (Completed 20191021)
-- ~~Enable username and password support in webgui~~ (Complete)
-- ~~Enable subtitle control~~ (Complete)
-- ~~Enable library scanning / cleaning~~ (Complete)
-- ~~Enable Support for cinemavision~~ (Complete)
-- ~~Correct cinemavision dialog control~~ (Complete)
-- ~~Enable kodi Volume Control~~ (Completed 20191023)
-- ~~Enable movie skip fwd/rev~~ (Complete)
-- ~~Enable random movie selection~~ (Completed 20191021)
-- ~~Add play "from youtube" option for videos / music~~ (Complete)
-- ~~Clean up decision tree, requires significant pruning~~ ;-)
-- Show a filtered list of movies when a play request returns multiple results (WIP)
-- Add support for the CommonPlay Skill Infrastructure (Changed verbal requests 20191021)
-- Investigate other play functions for music / episodes / pvr
-- Investigate method to handle multiple KODI instances on network 
-- ~~Add a single stop command for all playing items~~ (Completed 20191021)
-- ~~Change skill call trigger words to reduce CommonPlay conflicts~~ (Completed 20191021)
-- Add the ability to cast any Kodi Library item to a chromecast enabled device (WIP 20191219)
+- Future features listed here... 
