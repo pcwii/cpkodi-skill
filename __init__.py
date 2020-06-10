@@ -5,12 +5,17 @@ import time
 
 from .kodi_tools import *
 
-from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
-from mycroft.util.log import LOG
 from adapt.intent import IntentBuilder
+
+from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.skills.core import intent_handler, intent_file_handler
+
+from mycroft.util.parse import extract_number, match_one, fuzzy_match
+from mycroft.util.log import LOG
+
+from mycroft.audio import wait_while_speaking
+
 from mycroft.messagebus import Message
-from mycroft.util.parse import match_one, fuzzy_match
 
 
 _author__ = 'PCWii'
@@ -170,13 +175,12 @@ class CPKodiSkill(CommonPlaySkill):
             direction_kw = "Select"  # these english words are required by the kodi api
         if "BackKeyword" in message.data:
             direction_kw = "Back"  # these english words are required by the kodi api
-        repeat_count = self.repeat_regex(message.data.get('utterance'))
-        LOG.info('utterance: ' + str(message.data.get('utterance')))
-        LOG.info('repeat_count: ' + str(repeat_count))
+        repeat_count = self.get_repeat_words(message.data.get('utterance'))
         if direction_kw:
             for each_count in range(0, int(repeat_count)):
                 response = kodi_tools.move_cursor(self.kodi_path, direction_kw)
                 if "OK" in response.text:
+                    wait_while_speaking()
                     self.speak_dialog("direction", data={"result": direction_kw}, expect_response=True)
 
     def translate_regex(self, regex):
@@ -196,6 +200,19 @@ class CPKodiSkill(CommonPlaySkill):
         else:
             return None
         return self.regexes[regex]
+
+    def get_repeat_words(self, message):
+        value = extract_number(message)
+        if value:
+            repeat_value = value
+        elif "once" in message:
+            repeat_value = 1
+        elif "twice" in message:
+            repeat_value = 2
+        else:
+            repeat_value = 1
+        return repeat_value
+
 
     def get_request_details(self, phrase):
         """
