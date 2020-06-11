@@ -106,7 +106,8 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_stop_intent(self, message):
         try:
             active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
-            if active_player_id:
+            LOG.info(str(active_player_id), str(active_player_type))
+            if active_player_type:
                 result = kodi_tools.stop_kodi(self.kodi_path, active_player_id)
             else:
                 LOG.info('Kodi does not appear to be playing anything at the moment')
