@@ -23,8 +23,8 @@ from mycroft.messagebus import Message
 _author__ = 'PCWii'
 # Release - '20200603 - Covid-19 Build'
 
-LOG.info("Current Modules: " + str(sys.modules))
-reload(sys.modules["CPKodiSkill.kodi_tools"])
+#LOG.info("Current Modules: " + str(sys.modules))
+reload(sys.modules["cpkodi-skill.kodi_tools"])
 
 
 class CPKodiSkill(CommonPlaySkill):
