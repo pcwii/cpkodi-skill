@@ -32,5 +32,5 @@ def create_playlist(kodi_path, id_dict, media_type):
         LOG.info(kodi_response.text)
         return kodi_response
     except Exception as e:
-        return e
+        return None
 

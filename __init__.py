@@ -149,6 +149,39 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.error(e)
             self.on_websettings_changed()
 
+    # clear Playlists
+    @intent_handler(IntentBuilder('').require("ClearKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword")
+                    .require("PlaylistKeyword"))
+    def handle_clear_playlist_intent(self, message):
+        try:
+            if "audio" in message.data:
+                result = None
+                result = kodi_tools.playlist_clear(self.kodi_path, "audio")
+                if "OK" in result.text:
+                    result = None
+                    LOG.info("Clear Audio Playlist Successful")
+            elif "video" in message.data:
+                result = None
+                result = kodi_tools.playlist_clear(self.kodi_path, "video")
+                if "OK" in result.text:
+                    result = None
+                    LOG.info("Clear Video Playlist Successful")
+            else:
+                result = None
+                result = kodi_tools.playlist_clear(self.kodi_path, "audio")
+                if "OK" in result.text:
+                    result = None
+                    LOG.info("Clear Audio Playlist Successful")
+                    result = kodi_tools.playlist_clear(self.kodi_path, "video")
+                    if "OK" in result.text:
+                        result = None
+                        LOG.info("Clear Video Playlist Successful")
+        except Exception as e:
+            LOG.info('An error was detected in: handle_clear_playlist_intent')
+            LOG.error(e)
+            self.on_websettings_changed()
+
+
     # turn notifications on requested in the utterance
     @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OnKeyword").require("KodiKeyword"))
     def handle_notification_on_intent(self, message):

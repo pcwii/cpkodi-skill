@@ -8,14 +8,20 @@ def get_active_player(kodi_path):
     method = "Player.GetActivePlayers"
     kodi_payload = {
         "jsonrpc": "2.0",
-        "method": method,
+        "method": "Player.GetActivePlayers",
         "id": 1
     }
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
-        active_player_id = json.loads(kodi_response.text)["result"][0]["playerid"]
-        active_player_type = json.loads(kodi_response.text)["result"][0]["type"]
+        print(kodi_response.text)
+        if json.loads(kodi_response.text)["result"]:
+            active_player_id = json.loads(kodi_response.text)["result"][0]["playerid"]
+            active_player_type = json.loads(kodi_response.text)["result"][0]["type"]
+        else:
+            active_player_id = None
+            active_player_type = None
+        # {"id":1,"jsonrpc":"2.0","result":[{"playerid":1,"playertype":"internal","type":"video"}]}
+        #
         return active_player_id, active_player_type
     except Exception as e:
-        # print(e)
-        return e
+        return None, None

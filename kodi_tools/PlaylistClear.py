@@ -3,9 +3,9 @@ import json
 
 
 def playlist_clear(kodi_path, media_type):
-    if "movie" in media_type:
+    if ("movie" in media_type) or ("video" in media_type):
         pl_id = 1
-    if ("album" in media_type) or ("title" in media_type) or ("artist" in media_type):
+    if ("album" in media_type) or ("title" in media_type) or ("artist" in media_type) or ("audio" in media_type):
         pl_id = 0
     json_header = {'content-type': 'application/json'}
     method = "Playlist.Clear"
