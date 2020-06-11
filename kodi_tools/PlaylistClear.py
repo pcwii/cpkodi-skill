@@ -19,6 +19,7 @@ def playlist_clear(kodi_path, media_type):
     }
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
-        return json.loads(kodi_response.text)["result"]
+        return kodi_response
+        #return json.loads(kodi_response.text)["result"]
     except Exception as e:
         return e

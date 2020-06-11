@@ -369,20 +369,25 @@ class CPKodiSkill(CommonPlaySkill):
 
     def queue_and_play(self, playlist_items, playlist_type):
         result = None
-        result = kodi_tools.playlist_clear(self.kodi_path, playlist_type)
-        if "OK" in result.text:
-            result = None
-            LOG.info("Clear Playlist Successful")
-            result = kodi_tools.create_playlist(self.kodi_path, playlist_items, playlist_type)
-        if "OK" in result.text:
-            result = None
-            LOG.info("Add Playlist Successful")
-            wait_while_speaking()
-            self.speak_dialog("now.playing", data={"result_type": str(playlist_type)}, expect_response=False)
-            result = kodi_tools.play_normal(self.kodi_path, playlist_type)
-        if "OK" in result.text:
-            result = None
-            LOG.info("Now Playing...")
+        try:
+            result = kodi_tools.playlist_clear(self.kodi_path, playlist_type)
+            if "OK" in result.text:
+                result = None
+                LOG.info("Clear Playlist Successful")
+                result = kodi_tools.create_playlist(self.kodi_path, playlist_items, playlist_type)
+            if "OK" in result.text:
+                result = None
+                LOG.info("Add Playlist Successful")
+                wait_while_speaking()
+                self.speak_dialog("now.playing", data={"result_type": str(playlist_type)}, expect_response=False)
+                result = kodi_tools.play_normal(self.kodi_path, playlist_type)
+            if "OK" in result.text:
+                result = None
+                LOG.info("Now Playing...")
+        except Exception as e:
+            LOG.info('An error was detected in: queue_and_play')
+            LOG.error(e)
+            self.on_websettings_changed()
 
 
 def create_skill():
