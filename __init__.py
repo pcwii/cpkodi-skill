@@ -151,8 +151,8 @@ class CPKodiSkill(CommonPlaySkill):
             self.on_websettings_changed()
 
     # clear Playlists
-    @intent_handler(IntentBuilder('').require("ClearKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword")
-                    .require("PlaylistKeyword"))
+    @intent_handler(IntentBuilder('').require("ClearKeyword").require("PlaylistKeyword").
+                    one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_clear_playlist_intent(self, message):
         try:
             if "audio" in message.data:
