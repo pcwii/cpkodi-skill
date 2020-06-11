@@ -21,6 +21,6 @@ def play_normal(kodi_path, media_type):
     }
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
-        return kodi_response.text
+        return kodi_response
     except Exception as e:
         return e

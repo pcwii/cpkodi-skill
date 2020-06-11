@@ -1,9 +1,11 @@
 from os.path import dirname
 import re
+import sys
 import splitter
 import time
 
 from .kodi_tools import *
+from importlib import reload
 
 from adapt.intent import IntentBuilder
 
@@ -20,6 +22,9 @@ from mycroft.messagebus import Message
 
 _author__ = 'PCWii'
 # Release - '20200603 - Covid-19 Build'
+
+LOG.info("Current Modules: " + str(sys.modules))
+reload(sys.modules["CPKodiSkill.kodi_tools"])
 
 
 class CPKodiSkill(CommonPlaySkill):
