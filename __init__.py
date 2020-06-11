@@ -24,7 +24,7 @@ _author__ = 'PCWii'
 # Release - '20200603 - Covid-19 Build'
 
 LOG.info("Current Modules: " + str(sys.modules))
-reload(sys.modules["cpkodi-skill.pcwii.kodi_tools"])
+#reload(sys.modules["cpkodi-skill.pcwii.kodi_tools"])
 
 
 class CPKodiSkill(CommonPlaySkill):
