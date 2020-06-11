@@ -184,6 +184,21 @@ class CPKodiSkill(CommonPlaySkill):
                     wait_while_speaking()
                     self.speak_dialog("direction", data={"result": direction_kw}, expect_response=True)
 
+    # movie list navigation decision utterance
+    @intent_handler(IntentBuilder('').require('NavigateContextKeyword').one_of('YesKeyword', 'NoKeyword'))
+    def handle_navigate_Decision_intent(self, message):
+        self.set_context('NavigateContextKeyword', '')
+        if "YesKeyword" in message.data:  # Yes was spoken to navigate the list, reading the first item
+            LOG.info('User responded with...' + message.data.get('YesKeyword'))
+            self.set_context('ListContextKeyword', 'ListContext')
+            msg_payload = str(self.movie_list[self.movie_index]['label'])
+            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
+        else:  # No was spoken to navigate the list, reading the first item
+            LOG.info('User responded with...' + message.data.get('NoKeyword'))
+            self.speak_dialog('cancel', expect_response=False)
+
+
+
     def translate_regex(self, regex):
         """
             All requests types are added here and return the requested items
@@ -307,29 +322,35 @@ class CPKodiSkill(CommonPlaySkill):
         request_type = data["type"]
         # self.queue_and_play(data["library"], request_type)
         playlist_items = data["library"]
-        playlist_type = request_type
         playlist_count = len(data["library"])
+        playlist_type = request_type
         LOG.info(str(playlist_items), str(playlist_type), str(playlist_count))
         playlist_dict = []
-        # Todo Determine what to do if more than one movie is returned
         try:
             if "movie" in playlist_type:
+                """
+                    If type is movie then ask if there are multiple, if one then add to playlist and play
+                """
                 LOG.info('Preparing to Play Movie')
                 for each_item in playlist_items:
                     movie_id = str(each_item["movieid"])
                     playlist_dict.append(movie_id)
+                if len(data["library"]) == 1:
+                    self.queue_and_play(playlist_dict, playlist_type)
+                elif len(data["library"]):
+                    self.set_context('NavigateContextKeyword', 'NavigateContext')
+                    self.speak_dialog('multiple.results', data={"result": str(playlist_count)}, expect_response=True)
+                else:
+                    self.speak_dialog('no.results', data={"result": movie_name}, expect_response=False)
             if ("album" in playlist_type) or ("title" in playlist_type) or ("artist" in playlist_type):
+                """
+                    If type is music then add all to playlist and play
+                """
                 LOG.info('Preparing to Play Music')
                 for each_item in playlist_items:
                     song_id = str(each_item["songid"])
                     playlist_dict.append(song_id)
-            result = kodi_tools.playlist_clear(self.kodi_path, playlist_type)
-            if "OK" in result.text:
-                result = None
-                LOG.info("Clear Playlist Successful")
-                result = kodi_tools.create_playlist(self.kodi_path, playlist_dict, playlist_type)
-            if "OK" in result.text:
-                LOG.info("Add Playlist Successful")
+                self.queue_and_play(playlist_dict, playlist_type)
         except Exception as e:
             LOG.info('An error was detected in: CPS_match_query_phrase')
             LOG.error(e)
@@ -340,8 +361,21 @@ class CPKodiSkill(CommonPlaySkill):
         # pass
 
     def queue_and_play(self, playlist_items, playlist_type):
-        LOG.info('Do Nothing Here Yet')
-        #
+        result = None
+        result = kodi_tools.playlist_clear(self.kodi_path, playlist_type)
+        if "OK" in result.text:
+            result = None
+            LOG.info("Clear Playlist Successful")
+            result = kodi_tools.create_playlist(self.kodi_path, playlist_items, playlist_type)
+        if "OK" in result.text:
+            result = None
+            LOG.info("Add Playlist Successful")
+            wait_while_speaking()
+            self.speak_dialog("now.playing", data={"result_type": str(playlist_type)}, expect_response=False)
+            result = kodi_tools.play_normal(self.kodi_path, playlist_type)
+        if "OK" in result.text:
+            result = None
+            LOG.info("Now Playing...")
 
 
 def create_skill():
