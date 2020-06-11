@@ -24,7 +24,7 @@ _author__ = 'PCWii'
 # Release - '20200603 - Covid-19 Build'
 
 for each_module in sys.modules:
-    if "kodi" in each_module
+    if "kodi" in each_module:
         LOG.info("Found Kodi Module: " + str(each_module))
 #reload(sys.modules["cpkodi-skill.pcwii.kodi_tools"])
 
