@@ -366,6 +366,10 @@ class CPKodiSkill(CommonPlaySkill):
         artist_type = re.match(self.translate_regex('artist.type'), phrase)
         movie_type = re.match(self.translate_regex('movie.type'), phrase)
         song_type = re.match(self.translate_regex('song.type'), phrase)
+        season_type = re.match(self.translate_regex('show.season.type'), phrase)
+        LOG.info(str(season_type))
+        episode_type = re.match(self.translate_regex('show.episode.type'), phrase)
+        LOG.info(str(episode_type))
         if album_type:
             request_type = 'album'
             request_item = album_type.groupdict()['album']
@@ -378,6 +382,14 @@ class CPKodiSkill(CommonPlaySkill):
         elif song_type:
             request_type = 'title'
             request_item = song_type.groupdict()['title']
+        elif season_type:
+            request_type = 'show'
+            request_item = song_type.groupdict()['showname']
+            request_episode = song_type.groupdict()['episode']
+        elif episode_type:
+            request_type = 'show'
+            request_item = song_type.groupdict()['showname']
+            request_episode = song_type.groupdict()['episode']
         else:
             # Todo Add TV-Show types
             request_type = None
@@ -397,6 +409,8 @@ class CPKodiSkill(CommonPlaySkill):
     def CPS_match_query_phrase(self, phrase):
         """
             The method is invoked by the PlayBackControlSkill.
+            It should check to see if this skill can play the requested media
+            Phrase is provided without the word "play"
         """
         results = None
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
