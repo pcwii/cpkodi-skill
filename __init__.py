@@ -267,7 +267,7 @@ class CPKodiSkill(CommonPlaySkill):
             """
                 Next we must readback the next item in the list and ask what to do
             """
-            self.movie_index += 1
+            self.active_index += 1
             msg_payload = str(self.active_library[self.active_index]['label'])
             wait_while_speaking()
             self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
@@ -278,7 +278,7 @@ class CPKodiSkill(CommonPlaySkill):
                 Context does not change
             """
             LOG.info('User responded with...' + message.data.get('NextKeyword'))
-            self.movie_index += 1
+            self.active_index += 1
             msg_payload = str(self.active_library[self.active_index]['label'])
             wait_while_speaking()
             self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)

@@ -1,3 +1,4 @@
+from mycroft.util.log import LOG
 import requests
 import json
 
@@ -48,7 +49,7 @@ def get_requested_music(kodi_path, search_item, search_type):
                 clean_list.append(info)
             else:
                 if len(each_song['label']) == len(song_title):
-                    print('found duplicate')
+                    LOG.info('Removing Duplicate Entries')
                 else:
                     clean_list.append(info)
         return clean_list  # returns a dictionary of matched movies
