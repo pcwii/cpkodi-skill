@@ -40,6 +40,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.regexes = {}
         self.active_library = None
         self.active_index = 0
+        self.active_request = None
         # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
@@ -443,12 +444,13 @@ class CPKodiSkill(CommonPlaySkill):
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
         """
-        LOG.info('cpkodi Library: ' + str(data["library"]))
-        LOG.info('cpkodi Request: ' + str(data["request"]))
-        LOG.info('cpkodi Type: ' + str(data["type"]))
+        #LOG.info('cpkodi Library: ' + str(data["library"]))
+        #LOG.info('cpkodi Request: ' + str(data["request"]))
+        #LOG.info('cpkodi Type: ' + str(data["type"]))
         request_type = data["type"]
         self.active_library = data["library"]
         self.active_index = 0  # reinitialize the step counter for reading back the library
+        self.active_request = str(data["request"])
         playlist_count = len(self.active_library)
         playlist_type = request_type
         #LOG.info(str(self.active_library), str(playlist_type), str(playlist_count))

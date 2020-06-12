@@ -14,7 +14,7 @@ def play_normal(kodi_path, media_type):
         "method": method,
         "params": {
             "item": {
-                "playlistid": pl_id
+                "playlistid": int(pl_id)
             }
         },
         "id": 1
