@@ -502,8 +502,8 @@ class CPKodiSkill(CommonPlaySkill):
                 self.speak_dialog("now.playing", data={"result_type": str(playlist_type)}, expect_response=False)
                 result = kodi_tools.play_normal(self.kodi_path, playlist_type)
             if "OK" in result.text:
+                LOG.info("Now Playing..." + str(result.text))
                 result = None
-                LOG.info("Now Playing...")
         except Exception as e:
             LOG.info('An error was detected in: clear_queue_and_play')
             LOG.error(e)
