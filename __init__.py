@@ -366,7 +366,7 @@ class CPKodiSkill(CommonPlaySkill):
         artist_type = re.match(self.translate_regex('artist.type'), phrase)
         movie_type = re.match(self.translate_regex('movie.type'), phrase)
         song_type = re.match(self.translate_regex('song.type'), phrase)
-        show_type = re.match(self.translate_regex('show.type.regex'), phrase)
+        show_type = re.match(self.translate_regex('show.type'), phrase)
         if album_type:
             request_type = 'album'
             request_item = album_type.groupdict()['album']
@@ -447,6 +447,7 @@ class CPKodiSkill(CommonPlaySkill):
                 else:
                     return None  # until a match is found
         #except Exception as e:
+        #    LOG.info('An error was detected in: CPS_match_query_phrase')
         #    LOG.info('An error was detected in: CPS_match_query_phrase')
         #    LOG.error(e)
         #    self.on_websettings_changed()
