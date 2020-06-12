@@ -382,7 +382,7 @@ class CPKodiSkill(CommonPlaySkill):
         elif show_type:
             # play the outer limits season 1 episode 2
             request_type = 'show'
-            request_item = song_type.groupdict()['showname']
+            request_item = show_type.groupdict()['showname']
             LOG.info(str(request_item))
             # Todo: remove after testing
             request_type = None
