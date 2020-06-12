@@ -1,1 +1,1 @@
-(the |)(?P<showname>.+)(?=\s+season)
+(the |)(?P<showname>.+)(?=\s+season)(?P<episode>.+)
