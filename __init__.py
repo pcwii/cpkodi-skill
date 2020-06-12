@@ -3,6 +3,7 @@ import re
 import sys
 import splitter
 import time
+import json
 
 from .kodi_tools import *
 from importlib import reload
@@ -37,6 +38,8 @@ class CPKodiSkill(CommonPlaySkill):
         self._is_setup = False
         self.notifier_bool = False
         self.regexes = {}
+        self.active_library = None
+        self.active_index = 0
         # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
@@ -101,7 +104,7 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.error(e)
                 self.on_websettings_changed()
 
-    # stop film was requested in the utterance
+    # stop kodi was requested in the utterance
     @intent_handler(IntentBuilder("").require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_stop_intent(self, message):
         try:
@@ -116,7 +119,7 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.error(e)
             self.on_websettings_changed()
 
-    # pause film was requested in the utterance
+    # request to Pause a playing kodi instance
     @intent_handler(IntentBuilder("").require("PauseKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_pause_intent(self, message):
         try:
@@ -125,7 +128,7 @@ class CPKodiSkill(CommonPlaySkill):
                 result = kodi_tools.pause_all(self.kodi_path, active_player_id)
                 if "OK" in result.text:
                     LOG.info("paused")
-                    # Todo speak kodi is paused
+                    self.speak_dialog('paused', expect_response=False)
             else:
                 LOG.info('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
@@ -133,7 +136,7 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.error(e)
             self.on_websettings_changed()
 
-    # resume the film was requested in the utterance
+    # request to resume a paused kodi instance
     @intent_handler(IntentBuilder('').require("ResumeKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_resume_intent(self, message):
         try:
@@ -142,7 +145,7 @@ class CPKodiSkill(CommonPlaySkill):
                 result = kodi_tools.resume_play(self.kodi_path, active_player_id)
                 if "OK" in result.text:
                     LOG.info("Resumed")
-                    # Todo speak kodi has resumed
+                    self.speak_dialog('resumed', expect_response=False)
             else:
                 LOG.info('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
@@ -182,7 +185,6 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.error(e)
             self.on_websettings_changed()
 
-
     # turn notifications on requested in the utterance
     @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OnKeyword").require("KodiKeyword"))
     def handle_notification_on_intent(self, message):
@@ -195,13 +197,17 @@ class CPKodiSkill(CommonPlaySkill):
         self.notifier_bool = False
         self.speak_dialog("notification.off")
 
-    # move cursor utterance processing
+    # move cursor utterance
     @intent_handler(IntentBuilder('').require('MoveKeyword').require('CursorKeyword').
                     one_of('UpKeyword', 'DownKeyword', 'LeftKeyword', 'RightKeyword', 'EnterKeyword',
                            'SelectKeyword', 'BackKeyword'))
     def handle_move_cursor_intent(self, message):  # a request was made to move the kodi cursor
-        self.set_context('MoveKeyword', 'move')  # in future the user does not have to say the move keyword
-        self.set_context('CursorKeyword', 'cursor')  # in future the user does not have to say the cursor keyword
+        """
+            This routine will move the kodi cursor
+            Context is set so the user only has to say the direction on future navigation
+        """
+        self.set_context('MoveKeyword', 'move')
+        self.set_context('CursorKeyword', 'cursor')
         direction_kw = None
         if "UpKeyword" in message.data:
             direction_kw = "Up"  # these english words are required by the kodi api
@@ -225,20 +231,72 @@ class CPKodiSkill(CommonPlaySkill):
                     wait_while_speaking()
                     self.speak_dialog("direction", data={"result": direction_kw}, expect_response=True)
 
-    # movie list navigation decision utterance
     @intent_handler(IntentBuilder('').require('NavigateContextKeyword').one_of('YesKeyword', 'NoKeyword'))
-    def handle_navigate_Decision_intent(self, message):
-        self.set_context('NavigateContextKeyword', '')
-        if "YesKeyword" in message.data:  # Yes was spoken to navigate the list, reading the first item
+    def handle_navigate_decision_intent(self, message):
+        """
+            The user answered Yes/No to the question Would you like me to list the movies
+        """
+        self.set_context('NavigateContextKeyword', '') # Clear the context
+        if "YesKeyword" in message.data:
+            """
+                If yes was spoken the read the first item and request next stesp
+            """
             LOG.info('User responded with...' + message.data.get('YesKeyword'))
             self.set_context('ListContextKeyword', 'ListContext')
-            msg_payload = str(self.movie_list[self.movie_index]['label'])
+            msg_payload = str(self.active_library[self.active_index]['label'])
             self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
         else:  # No was spoken to navigate the list, reading the first item
             LOG.info('User responded with...' + message.data.get('NoKeyword'))
             self.speak_dialog('cancel', expect_response=False)
 
-
+    @intent_handler(IntentBuilder('').require('ListContextKeyword').
+                    one_of('AddKeyword', 'NextKeyword', 'PlayKeyword', 'StopKeyword'))
+    def handle_navigate_library_intent(self, message):
+        """
+            Conversational Context to handle listing of found movies
+        """
+        if "AddKeyword" in message.data:
+            """
+                User reqested to add this item to the playlist
+                Context does not change
+            """
+            LOG.info('User responded with...' + message.data.get('AddKeyword'))
+            playlist_dict = []
+            playlist_dict.append(self.active_library[self.active_index]['movieid'])
+            kodi_tools.create_playlist(self.kodi_path, playlist_dict, "movie")
+            """
+                Next we must readback the next item in the list and ask what to do
+            """
+            self.movie_index += 1
+            msg_payload = str(self.active_library[self.active_index]['label'])
+            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
+        elif "NextKeyword" in message.data:
+            """
+                User reqested the next item in the list therfore we need to readback
+                the next item in the list and ask what to do
+                Context does not change
+            """
+            LOG.info('User responded with...' + message.data.get('NextKeyword'))
+            self.movie_index += 1
+            msg_payload = str(self.active_library[self.active_index]['label'])
+            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
+        elif "PlayKeyword" in message.data:
+            """
+                The user requested to play the currently listed item
+                Any active playlists are cleared and this item is played
+                Context is cleared
+            """
+            LOG.info('User responded with...' + message.data.get('PlayKeyword'))
+            self.set_context('ListContextKeyword', '')
+            playlist_dict = []
+            playlist_dict.append(self.active_library[self.active_index]['movieid'])
+            self.clear_queue_and_play(playlist_dict, "movie")
+        elif "StopKeyword" in message.data:
+            LOG.info('User responded with...' + message.data.get('StopKeyword'))
+            self.set_context('ListContextKeyword', '')
+        else:
+            self.set_context('ListContextKeyword', '')
+            self.speak_dialog('cancel', expect_response=False)
 
     def translate_regex(self, regex):
         """
@@ -258,7 +316,30 @@ class CPKodiSkill(CommonPlaySkill):
             return None
         return self.regexes[regex]
 
+    def convert_cardinal(self, message):
+        """
+            This routine will take words like once, twice, three times and convert them to numbers 1, 2, 3
+            Since it uses a file we can ensure it is language agnostic
+            This routine replaces the get_repeat_words routine
+        """
+        value = extract_number(message)
+        path = self.find_resource("CardrdinalList.json")
+        if value:
+            repeat_value = value
+            return repeat_value
+        else:
+            with open(path) as f:
+                data = json.load(f)
+            LOG.info(str(data))
+            for each_item in data:
+                for cardinal, value in each_item.items():
+                    print(cardinal, value)  # example usage
+                    if cardinal in message:
+                        repeat_value = value
+                        return repeat_value
+
     def get_repeat_words(self, message):
+        # Todo This routine is not language agnostic
         value = extract_number(message)
         if value:
             repeat_value = value
@@ -275,6 +356,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
             matches the phrase against a series of regex's
             all files are .regex
+            More types can be added to expand functions
         """
         album_type = re.match(self.translate_regex('album.type'), phrase)
         artist_type = re.match(self.translate_regex('artist.type'), phrase)
@@ -293,6 +375,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_type = 'title'
             request_item = song_type.groupdict()['title']
         else:
+            # Todo Add TV-Show types
             request_type = None
             request_item = None
         return request_item, request_type  # returns the request details and the request type
@@ -361,11 +444,11 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('cpkodi Request: ' + str(data["request"]))
         LOG.info('cpkodi Type: ' + str(data["type"]))
         request_type = data["type"]
-        # self.queue_and_play(data["library"], request_type)
-        playlist_items = data["library"]
-        playlist_count = len(data["library"])
+        self.active_library = data["library"]
+        self.active_index = 0  # reinitialize the step counter for reading back the library
+        playlist_count = len(self.active_library)
         playlist_type = request_type
-        LOG.info(str(playlist_items), str(playlist_type), str(playlist_count))
+        LOG.info(str(self.active_library), str(playlist_type), str(playlist_count))
         playlist_dict = []
         try:
             if "movie" in playlist_type:
@@ -373,35 +456,32 @@ class CPKodiSkill(CommonPlaySkill):
                     If type is movie then ask if there are multiple, if one then add to playlist and play
                 """
                 LOG.info('Preparing to Play Movie')
-                for each_item in playlist_items:
+                for each_item in self.active_library:
                     movie_id = str(each_item["movieid"])
                     playlist_dict.append(movie_id)
                 if len(data["library"]) == 1:
-                    self.queue_and_play(playlist_dict, playlist_type)
-                elif len(data["library"]):
+                    # Only one item was returned so go ahead and play
+                    self.clear_queue_and_play(playlist_dict, playlist_type)
+                elif len(data["library"]):  # confirm the library does not have a zero length or is None
                     self.set_context('NavigateContextKeyword', 'NavigateContext')
                     self.speak_dialog('multiple.results', data={"result": str(playlist_count)}, expect_response=True)
                 else:
-                    self.speak_dialog('no.results', data={"result": movie_name}, expect_response=False)
+                    self.speak_dialog('no.results', data={"result": str(data["request"])}, expect_response=False)
             if ("album" in playlist_type) or ("title" in playlist_type) or ("artist" in playlist_type):
                 """
                     If type is music then add all to playlist and play
                 """
                 LOG.info('Preparing to Play Music')
-                for each_item in playlist_items:
+                for each_item in self.active_library:
                     song_id = str(each_item["songid"])
                     playlist_dict.append(song_id)
-                self.queue_and_play(playlist_dict, playlist_type)
+                self.clear_queue_and_play(playlist_dict, playlist_type)
         except Exception as e:
             LOG.info('An error was detected in: CPS_match_query_phrase')
             LOG.error(e)
             self.on_websettings_changed()
 
-        # Todo start conversation context around the movies that were returned.
-        # options are list, play all
-        # pass
-
-    def queue_and_play(self, playlist_items, playlist_type):
+    def clear_queue_and_play(self, playlist_items, playlist_type):
         result = None
         try:
             result = kodi_tools.playlist_clear(self.kodi_path, playlist_type)
@@ -419,7 +499,7 @@ class CPKodiSkill(CommonPlaySkill):
                 result = None
                 LOG.info("Now Playing...")
         except Exception as e:
-            LOG.info('An error was detected in: queue_and_play')
+            LOG.info('An error was detected in: clear_queue_and_play')
             LOG.error(e)
             self.on_websettings_changed()
 
