@@ -318,7 +318,7 @@ class CPKodiSkill(CommonPlaySkill):
                 return None
         else:
             return None
-        return self.regexes[regex]
+        return str(self.regexes[regex])
 
     def convert_cardinal(self, message):
         """
@@ -385,7 +385,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_item = show_type.groupdict()['showname']
             LOG.info("Show Name: " + str(request_item))
             request_episode = show_type.groupdict()['episode']
-            LOG.info("Episode: " + str(request_item))
+            LOG.info("Episode: " + str(request_episode))
             # Todo: remove after testing
             request_type = None
             request_item = None
