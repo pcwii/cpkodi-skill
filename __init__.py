@@ -500,6 +500,7 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info("Add Playlist Successful")
                 wait_while_speaking()
                 self.speak_dialog("now.playing", data={"result_type": str(playlist_type)}, expect_response=False)
+                time.sleep(2)
                 result = kodi_tools.play_normal(self.kodi_path, playlist_type)
             if "OK" in result.text:
                 LOG.info("Now Playing..." + str(result.text))
