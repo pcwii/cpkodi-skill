@@ -414,7 +414,7 @@ class CPKodiSkill(CommonPlaySkill):
                 word_list = self.split_compound(request_item)
                 LOG.info(str(word_list))
                 results = kodi_tools.get_requested_movies(self.kodi_path, word_list)
-                LOG.info("Possible movies matches are: " + str(results))
+                # LOG.info("Possible movies matches are: " + str(results))
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
                 results = kodi_tools.get_requested_music(self.kodi_path, request_item, request_type)
                 LOG.info("Searching for music")
