@@ -269,6 +269,7 @@ class CPKodiSkill(CommonPlaySkill):
             """
             self.movie_index += 1
             msg_payload = str(self.active_library[self.active_index]['label'])
+            wait_while_speaking()
             self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
         elif "NextKeyword" in message.data:
             """
@@ -279,6 +280,7 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('User responded with...' + message.data.get('NextKeyword'))
             self.movie_index += 1
             msg_payload = str(self.active_library[self.active_index]['label'])
+            wait_while_speaking()
             self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
         elif "PlayKeyword" in message.data:
             """
@@ -296,6 +298,7 @@ class CPKodiSkill(CommonPlaySkill):
             self.set_context('ListContextKeyword', '')
         else:
             self.set_context('ListContextKeyword', '')
+            wait_while_speaking()
             self.speak_dialog('cancel', expect_response=False)
 
     def translate_regex(self, regex):
@@ -464,8 +467,10 @@ class CPKodiSkill(CommonPlaySkill):
                     self.clear_queue_and_play(playlist_dict, playlist_type)
                 elif len(data["library"]):  # confirm the library does not have a zero length or is None
                     self.set_context('NavigateContextKeyword', 'NavigateContext')
+                    wait_while_speaking()
                     self.speak_dialog('multiple.results', data={"result": str(playlist_count)}, expect_response=True)
                 else:
+                    wait_while_speaking()
                     self.speak_dialog('no.results', data={"result": str(data["request"])}, expect_response=False)
             if ("album" in playlist_type) or ("title" in playlist_type) or ("artist" in playlist_type):
                 """
