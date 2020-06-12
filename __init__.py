@@ -366,10 +366,7 @@ class CPKodiSkill(CommonPlaySkill):
         artist_type = re.match(self.translate_regex('artist.type'), phrase)
         movie_type = re.match(self.translate_regex('movie.type'), phrase)
         song_type = re.match(self.translate_regex('song.type'), phrase)
-        season_type = re.match(self.translate_regex('show.season.type'), phrase)
-        LOG.info(str(season_type))
-        episode_type = re.match(self.translate_regex('show.episode.type'), phrase)
-        LOG.info(str(episode_type))
+        show_type = re.match(self.translate_regex('show.type.regex'), phrase)
         if album_type:
             request_type = 'album'
             request_item = album_type.groupdict()['album']
@@ -382,14 +379,13 @@ class CPKodiSkill(CommonPlaySkill):
         elif song_type:
             request_type = 'title'
             request_item = song_type.groupdict()['title']
-        elif season_type:
+        elif show_type:
             request_type = 'show'
             request_item = song_type.groupdict()['showname']
-            request_episode = song_type.groupdict()['episode']
-        elif episode_type:
-            request_type = 'show'
-            request_item = song_type.groupdict()['showname']
-            request_episode = song_type.groupdict()['episode']
+            LOG.info(str(request_item))
+            # Todo: remove after testing
+            request_type = None
+            request_item = None
         else:
             # Todo Add TV-Show types
             request_type = None

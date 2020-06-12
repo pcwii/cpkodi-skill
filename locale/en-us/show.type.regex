@@ -1,0 +1,1 @@
+(the |)(?P<showname>.+)((?=\s+season))
