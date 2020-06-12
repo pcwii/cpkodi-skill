@@ -380,6 +380,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_type = 'title'
             request_item = song_type.groupdict()['title']
         elif show_type:
+            # play the outer limits season 1 episode 2
             request_type = 'show'
             request_item = song_type.groupdict()['showname']
             LOG.info(str(request_item))
@@ -414,7 +415,8 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('CPKodi Skill must be setup at the home.mycroft.ai')
             self.on_websettings_changed()
             return None
-        try:
+        #try:
+        if True:
             request_item, request_type = self.get_request_details(phrase)  # extract the item name from the phrase
             if (request_item is None) or (request_type is None):
                 LOG.info('GetRequest returned None')
@@ -444,10 +446,10 @@ class CPKodiSkill(CommonPlaySkill):
                     return phrase, match_level, data
                 else:
                     return None  # until a match is found
-        except Exception as e:
-            LOG.info('An error was detected in: CPS_match_query_phrase')
-            LOG.error(e)
-            self.on_websettings_changed()
+        #except Exception as e:
+        #    LOG.info('An error was detected in: CPS_match_query_phrase')
+        #    LOG.error(e)
+        #    self.on_websettings_changed()
 
     def CPS_start(self, phrase, data):
         """ Starts playback.
