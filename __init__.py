@@ -448,7 +448,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_index = 0  # reinitialize the step counter for reading back the library
         playlist_count = len(self.active_library)
         playlist_type = request_type
-        LOG.info(str(self.active_library), str(playlist_type), str(playlist_count))
+        #LOG.info(str(self.active_library), str(playlist_type), str(playlist_count))
         playlist_dict = []
         try:
             if "movie" in playlist_type:
