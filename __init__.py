@@ -105,202 +105,6 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.error(e)
                 self.on_websettings_changed()
 
-    # stop kodi was requested in the utterance
-    @intent_handler(IntentBuilder("").require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
-    def handle_stop_intent(self, message):
-        try:
-            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
-            LOG.info(str(active_player_id), str(active_player_type))
-            if active_player_type:
-                result = kodi_tools.stop_kodi(self.kodi_path, active_player_id)
-            else:
-                LOG.info('Kodi does not appear to be playing anything at the moment')
-        except Exception as e:
-            LOG.info('An error was detected in: handle_stop_intent')
-            LOG.error(e)
-            self.on_websettings_changed()
-
-    # request to Pause a playing kodi instance
-    @intent_handler(IntentBuilder("").require("PauseKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
-    def handle_pause_intent(self, message):
-        try:
-            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
-            if active_player_id:
-                result = kodi_tools.pause_all(self.kodi_path, active_player_id)
-                if "OK" in result.text:
-                    LOG.info("paused")
-                    self.speak_dialog('paused', expect_response=False)
-            else:
-                LOG.info('Kodi does not appear to be playing anything at the moment')
-        except Exception as e:
-            LOG.info('An error was detected in: handle_pause_intent')
-            LOG.error(e)
-            self.on_websettings_changed()
-
-    # request to resume a paused kodi instance
-    @intent_handler(IntentBuilder('').require("ResumeKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
-    def handle_resume_intent(self, message):
-        try:
-            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
-            if active_player_id:
-                result = kodi_tools.resume_play(self.kodi_path, active_player_id)
-                if "OK" in result.text:
-                    LOG.info("Resumed")
-                    self.speak_dialog('resumed', expect_response=False)
-            else:
-                LOG.info('Kodi does not appear to be playing anything at the moment')
-        except Exception as e:
-            LOG.info('An error was detected in: handle_resume_intent')
-            LOG.error(e)
-            self.on_websettings_changed()
-
-    # clear Playlists
-    @intent_handler(IntentBuilder('').require("ClearKeyword").require("PlaylistKeyword").
-                    one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
-    def handle_clear_playlist_intent(self, message):
-        try:
-            if "audio" in message.data:
-                result = None
-                result = kodi_tools.playlist_clear(self.kodi_path, "audio")
-                if "OK" in result.text:
-                    result = None
-                    LOG.info("Clear Audio Playlist Successful")
-            elif "video" in message.data:
-                result = None
-                result = kodi_tools.playlist_clear(self.kodi_path, "video")
-                if "OK" in result.text:
-                    result = None
-                    LOG.info("Clear Video Playlist Successful")
-            else:
-                result = None
-                result = kodi_tools.playlist_clear(self.kodi_path, "audio")
-                if "OK" in result.text:
-                    result = None
-                    LOG.info("Clear Audio Playlist Successful")
-                    result = kodi_tools.playlist_clear(self.kodi_path, "video")
-                    if "OK" in result.text:
-                        result = None
-                        LOG.info("Clear Video Playlist Successful")
-        except Exception as e:
-            LOG.info('An error was detected in: handle_clear_playlist_intent')
-            LOG.error(e)
-            self.on_websettings_changed()
-
-    # turn notifications on requested in the utterance
-    @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OnKeyword").require("KodiKeyword"))
-    def handle_notification_on_intent(self, message):
-        self.notifier_bool = True
-        self.speak_dialog("notification.on")
-
-    # turn notifications off requested in the utterance
-    @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OffKeyword").require("KodiKeyword"))
-    def handle_notification_off_intent(self, message):
-        self.notifier_bool = False
-        self.speak_dialog("notification.off")
-
-    # move cursor utterance
-    @intent_handler(IntentBuilder('').require('MoveKeyword').require('CursorKeyword').
-                    one_of('UpKeyword', 'DownKeyword', 'LeftKeyword', 'RightKeyword', 'EnterKeyword',
-                           'SelectKeyword', 'BackKeyword'))
-    def handle_move_cursor_intent(self, message):  # a request was made to move the kodi cursor
-        """
-            This routine will move the kodi cursor
-            Context is set so the user only has to say the direction on future navigation
-        """
-        self.set_context('MoveKeyword', 'move')
-        self.set_context('CursorKeyword', 'cursor')
-        direction_kw = None
-        if "UpKeyword" in message.data:
-            direction_kw = "Up"  # these english words are required by the kodi api
-        if "DownKeyword" in message.data:
-            direction_kw = "Down"  # these english words are required by the kodi api
-        if "LeftKeyword" in message.data:
-            direction_kw = "Left"  # these english words are required by the kodi api
-        if "RightKeyword" in message.data:
-            direction_kw = "Right"  # these english words are required by the kodi api
-        if "EnterKeyword" in message.data:
-            direction_kw = "Enter"  # these english words are required by the kodi api
-        if "SelectKeyword" in message.data:
-            direction_kw = "Select"  # these english words are required by the kodi api
-        if "BackKeyword" in message.data:
-            direction_kw = "Back"  # these english words are required by the kodi api
-        repeat_count = self.get_repeat_words(message.data.get('utterance'))
-        if direction_kw:
-            for each_count in range(0, int(repeat_count)):
-                response = kodi_tools.move_cursor(self.kodi_path, direction_kw)
-                if "OK" in response.text:
-                    wait_while_speaking()
-                    self.speak_dialog("direction", data={"result": direction_kw}, expect_response=True)
-
-    @intent_handler(IntentBuilder('').require('NavigateContextKeyword').one_of('YesKeyword', 'NoKeyword'))
-    def handle_navigate_decision_intent(self, message):
-        """
-            The user answered Yes/No to the question Would you like me to list the movies
-        """
-        self.set_context('NavigateContextKeyword', '') # Clear the context
-        if "YesKeyword" in message.data:
-            """
-                If yes was spoken the read the first item and request next stesp
-            """
-            LOG.info('User responded with...' + message.data.get('YesKeyword'))
-            self.set_context('ListContextKeyword', 'ListContext')
-            msg_payload = str(self.active_library[self.active_index]['label'])
-            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
-        else:  # No was spoken to navigate the list, reading the first item
-            LOG.info('User responded with...' + message.data.get('NoKeyword'))
-            self.speak_dialog('cancel', expect_response=False)
-
-    @intent_handler(IntentBuilder('').require('ListContextKeyword').
-                    one_of('AddKeyword', 'NextKeyword', 'PlayKeyword', 'StopKeyword'))
-    def handle_navigate_library_intent(self, message):
-        """
-            Conversational Context to handle listing of found movies
-        """
-        if "AddKeyword" in message.data:
-            """
-                User reqested to add this item to the playlist
-                Context does not change
-            """
-            LOG.info('User responded with...' + message.data.get('AddKeyword'))
-            playlist_dict = []
-            playlist_dict.append(self.active_library[self.active_index]['movieid'])
-            kodi_tools.create_playlist(self.kodi_path, playlist_dict, "movie")
-            """
-                Next we must readback the next item in the list and ask what to do
-            """
-            self.active_index += 1
-            msg_payload = str(self.active_library[self.active_index]['label'])
-            wait_while_speaking()
-            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
-        elif "NextKeyword" in message.data:
-            """
-                User reqested the next item in the list therfore we need to readback
-                the next item in the list and ask what to do
-                Context does not change
-            """
-            LOG.info('User responded with...' + message.data.get('NextKeyword'))
-            self.active_index += 1
-            msg_payload = str(self.active_library[self.active_index]['label'])
-            wait_while_speaking()
-            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
-        elif "PlayKeyword" in message.data:
-            """
-                The user requested to play the currently listed item
-                Any active playlists are cleared and this item is played
-                Context is cleared
-            """
-            LOG.info('User responded with...' + message.data.get('PlayKeyword'))
-            self.set_context('ListContextKeyword', '')
-            playlist_dict = []
-            playlist_dict.append(self.active_library[self.active_index]['movieid'])
-            self.clear_queue_and_play(playlist_dict, "movie")
-        elif "StopKeyword" in message.data:
-            LOG.info('User responded with...' + message.data.get('StopKeyword'))
-            self.set_context('ListContextKeyword', '')
-        else:
-            self.set_context('ListContextKeyword', '')
-            wait_while_speaking()
-            self.speak_dialog('cancel', expect_response=False)
 
     def translate_regex(self, regex):
         """
@@ -526,6 +330,344 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('An error was detected in: clear_queue_and_play')
             LOG.error(e)
             self.on_websettings_changed()
+    """
+        All vocal intents apear here
+    """
+
+
+    # stop kodi was requested in the utterance
+    @intent_handler(IntentBuilder("").require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
+    def handle_stop_intent(self, message):
+        try:
+            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+            LOG.info(str(active_player_id), str(active_player_type))
+            if active_player_type:
+                result = kodi_tools.stop_kodi(self.kodi_path, active_player_id)
+            else:
+                LOG.info('Kodi does not appear to be playing anything at the moment')
+        except Exception as e:
+            LOG.info('An error was detected in: handle_stop_intent')
+            LOG.error(e)
+            self.on_websettings_changed()
+
+
+    # request to Pause a playing kodi instance
+    @intent_handler(IntentBuilder("").require("PauseKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
+    def handle_pause_intent(self, message):
+        try:
+            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+            if active_player_id:
+                result = kodi_tools.pause_all(self.kodi_path, active_player_id)
+                if "OK" in result.text:
+                    LOG.info("paused")
+                    self.speak_dialog('paused', expect_response=False)
+            else:
+                LOG.info('Kodi does not appear to be playing anything at the moment')
+        except Exception as e:
+            LOG.info('An error was detected in: handle_pause_intent')
+            LOG.error(e)
+            self.on_websettings_changed()
+
+
+    # request to resume a paused kodi instance
+    @intent_handler(IntentBuilder('').require("ResumeKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
+    def handle_resume_intent(self, message):
+        try:
+            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+            if active_player_id:
+                result = kodi_tools.resume_play(self.kodi_path, active_player_id)
+                if "OK" in result.text:
+                    LOG.info("Resumed")
+                    self.speak_dialog('resumed', expect_response=False)
+            else:
+                LOG.info('Kodi does not appear to be playing anything at the moment')
+        except Exception as e:
+            LOG.info('An error was detected in: handle_resume_intent')
+            LOG.error(e)
+            self.on_websettings_changed()
+
+
+    # clear Playlists
+    @intent_handler(IntentBuilder('').require("ClearKeyword").require("PlaylistKeyword").
+                    one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
+    def handle_clear_playlist_intent(self, message):
+        try:
+            if "audio" in message.data:
+                result = None
+                result = kodi_tools.playlist_clear(self.kodi_path, "audio")
+                if "OK" in result.text:
+                    result = None
+                    LOG.info("Clear Audio Playlist Successful")
+            elif "video" in message.data:
+                result = None
+                result = kodi_tools.playlist_clear(self.kodi_path, "video")
+                if "OK" in result.text:
+                    result = None
+                    LOG.info("Clear Video Playlist Successful")
+            else:
+                result = None
+                result = kodi_tools.playlist_clear(self.kodi_path, "audio")
+                if "OK" in result.text:
+                    result = None
+                    LOG.info("Clear Audio Playlist Successful")
+                    result = kodi_tools.playlist_clear(self.kodi_path, "video")
+                    if "OK" in result.text:
+                        result = None
+                        LOG.info("Clear Video Playlist Successful")
+        except Exception as e:
+            LOG.info('An error was detected in: handle_clear_playlist_intent')
+            LOG.error(e)
+            self.on_websettings_changed()
+
+
+    # turn notifications on requested in the utterance
+    @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OnKeyword").require("KodiKeyword"))
+    def handle_notification_on_intent(self, message):
+        self.notifier_bool = True
+        self.speak_dialog("notification.on")
+
+
+    # turn notifications off requested in the utterance
+    @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OffKeyword").require("KodiKeyword"))
+    def handle_notification_off_intent(self, message):
+        self.notifier_bool = False
+        self.speak_dialog("notification.off")
+
+
+    # move cursor utterance
+    @intent_handler(IntentBuilder('').require('MoveKeyword').require('CursorKeyword').
+                    one_of('UpKeyword', 'DownKeyword', 'LeftKeyword', 'RightKeyword', 'EnterKeyword',
+                           'SelectKeyword', 'BackKeyword'))
+    def handle_move_cursor_intent(self, message):  # a request was made to move the kodi cursor
+        """
+            This routine will move the kodi cursor
+            Context is set so the user only has to say the direction on future navigation
+        """
+        self.set_context('MoveKeyword', 'move')
+        self.set_context('CursorKeyword', 'cursor')
+        direction_kw = None
+        if "UpKeyword" in message.data:
+            direction_kw = "Up"  # these english words are required by the kodi api
+        if "DownKeyword" in message.data:
+            direction_kw = "Down"  # these english words are required by the kodi api
+        if "LeftKeyword" in message.data:
+            direction_kw = "Left"  # these english words are required by the kodi api
+        if "RightKeyword" in message.data:
+            direction_kw = "Right"  # these english words are required by the kodi api
+        if "EnterKeyword" in message.data:
+            direction_kw = "Enter"  # these english words are required by the kodi api
+        if "SelectKeyword" in message.data:
+            direction_kw = "Select"  # these english words are required by the kodi api
+        if "BackKeyword" in message.data:
+            direction_kw = "Back"  # these english words are required by the kodi api
+        repeat_count = self.get_repeat_words(message.data.get('utterance'))
+        if direction_kw:
+            for each_count in range(0, int(repeat_count)):
+                response = kodi_tools.move_cursor(self.kodi_path, direction_kw)
+                if "OK" in response.text:
+                    wait_while_speaking()
+                    self.speak_dialog("direction", data={"result": direction_kw}, expect_response=True)
+
+
+    @intent_handler(IntentBuilder('').require('NavigateContextKeyword').one_of('YesKeyword', 'NoKeyword'))
+    def handle_navigate_decision_intent(self, message):
+        """
+            The user answered Yes/No to the question Would you like me to list the movies
+        """
+        self.set_context('NavigateContextKeyword', '')  # Clear the context
+        if "YesKeyword" in message.data:
+            """
+                If yes was spoken the read the first item and request next stesp
+            """
+            LOG.info('User responded with...' + message.data.get('YesKeyword'))
+            self.set_context('ListContextKeyword', 'ListContext')
+            msg_payload = str(self.active_library[self.active_index]['label'])
+            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
+        else:  # No was spoken to navigate the list, reading the first item
+            LOG.info('User responded with...' + message.data.get('NoKeyword'))
+            self.speak_dialog('cancel', expect_response=False)
+
+
+    @intent_handler(IntentBuilder('').require('ListContextKeyword').
+                    one_of('AddKeyword', 'NextKeyword', 'PlayKeyword', 'StopKeyword'))
+    def handle_navigate_library_intent(self, message):
+        """
+            Conversational Context to handle listing of found movies
+        """
+        if "AddKeyword" in message.data:
+            """
+                User reqested to add this item to the playlist
+                Context does not change
+            """
+            LOG.info('User responded with...' + message.data.get('AddKeyword'))
+            playlist_dict = []
+            playlist_dict.append(self.active_library[self.active_index]['movieid'])
+            kodi_tools.create_playlist(self.kodi_path, playlist_dict, "movie")
+            """
+                Next we must readback the next item in the list and ask what to do
+            """
+            self.active_index += 1
+            msg_payload = str(self.active_library[self.active_index]['label'])
+            wait_while_speaking()
+            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
+        elif "NextKeyword" in message.data:
+            """
+                User reqested the next item in the list therfore we need to readback
+                the next item in the list and ask what to do
+                Context does not change
+            """
+            LOG.info('User responded with...' + message.data.get('NextKeyword'))
+            self.active_index += 1
+            msg_payload = str(self.active_library[self.active_index]['label'])
+            wait_while_speaking()
+            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
+        elif "PlayKeyword" in message.data:
+            """
+                The user requested to play the currently listed item
+                Any active playlists are cleared and this item is played
+                Context is cleared
+            """
+            LOG.info('User responded with...' + message.data.get('PlayKeyword'))
+            self.set_context('ListContextKeyword', '')
+            playlist_dict = []
+            playlist_dict.append(self.active_library[self.active_index]['movieid'])
+            self.clear_queue_and_play(playlist_dict, "movie")
+        elif "StopKeyword" in message.data:
+            LOG.info('User responded with...' + message.data.get('StopKeyword'))
+            self.set_context('ListContextKeyword', '')
+        else:
+            self.set_context('ListContextKeyword', '')
+            wait_while_speaking()
+            self.speak_dialog('cancel', expect_response=False)
+
+    # the movie information dialog was requested in the utterance
+    @intent_handler(IntentBuilder('').require('SetsKeyword').require('KodiKeyword').require('VolumeKeyword'))
+    def handle_set_volume_intent(self, message):
+        str_remainder = str(message.utterance_remainder())
+        volume_level = re.findall('\d+', str_remainder)
+        if volume_level:
+            if int(volume_level[0]) < 101:
+                new_volume = kodi_tools.set_volume(self.kodi_path, int(volume_level[0]))
+                LOG.info("Kodi Volume Now: " + str(new_volume))
+                self.speak_dialog('volume.set', data={'result': str(new_volume)}, expect_response=False)
+            else:
+                self.speak_dialog('volume.error', data={'result': str(int(volume_level[0]))}, expect_response=False)
+
+    # the user requested to skip the movie timeline forward or backward
+    @intent_handler(IntentBuilder('').require("SkipKeyword").optionally('KodiKeyword').optionally('FilmKeyword').
+                    one_of('ForwardKeyword', 'BackwardKeyword'))
+    def handle_skip_movie_intent(self, message):
+        backward_kw = message.data.get("BackwardKeyword")
+        if backward_kw:
+            dir_skip = "smallbackward"
+        else:
+            dir_skip = "smallforward"
+        active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+        LOG.info(str(active_player_id), str(active_player_type))
+        if active_player_type:
+            result = kodi_tools.skip_play(self.kodi_path, dir_skip)
+            LOG.info('Kodi Skip Result: ' + str(result))
+        else:
+            LOG.info('Kodi does not appear to be playing anything at the moment')
+
+    # the movie information dialog was requested in the utterance
+    @intent_handler(IntentBuilder('').require('VisibilityKeyword').require('InfoKeyword').
+                    optionally('KodiKeyword').optionally('FilmKeyword'))
+    def handle_show_movie_info_intent(self, message):
+        active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+        LOG.info(str(active_player_id), str(active_player_type))
+        if active_player_type:
+            result = kodi_tools.show_movie_info(self.kodi_path)
+            LOG.info('Kodi Show Info Result: ' + str(result))
+        else:
+            LOG.info('Kodi does not appear to be playing anything at the moment')
+
+    # user has requested to turn on the movie subtitles
+    @intent_handler(IntentBuilder('').require("KodiKeyword").require('SubtitlesKeyword').require('OnKeyword'))
+    def handle_subtitles_on_intent(self, message):
+        active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+        LOG.info(str(active_player_id), str(active_player_type))
+        if active_player_type:
+            result = kodi_tools.show_subtitles(self.kodi_path)
+            LOG.info('Kodi Show Subtitles Result: ' + str(result))
+        else:
+            LOG.info('Kodi does not appear to be playing anything at the moment')
+
+    # user has requested to turn off the movie subtitles
+    @intent_handler(IntentBuilder('').require("KodiKeyword").require('SubtitlesKeyword').require('OffKeyword'))
+    def handle_subtitles_off_intent(self, message):
+        active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+        LOG.info(str(active_player_id), str(active_player_type))
+        if active_player_type:
+            result = kodi_tools.hide_subtitles(self.kodi_path)
+            LOG.info('Kodi Hide Subtitles Result: ' + str(result))
+        else:
+            LOG.info('Kodi does not appear to be playing anything at the moment')
+
+
+    # user has requested to show the recently added movies list
+    @intent_handler(IntentBuilder('').require("ListKeyword").require('RecentKeyword').require('FilmKeyword'))
+    def handle_show_movies_added_intent(self, message):
+        window_path = "videodb://recentlyaddedmovies/"
+        result = kodi_tools.show_window(self.kodi_path, window_path)
+        LOG.info('Kodi Show Window Result: ' + str(result))
+        sort_kw = message.data.get("RecentKeyword")
+        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+
+    # user has requested to show the movies listed by genres
+    @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('GenreKeyword'))
+    def handle_show_movies_genres_intent(self, message):
+        window_path = "videodb://movies/genres/"
+        result = kodi_tools.show_window(self.kodi_path, window_path)
+        LOG.info('Kodi Show Window Result: ' + str(result))
+        sort_kw = message.data.get("GenreKeyword")
+        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+
+    # user has requested to show the movies listed by actor
+    @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('ActorKeyword'))
+    def handle_show_movies_actors_intent(self, message):
+        window_path = "videodb://movies/actors/"
+        result = kodi_tools.show_window(self.kodi_path, window_path)
+        LOG.info('Kodi Show Window Result: ' + str(result))
+        sort_kw = message.data.get("ActorKeyword")
+        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+
+    # user has requested to show the movies listed by studio
+    @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('StudioKeyword'))
+    def handle_show_movies_studio_intent(self, message):
+        window_path = "videodb://movies/studios/"
+        result = kodi_tools.show_window(self.kodi_path, window_path)
+        LOG.info('Kodi Show Window Result: ' + str(result))
+        sort_kw = message.data.get("StudioKeyword")
+        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+
+    # user has requested to show the movies listed by title
+    @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('TitleKeyword'))
+    def handle_show_movies_title_intent(self, message):
+        window_path = "videodb://movies/titles/"
+        result = kodi_tools.show_window(self.kodi_path, window_path)
+        LOG.info('Kodi Show Window Result: ' + str(result))
+        sort_kw = message.data.get("TitleKeyword")
+        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+
+    # user has requested to show the movies listed by movie sets
+    @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('SetsKeyword'))
+    def handle_show_movies_sets_intent(self, message):
+        window_path = "videodb://movies/sets/"
+        result = kodi_tools.show_window(self.kodi_path, window_path)
+        LOG.info('Kodi Show Window Result: ' + str(result))
+        sort_kw = message.data.get("SetsKeyword")
+        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+
+    # user has requested to show the movies listed all movies
+    @intent_handler(IntentBuilder('').require("ListKeyword").require('AllKeyword').require('FilmKeyword'))
+    def handle_show_all_movies_intent(self, message):
+        window_path = "videodb://movies/sets/"
+        result = kodi_tools.show_window(self.kodi_path, window_path)
+        LOG.info('Kodi Show Window Result: ' + str(result))
+        sort_kw = message.data.get("AllKeyword")
+        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+
 
 
 def create_skill():
