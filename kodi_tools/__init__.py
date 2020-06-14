@@ -1,5 +1,5 @@
 # prepare all kodi Tools for use
-from .CheckPluginPresent import check_yt_present
+from .CheckPluginPresent import check_plugin_present
 from .CreatePlaylist import create_playlist
 from .GetActivePlayer import get_active_player
 from .GetAllMovies import get_all_movies
@@ -13,6 +13,7 @@ from .MoveCursor import move_cursor
 from .PausePlayer import pause_all
 from .PlaylistClear import playlist_clear
 from .PlayNormal import play_normal
+from .PlayYT import play_yt
 from .PostNotification import post_notification
 from .ResumePlayer import resume_play
 from .SetVolume import set_volume

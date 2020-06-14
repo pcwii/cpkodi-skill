@@ -8,6 +8,10 @@ import random
 
 from .kodi_tools import *
 from importlib import reload
+import urllib.error
+import urllib.parse
+import urllib.request
+
 
 from adapt.intent import IntentBuilder
 
@@ -227,7 +231,6 @@ class CPKodiSkill(CommonPlaySkill):
             It should check to see if this skill can play the requested media
             Phrase is provided without the word "play"
         """
-        # Todo: handle Random Song Requests "Play Some Music", Grab random selection of 10 - 15 songs?
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
         results = None
@@ -256,6 +259,8 @@ class CPKodiSkill(CommonPlaySkill):
                     results = self.random_music_select()
                 else:
                     results = kodi_tools.get_requested_music(self.kodi_path, request_item, request_type)
+            if ("youtube" in request_type) and kodi_tools.check_plugin_present(self.kodi_path, "plugin.video.youtube"):
+                results = self.get_youtube_links(request_item)
             if results is None:
                 LOG.info("Found Nothing!")
                 return None
@@ -282,18 +287,23 @@ class CPKodiSkill(CommonPlaySkill):
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
         """
-        #LOG.info('cpkodi Library: ' + str(data["library"]))
-        #LOG.info('cpkodi Request: ' + str(data["request"]))
-        #LOG.info('cpkodi Type: ' + str(data["type"]))
-        request_type = data["type"]
-        self.active_library = data["library"]
+        request_type = data["type"]  # album, artist, movie, title, youtube, show
+        self.active_library = data["library"]  # a list of what was found
         self.active_index = 0  # reinitialize the step counter for reading back the library
-        self.active_request = str(data["request"])
-        playlist_count = len(self.active_library)
+        self.active_request = str(data["request"])  # what was requested
+        playlist_count = len(self.active_library)  # how many items were returned
         playlist_type = request_type
         #LOG.info(str(self.active_library), str(playlist_type), str(playlist_count))
         playlist_dict = []
         try:
+            if "youtube" in playlist_type:
+                """
+                    if Type is youtube then plugin and source has already been confirmed so go ahead and play
+                """
+                wait_while_speaking()
+                self.speak_dialog('play.youtube', data={"result": self.active_request}, expect_response=False)
+                LOG.info('Attempting to Play youtube items: ' + str(self.active_library))
+                kodi_tools.play_yt(self.kodi_path, self.active_library[0])
             if "movie" in playlist_type:
                 """
                     If type is movie then ask if there are multiple, if one then add to playlist and play
@@ -362,6 +372,36 @@ class CPKodiSkill(CommonPlaySkill):
         full_list = kodi_tools.get_all_music(self.kodi_path)
         random_entry = random.choices(full_list, k=item_count)
         return random_entry
+
+    def get_youtube_links(self, search_text):
+        LOG.info(search_text)
+        query = urllib.parse.quote(search_text)
+        url = "https://www.youtube.com/results?search_query=" + query
+        response = urllib.request.urlopen(url)
+        html = response.read()
+        # Get all video links from page
+        temp_links = []
+        all_video_links = re.findall(r'href=\"\/watch\?v=(.{11})', html.decode())
+        for each_video in all_video_links:
+            if each_video not in temp_links:
+                temp_links.append(each_video)
+        video_links = temp_links
+        # Get all playlist links from page
+        temp_links = []
+        all_playlist_results = re.findall(r'href=\"\/playlist\?list\=(.{34})', html.decode())
+        sep = '"'
+        for each_playlist in all_playlist_results:
+            if each_playlist not in temp_links:
+                cleaned_pl = each_playlist.split(sep, 1)[0]
+                temp_links.append(cleaned_pl)
+        playlist_links = temp_links
+        yt_links = []
+        if video_links:
+            yt_links.append("?video_id=" + video_links[0])
+        if playlist_links:
+            yt_links.append("?playlist_id=" + playlist_links[0] + "&play=1&order=shuffle")
+        return yt_links
+
 
     """
         All vocal intents apear here
