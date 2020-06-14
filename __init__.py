@@ -81,7 +81,7 @@ class CPKodiSkill(CommonPlaySkill):
         voice_payload = "Listening"
         if self.notifier_bool:
             try:
-                kodi_tools.post_notification(self.kodi_path, voice_payload)
+                post_notification(self.kodi_path, voice_payload)
             except Exception as e:
                 LOG.info('An error was detected in: handle_listen')
                 LOG.error(e)
@@ -93,7 +93,7 @@ class CPKodiSkill(CommonPlaySkill):
         voice_payload = utterance
         if self.notifier_bool:
             try:
-                kodi_tools.post_notification(self.kodi_path, voice_payload)
+                post_notification(self.kodi_path, voice_payload)
             except Exception as e:
                 LOG.info('An error was detected in: handle_utterance')
                 LOG.error(e)
@@ -104,7 +104,7 @@ class CPKodiSkill(CommonPlaySkill):
         voice_payload = message.data.get('utterance')
         if self.notifier_bool:
             try:
-                kodi_tools.post_notification(self.kodi_path, voice_payload)
+                post_notification(self.kodi_path, voice_payload)
             except Exception as e:
                 LOG.info('An error was detected in: handle_speak')
                 LOG.error(e)
@@ -253,13 +253,13 @@ class CPKodiSkill(CommonPlaySkill):
                 else:
                     word_list = self.split_compound(request_item)
                     LOG.info(str(word_list))
-                    results = kodi_tools.get_requested_movies(self.kodi_path, word_list)
+                    results = get_requested_movies(self.kodi_path, word_list)
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
                 if "random" in request_item:
                     results = self.random_music_select()
                 else:
-                    results = kodi_tools.get_requested_music(self.kodi_path, request_item, request_type)
-            if ("youtube" in request_type) and kodi_tools.check_plugin_present(self.kodi_path, "plugin.video.youtube"):
+                    results = get_requested_music(self.kodi_path, request_item, request_type)
+            if ("youtube" in request_type) and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
                 results = self.get_youtube_links(request_item)
             if results is None:
                 LOG.info("Found Nothing!")
@@ -303,7 +303,7 @@ class CPKodiSkill(CommonPlaySkill):
                 wait_while_speaking()
                 self.speak_dialog('play.youtube', data={"result": self.active_request}, expect_response=False)
                 LOG.info('Attempting to Play youtube items: ' + str(self.active_library))
-                kodi_tools.play_yt(self.kodi_path, self.active_library[0])
+                play_yt(self.kodi_path, self.active_library[0])
             if "movie" in playlist_type:
                 """
                     If type is movie then ask if there are multiple, if one then add to playlist and play
@@ -340,18 +340,18 @@ class CPKodiSkill(CommonPlaySkill):
     def clear_queue_and_play(self, playlist_items, playlist_type):
         result = None
         try:
-            result = kodi_tools.playlist_clear(self.kodi_path, playlist_type)
+            result = playlist_clear(self.kodi_path, playlist_type)
             if "OK" in result.text:
                 result = None
                 LOG.info("Clear Playlist Successful")
-                result = kodi_tools.create_playlist(self.kodi_path, playlist_items, playlist_type)
+                result = create_playlist(self.kodi_path, playlist_items, playlist_type)
             if "OK" in result.text:
                 result = None
                 LOG.info("Add Playlist Successful")
                 wait_while_speaking()
                 self.speak_dialog("now.playing", data={"result_type": str(playlist_type)}, expect_response=False)
                 time.sleep(2) # wait for playlist before playback
-                result = kodi_tools.play_normal(self.kodi_path, playlist_type)
+                result = play_normal(self.kodi_path, playlist_type)
             if "OK" in result.text:
                 LOG.info("Now Playing..." + str(result.text))
                 result = None
@@ -362,14 +362,14 @@ class CPKodiSkill(CommonPlaySkill):
 
     def random_movie_select(self):
         item_count = 1
-        full_list = kodi_tools.get_all_movies(self.kodi_path)
+        full_list = get_all_movies(self.kodi_path)
         random_entry = random.choices(full_list, k=item_count)
         return random_entry
 
     def random_music_select(self):
         item_count = random.randint(10, 20)
         LOG.info('Randomly Selecting: ' + str(item_count) +' entries.')
-        full_list = kodi_tools.get_all_music(self.kodi_path)
+        full_list = get_all_music(self.kodi_path)
         random_entry = random.choices(full_list, k=item_count)
         return random_entry
 
@@ -410,10 +410,10 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder("").require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_stop_intent(self, message):
         try:
-            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+            active_player_id, active_player_type = get_active_player(self.kodi_path)
             LOG.info(str(active_player_id), str(active_player_type))
             if active_player_type:
-                result = kodi_tools.stop_kodi(self.kodi_path, active_player_id)
+                result = stop_kodi(self.kodi_path, active_player_id)
             else:
                 LOG.info('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
@@ -426,9 +426,9 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder("").require("PauseKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_pause_intent(self, message):
         try:
-            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+            active_player_id, active_player_type = get_active_player(self.kodi_path)
             if active_player_id:
-                result = kodi_tools.pause_all(self.kodi_path, active_player_id)
+                result = pause_all(self.kodi_path, active_player_id)
                 if "OK" in result.text:
                     LOG.info("paused")
                     self.speak_dialog('paused', expect_response=False)
@@ -444,9 +444,9 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require("ResumeKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_resume_intent(self, message):
         try:
-            active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+            active_player_id, active_player_type = get_active_player(self.kodi_path)
             if active_player_id:
-                result = kodi_tools.resume_play(self.kodi_path, active_player_id)
+                result = resume_play(self.kodi_path, active_player_id)
                 if "OK" in result.text:
                     LOG.info("Resumed")
                     self.speak_dialog('resumed', expect_response=False)
@@ -465,23 +465,23 @@ class CPKodiSkill(CommonPlaySkill):
         try:
             if "audio" in message.data:
                 result = None
-                result = kodi_tools.playlist_clear(self.kodi_path, "audio")
+                result = playlist_clear(self.kodi_path, "audio")
                 if "OK" in result.text:
                     result = None
                     LOG.info("Clear Audio Playlist Successful")
             elif "video" in message.data:
                 result = None
-                result = kodi_tools.playlist_clear(self.kodi_path, "video")
+                result = playlist_clear(self.kodi_path, "video")
                 if "OK" in result.text:
                     result = None
                     LOG.info("Clear Video Playlist Successful")
             else:
                 result = None
-                result = kodi_tools.playlist_clear(self.kodi_path, "audio")
+                result = playlist_clear(self.kodi_path, "audio")
                 if "OK" in result.text:
                     result = None
                     LOG.info("Clear Audio Playlist Successful")
-                    result = kodi_tools.playlist_clear(self.kodi_path, "video")
+                    result = playlist_clear(self.kodi_path, "video")
                     if "OK" in result.text:
                         result = None
                         LOG.info("Clear Video Playlist Successful")
@@ -534,7 +534,7 @@ class CPKodiSkill(CommonPlaySkill):
         repeat_count = self.get_repeat_words(message.data.get('utterance'))
         if direction_kw:
             for each_count in range(0, int(repeat_count)):
-                response = kodi_tools.move_cursor(self.kodi_path, direction_kw)
+                response = move_cursor(self.kodi_path, direction_kw)
                 if "OK" in response.text:
                     wait_while_speaking()
                     self.speak_dialog("direction", data={"result": direction_kw}, expect_response=True)
@@ -574,7 +574,7 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('User responded with...' + message.data.get('AddKeyword'))
             playlist_dict = []
             playlist_dict.append(self.active_library[self.active_index]['movieid'])
-            kodi_tools.create_playlist(self.kodi_path, playlist_dict, "movie")
+            create_playlist(self.kodi_path, playlist_dict, "movie")
             """
                 Next we must readback the next item in the list and ask what to do
             """
@@ -619,7 +619,7 @@ class CPKodiSkill(CommonPlaySkill):
         volume_level = re.findall('\d+', str_remainder)
         if volume_level:
             if int(volume_level[0]) < 101:
-                new_volume = kodi_tools.set_volume(self.kodi_path, int(volume_level[0]))
+                new_volume = set_volume(self.kodi_path, int(volume_level[0]))
                 LOG.info("Kodi Volume Now: " + str(new_volume))
                 self.speak_dialog('volume.set', data={'result': str(new_volume)}, expect_response=False)
             else:
@@ -634,10 +634,10 @@ class CPKodiSkill(CommonPlaySkill):
             dir_skip = "smallbackward"
         else:
             dir_skip = "smallforward"
-        active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+        active_player_id, active_player_type = get_active_player(self.kodi_path)
         LOG.info(str(active_player_id), str(active_player_type))
         if active_player_type:
-            result = kodi_tools.skip_play(self.kodi_path, dir_skip)
+            result = skip_play(self.kodi_path, dir_skip)
             LOG.info('Kodi Skip Result: ' + str(result))
         else:
             LOG.info('Kodi does not appear to be playing anything at the moment')
@@ -646,10 +646,10 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require('VisibilityKeyword').require('InfoKeyword').
                     optionally('KodiKeyword').optionally('FilmKeyword'))
     def handle_show_movie_info_intent(self, message):
-        active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+        active_player_id, active_player_type = get_active_player(self.kodi_path)
         LOG.info(str(active_player_id), str(active_player_type))
         if active_player_type:
-            result = kodi_tools.show_movie_info(self.kodi_path)
+            result = show_movie_info(self.kodi_path)
             LOG.info('Kodi Show Info Result: ' + str(result))
         else:
             LOG.info('Kodi does not appear to be playing anything at the moment')
@@ -657,10 +657,10 @@ class CPKodiSkill(CommonPlaySkill):
     # user has requested to turn on the movie subtitles
     @intent_handler(IntentBuilder('').require("KodiKeyword").require('SubtitlesKeyword').require('OnKeyword'))
     def handle_subtitles_on_intent(self, message):
-        active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+        active_player_id, active_player_type = get_active_player(self.kodi_path)
         LOG.info(str(active_player_id), str(active_player_type))
         if active_player_type:
-            result = kodi_tools.show_subtitles(self.kodi_path)
+            result = show_subtitles(self.kodi_path)
             LOG.info('Kodi Show Subtitles Result: ' + str(result))
         else:
             LOG.info('Kodi does not appear to be playing anything at the moment')
@@ -668,10 +668,10 @@ class CPKodiSkill(CommonPlaySkill):
     # user has requested to turn off the movie subtitles
     @intent_handler(IntentBuilder('').require("KodiKeyword").require('SubtitlesKeyword').require('OffKeyword'))
     def handle_subtitles_off_intent(self, message):
-        active_player_id, active_player_type = kodi_tools.get_active_player(self.kodi_path)
+        active_player_id, active_player_type = get_active_player(self.kodi_path)
         LOG.info(str(active_player_id), str(active_player_type))
         if active_player_type:
-            result = kodi_tools.hide_subtitles(self.kodi_path)
+            result = hide_subtitles(self.kodi_path)
             LOG.info('Kodi Hide Subtitles Result: ' + str(result))
         else:
             LOG.info('Kodi does not appear to be playing anything at the moment')
@@ -681,7 +681,7 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require("ListKeyword").require('RecentKeyword').require('FilmKeyword'))
     def handle_show_movies_added_intent(self, message):
         window_path = "videodb://recentlyaddedmovies/"
-        result = kodi_tools.show_window(self.kodi_path, window_path)
+        result = show_window(self.kodi_path, window_path)
         LOG.info('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("RecentKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
@@ -690,7 +690,7 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('GenreKeyword'))
     def handle_show_movies_genres_intent(self, message):
         window_path = "videodb://movies/genres/"
-        result = kodi_tools.show_window(self.kodi_path, window_path)
+        result = show_window(self.kodi_path, window_path)
         LOG.info('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("GenreKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
@@ -699,7 +699,7 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('ActorKeyword'))
     def handle_show_movies_actors_intent(self, message):
         window_path = "videodb://movies/actors/"
-        result = kodi_tools.show_window(self.kodi_path, window_path)
+        result = show_window(self.kodi_path, window_path)
         LOG.info('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("ActorKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
@@ -708,7 +708,7 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('StudioKeyword'))
     def handle_show_movies_studio_intent(self, message):
         window_path = "videodb://movies/studios/"
-        result = kodi_tools.show_window(self.kodi_path, window_path)
+        result = show_window(self.kodi_path, window_path)
         LOG.info('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("StudioKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
@@ -717,7 +717,7 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('TitleKeyword'))
     def handle_show_movies_title_intent(self, message):
         window_path = "videodb://movies/titles/"
-        result = kodi_tools.show_window(self.kodi_path, window_path)
+        result = show_window(self.kodi_path, window_path)
         LOG.info('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("TitleKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
@@ -726,7 +726,7 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('SetsKeyword'))
     def handle_show_movies_sets_intent(self, message):
         window_path = "videodb://movies/sets/"
-        result = kodi_tools.show_window(self.kodi_path, window_path)
+        result = show_window(self.kodi_path, window_path)
         LOG.info('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("SetsKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
@@ -735,7 +735,7 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require("ListKeyword").require('AllKeyword').require('FilmKeyword'))
     def handle_show_all_movies_intent(self, message):
         window_path = "videodb://movies/sets/"
-        result = kodi_tools.show_window(self.kodi_path, window_path)
+        result = show_window(self.kodi_path, window_path)
         LOG.info('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("AllKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
@@ -744,7 +744,7 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require("CleanKeyword").require('KodiKeyword').require('LibraryKeyword'))
     def handle_clean_library_intent(self, message):
         method = "VideoLibrary.Clean"
-        result = kodi_tools.update_library(self.kodi_path, method)
+        result = update_library(self.kodi_path, method)
         LOG.info('Kodi Update Library Result: ' + str(result))
         update_kw = message.data.get("CleanKeyword")
         self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
@@ -753,12 +753,10 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require("ScanKeyword").require('KodiKeyword').require('LibraryKeyword'))
     def handle_scan_library_intent(self, message):
         method = "VideoLibrary.Scan"
-        result = kodi_tools.update_library(self.kodi_path, method)
+        result = update_library(self.kodi_path, method)
         LOG.info('Kodi Update Library Result: ' + str(result))
         update_kw = message.data.get("ScanKeyword")
         self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
-
-
 
 
 def create_skill():

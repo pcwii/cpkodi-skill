@@ -32,9 +32,13 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 * "play all shook up”
 * "play the song blue suede shoes"
 * "play the album appeal to reason”
+* "play some music" --will play a random selection
 * "clear the music playlist"
 * "pause the music"
 * "resume the music"
+## Examples -Youtube-
+* "play the captain marvel official trailer from youtube”
+* "play helix from youtube”
 ## Examples -Miscelaneous-
 * "pause kodi"
 * "re-start kodi"
