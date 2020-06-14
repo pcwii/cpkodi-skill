@@ -1,7 +1,9 @@
 # prepare all kodi Tools for use
-from .CheckYTPresent import check_yt_present
+from .CheckPluginPresent import check_yt_present
 from .CreatePlaylist import create_playlist
 from .GetActivePlayer import get_active_player
+from .GetAllMovies import get_all_movies
+from .GetAllMusic import get_all_music
 from .GetPosterURL import get_poster_url
 from .GetRequestedMovies import get_requested_movies
 from .GetRequestedMusic import get_requested_music
@@ -20,5 +22,6 @@ from .ShowSubtitles import show_subtitles
 from .ShowWindow import show_window
 from .SkipPlay import skip_play
 from .StopKodi import stop_kodi
+from .UpdateLibrary import update_library
 
 

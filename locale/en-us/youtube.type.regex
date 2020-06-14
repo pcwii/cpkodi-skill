@@ -1,0 +1,1 @@
+(the |)(?P<ytItem>.+)(?=\s+from youtube)

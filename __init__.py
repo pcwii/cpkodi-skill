@@ -4,6 +4,7 @@ import sys
 import splitter
 import time
 import json
+import random
 
 from .kodi_tools import *
 from importlib import reload
@@ -171,30 +172,41 @@ class CPKodiSkill(CommonPlaySkill):
         movie_type = re.match(self.translate_regex('movie.type'), phrase)
         song_type = re.match(self.translate_regex('song.type'), phrase)
         show_type = re.match(self.translate_regex('show.type'), phrase)
-        if album_type:
+        random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
+        random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
+        youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
+        if album_type:  # Music by: Album
             request_type = 'album'
             request_item = album_type.groupdict()['album']
-        elif artist_type:
+        elif artist_type:  # Music by: Artist
             request_type = 'artist'
             request_item = artist_type.groupdict()['artist']
-        elif movie_type:
+        elif movie_type:  # Movies
             request_type = 'movie'
             request_item = movie_type.groupdict()['movie']
-        elif song_type:
+        elif song_type:  # Music: by Song
             request_type = 'title'
             request_item = song_type.groupdict()['title']
-        elif show_type:
+        elif random_movie_type:
+            request_type = 'movie'
+            request_item = 'random'
+        elif random_music_type:  # rand
+            request_type = 'title'
+            request_item = 'random'
+        elif youtube_type:  # youtube request "the official captain marvel trailer from youtube"
+            request_type = 'youtube'
+            request_item = youtube_type.groupdict()['ytItem']
+        elif show_type:  # TV Shows
             # play the outer limits season 1 episode 2
             request_type = 'show'
             request_item = show_type.groupdict()['showname']
             LOG.info("Show Name: " + str(request_item))
             request_episode = show_type.groupdict()['episode']
             LOG.info("Episode: " + str(request_episode))
-            # Todo: remove after testing
+            # Todo: remove the following two lines after testing
             request_type = None
             request_item = None
         else:
-            # Todo Add TV-Show types
             request_type = None
             request_item = None
         return request_item, request_type  # returns the request details and the request type
@@ -215,6 +227,9 @@ class CPKodiSkill(CommonPlaySkill):
             It should check to see if this skill can play the requested media
             Phrase is provided without the word "play"
         """
+        # Todo: handle Random Song Requests "Play Some Music", Grab random selection of 10 - 15 songs?
+        # Todo: Handle Cinemavision options
+        # Todo: Handle Youtube searches
         results = None
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
@@ -230,16 +245,20 @@ class CPKodiSkill(CommonPlaySkill):
             else:
                 LOG.info("Requested search: " + str(request_item) + ", of type: " + str(request_type))
             if "movie" in request_type:
-                word_list = self.split_compound(request_item)
-                LOG.info(str(word_list))
-                results = kodi_tools.get_requested_movies(self.kodi_path, word_list)
-                # LOG.info("Possible movies matches are: " + str(results))
+                if "random" in request_item:
+                    results = self.random_movie_select()
+                else:
+                    word_list = self.split_compound(request_item)
+                    LOG.info(str(word_list))
+                    results = kodi_tools.get_requested_movies(self.kodi_path, word_list)
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
-                results = kodi_tools.get_requested_music(self.kodi_path, request_item, request_type)
-                LOG.info("Searching for music")
+                if "random" in request_item:
+                    results = self.random_music_select()
+                else:
+                    results = kodi_tools.get_requested_music(self.kodi_path, request_item, request_type)
             if results is None:
                 LOG.info("Found Nothing!")
-                return None  # no match found by this skill
+                return None
             else:
                 if len(results) > 0:
                     match_level = CPSMatchLevel.EXACT
@@ -330,11 +349,23 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('An error was detected in: clear_queue_and_play')
             LOG.error(e)
             self.on_websettings_changed()
+
+    def random_movie_select(self):
+        item_count = 1
+        full_list = kodi_tools.get_all_movies(self.kodi_path)
+        random_entry = random.choices(full_list, k=item_count)
+        return random_entry
+
+    def random_music_select(self):
+        item_count = random.randint(10, 20)
+        LOG.info('Randomly Selecting: ' + str(item_count) +' entries.')
+        full_list = kodi_tools.get_all_music(self.kodi_path)
+        random_entry = random.choices(full_list, k=item_count)
+        return random_entry
+
     """
         All vocal intents apear here
     """
-
-
     # stop kodi was requested in the utterance
     @intent_handler(IntentBuilder("").require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_stop_intent(self, message):
@@ -493,6 +524,7 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_navigate_library_intent(self, message):
         """
             Conversational Context to handle listing of found movies
+            This will walk you through each movie in the found list
         """
         if "AddKeyword" in message.data:
             """
@@ -667,6 +699,25 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("AllKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+
+    # user has requested to refresh the movie library database
+    @intent_handler(IntentBuilder('').require("CleanKeyword").require('KodiKeyword').require('LibraryKeyword'))
+    def handle_clean_library_intent(self, message):
+        method = "VideoLibrary.Clean"
+        result = kodi_tools.update_library(self.kodi_path, method)
+        LOG.info('Kodi Update Library Result: ' + str(result))
+        update_kw = message.data.get("CleanKeyword")
+        self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
+
+    # user has requested to update the movie database
+    @intent_handler(IntentBuilder('').require("ScanKeyword").require('KodiKeyword').require('LibraryKeyword'))
+    def handle_scan_library_intent(self, message):
+        method = "VideoLibrary.Scan"
+        result = kodi_tools.update_library(self.kodi_path, method)
+        LOG.info('Kodi Update Library Result: ' + str(result))
+        update_kw = message.data.get("ScanKeyword")
+        self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
+
 
 
 
