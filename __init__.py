@@ -110,7 +110,6 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.error(e)
                 self.on_websettings_changed()
 
-
     def translate_regex(self, regex):
         """
             All requests types are added here and return the requested items
@@ -163,7 +162,6 @@ class CPKodiSkill(CommonPlaySkill):
         else:
             repeat_value = 1
         return repeat_value
-
 
     def get_request_details(self, phrase):
         """
@@ -239,7 +237,7 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('CPKodi Skill must be setup at the home.mycroft.ai')
             self.on_websettings_changed()
             return None
-        #try:
+        # try:
         if True:
             request_item, request_type = self.get_request_details(phrase)  # extract the item name from the phrase
             if (request_item is None) or (request_type is None):
@@ -276,7 +274,7 @@ class CPKodiSkill(CommonPlaySkill):
                     return phrase, match_level, data
                 else:
                     return None  # until a match is found
-        #except Exception as e:
+        # except Exception as e:
         #    LOG.info('An error was detected in: CPS_match_query_phrase')
         #    LOG.info('An error was detected in: CPS_match_query_phrase')
         #    LOG.error(e)
@@ -402,7 +400,6 @@ class CPKodiSkill(CommonPlaySkill):
             yt_links.append("?playlist_id=" + playlist_links[0] + "&play=1&order=shuffle")
         return yt_links
 
-
     """
         All vocal intents apear here
     """
@@ -421,7 +418,6 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.error(e)
             self.on_websettings_changed()
 
-
     # request to Pause a playing kodi instance
     @intent_handler(IntentBuilder("").require("PauseKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_pause_intent(self, message):
@@ -439,7 +435,6 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.error(e)
             self.on_websettings_changed()
 
-
     # request to resume a paused kodi instance
     @intent_handler(IntentBuilder('').require("ResumeKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
     def handle_resume_intent(self, message):
@@ -456,7 +451,6 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('An error was detected in: handle_resume_intent')
             LOG.error(e)
             self.on_websettings_changed()
-
 
     # clear Playlists
     @intent_handler(IntentBuilder('').require("ClearKeyword").require("PlaylistKeyword").
@@ -490,20 +484,17 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.error(e)
             self.on_websettings_changed()
 
-
     # turn notifications on requested in the utterance
     @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OnKeyword").require("KodiKeyword"))
     def handle_notification_on_intent(self, message):
         self.notifier_bool = True
         self.speak_dialog("notification.on")
 
-
     # turn notifications off requested in the utterance
     @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OffKeyword").require("KodiKeyword"))
     def handle_notification_off_intent(self, message):
         self.notifier_bool = False
         self.speak_dialog("notification.off")
-
 
     # move cursor utterance
     @intent_handler(IntentBuilder('').require('MoveKeyword').require('CursorKeyword').
@@ -539,7 +530,6 @@ class CPKodiSkill(CommonPlaySkill):
                     wait_while_speaking()
                     self.speak_dialog("direction", data={"result": direction_kw}, expect_response=True)
 
-
     @intent_handler(IntentBuilder('').require('NavigateContextKeyword').one_of('YesKeyword', 'NoKeyword'))
     def handle_navigate_decision_intent(self, message):
         """
@@ -557,7 +547,6 @@ class CPKodiSkill(CommonPlaySkill):
         else:  # No was spoken to navigate the list, reading the first item
             LOG.info('User responded with...' + message.data.get('NoKeyword'))
             self.speak_dialog('cancel', expect_response=False)
-
 
     @intent_handler(IntentBuilder('').require('ListContextKeyword').
                     one_of('AddKeyword', 'NextKeyword', 'PlayKeyword', 'StopKeyword'))
@@ -675,7 +664,6 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('Kodi Hide Subtitles Result: ' + str(result))
         else:
             LOG.info('Kodi does not appear to be playing anything at the moment')
-
 
     # user has requested to show the recently added movies list
     @intent_handler(IntentBuilder('').require("ListKeyword").require('RecentKeyword').require('FilmKeyword'))
