@@ -169,14 +169,19 @@ class CPKodiSkill(CommonPlaySkill):
             all files are .regex
             More types can be added to expand functions
         """
-        album_type = re.match(self.translate_regex('album.type'), phrase)
-        artist_type = re.match(self.translate_regex('artist.type'), phrase)
-        movie_type = re.match(self.translate_regex('movie.type'), phrase)
-        song_type = re.match(self.translate_regex('song.type'), phrase)
-        show_type = re.match(self.translate_regex('show.type'), phrase)
-        random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
-        random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
+
         youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
+        if youtube_type:  # youtube request "the official captain marvel trailer from youtube"
+            request_type = 'youtube'
+            request_item = youtube_type.groupdict()['ytItem']
+        else:
+            album_type = re.match(self.translate_regex('album.type'), phrase)
+            artist_type = re.match(self.translate_regex('artist.type'), phrase)
+            movie_type = re.match(self.translate_regex('movie.type'), phrase)
+            song_type = re.match(self.translate_regex('song.type'), phrase)
+            show_type = re.match(self.translate_regex('show.type'), phrase)
+            random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
+            random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
         if album_type:  # Music by: Album
             request_type = 'album'
             request_item = album_type.groupdict()['album']
@@ -195,9 +200,6 @@ class CPKodiSkill(CommonPlaySkill):
         elif random_music_type:  # rand
             request_type = 'title'
             request_item = 'random'
-        elif youtube_type:  # youtube request "the official captain marvel trailer from youtube"
-            request_type = 'youtube'
-            request_item = youtube_type.groupdict()['ytItem']
         elif show_type:  # TV Shows
             # play the outer limits season 1 episode 2
             request_type = 'show'
