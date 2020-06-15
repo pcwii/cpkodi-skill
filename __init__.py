@@ -169,7 +169,14 @@ class CPKodiSkill(CommonPlaySkill):
             all files are .regex
             More types can be added to expand functions
         """
-
+        youtube_type = None
+        album_type = None
+        artist_type = None
+        movie_type = None
+        song_type = None
+        show_type = None
+        random_movie_type = None
+        random_music_type = None
         youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
         if youtube_type:  # youtube request "the official captain marvel trailer from youtube"
             LOG.info('Youtube Type was requested')
