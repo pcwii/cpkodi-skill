@@ -179,9 +179,10 @@ class CPKodiSkill(CommonPlaySkill):
         random_music_type = None
         youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
         if youtube_type:  # youtube request "the official captain marvel trailer from youtube"
-            LOG.info('Youtube Type was requested')
             request_type = 'youtube'
             request_item = youtube_type.groupdict()['ytItem']
+            LOG.info('Youtube Type was requested: ', str(request_item))
+            return request_item, request_type  # returns the request details and the request type
         else:
             album_type = re.match(self.translate_regex('album.type'), phrase)
             artist_type = re.match(self.translate_regex('artist.type'), phrase)
@@ -269,6 +270,7 @@ class CPKodiSkill(CommonPlaySkill):
                     results = get_requested_music(self.kodi_path, request_item, request_type)
             if ("youtube" in request_type) and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
                 results = self.get_youtube_links(request_item)
+
             if results is None:
                 LOG.info("Found Nothing!")
                 return None
