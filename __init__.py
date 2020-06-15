@@ -172,6 +172,7 @@ class CPKodiSkill(CommonPlaySkill):
 
         youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
         if youtube_type:  # youtube request "the official captain marvel trailer from youtube"
+            LOG.info('Youtube Type was requested')
             request_type = 'youtube'
             request_item = youtube_type.groupdict()['ytItem']
         else:
