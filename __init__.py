@@ -46,6 +46,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_library = None
         self.active_index = 0
         self.active_request = None
+        self.kodi_specific_request = False
         # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
@@ -243,7 +244,7 @@ class CPKodiSkill(CommonPlaySkill):
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
         results = None
-        kodi_specific = False
+        self.kodi_specific_request = False
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
             LOG.info('CPKodi Skill must be setup at the home.mycroft.ai')
@@ -252,8 +253,9 @@ class CPKodiSkill(CommonPlaySkill):
         # try:
         if True:
             kodi_request = re.match(self.translate_regex('kodi.word'), phrase)
+            LOG.info('Kodi phrase Check: ' + str(kodi_request))
             if kodi_request:  # kodi was specifically requested in the utterance
-                kodi_specific = True
+                self.kodi_specific_request = True
                 match_found = kodi_request.groupdict()['kodiRequest']
                 LOG.info('Kodi was specivied in the utterance')
                 LOG.info('Old Phrase: ' + str(phrase))
@@ -284,7 +286,7 @@ class CPKodiSkill(CommonPlaySkill):
                 return None
             else:
                 if len(results) > 0:
-                    if kodi_specific:
+                    if self.kodi_specific_request:
                         match_level = CPSMatchLevel.EXACT
                     else:
                         match_level = CPSMatchLevel.MULTI_KEY
