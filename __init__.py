@@ -182,7 +182,7 @@ class CPKodiSkill(CommonPlaySkill):
         if youtube_type:  # youtube request "the official captain marvel trailer from youtube"
             request_type = 'youtube'
             request_item = youtube_type.groupdict()['ytItem']
-            LOG.info('Youtube Type was requested: ', str(request_item))
+            LOG.info('Youtube Type was requested: ' + str(request_item))
             return request_item, request_type  # returns the request details and the request type
         else:
             album_type = re.match(self.translate_regex('album.type'), phrase)
@@ -253,14 +253,15 @@ class CPKodiSkill(CommonPlaySkill):
         # try:
         if True:
             kodi_request = re.match(self.translate_regex('kodi.word'), phrase)
-            LOG.info('Kodi phrase Check: ' + str(kodi_request))
             if kodi_request:  # kodi was specifically requested in the utterance
                 self.kodi_specific_request = True
                 match_found = kodi_request.groupdict()['kodiRequest']
-                LOG.info('Kodi was specivied in the utterance')
+                LOG.info('Kodi was specified in the utterance')
                 LOG.info('Old Phrase: ' + str(phrase))
                 phrase = str(phrase).replace(str(match_found), '')
                 LOG.info('New Phrase: ' + str(phrase))
+            else:
+                LOG.info('Kodi was NOT specified in the utterance')
             request_item, request_type = self.get_request_details(phrase)  # extract the item name from the phrase
             if (request_item is None) or (request_type is None):
                 LOG.info('GetRequest returned None')
