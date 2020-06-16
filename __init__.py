@@ -243,6 +243,7 @@ class CPKodiSkill(CommonPlaySkill):
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
         results = None
+        kodi_specific = False
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
             LOG.info('CPKodi Skill must be setup at the home.mycroft.ai')
@@ -250,6 +251,14 @@ class CPKodiSkill(CommonPlaySkill):
             return None
         # try:
         if True:
+            kodi_request = re.match(self.translate_regex('kodi.word'), phrase)
+            if kodi_request:  # kodi was specifically requested in the utterance
+                kodi_specific = True
+                match_found = kodi_request.groupdict()['kodiRequest']
+                LOG.info('Kodi was specivied in the utterance')
+                LOG.info('Old Phrase: ' + str(phrase))
+                phrase = str(phrase).replace(str(match_found), '')
+                LOG.info('New Phrase: ' + str(phrase))
             request_item, request_type = self.get_request_details(phrase)  # extract the item name from the phrase
             if (request_item is None) or (request_type is None):
                 LOG.info('GetRequest returned None')
@@ -270,13 +279,15 @@ class CPKodiSkill(CommonPlaySkill):
                     results = get_requested_music(self.kodi_path, request_item, request_type)
             if ("youtube" in request_type) and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
                 results = self.get_youtube_links(request_item)
-
             if results is None:
                 LOG.info("Found Nothing!")
                 return None
             else:
                 if len(results) > 0:
-                    match_level = CPSMatchLevel.EXACT
+                    if kodi_specific:
+                        match_level = CPSMatchLevel.EXACT
+                    else:
+                        match_level = CPSMatchLevel.MULTI_KEY
                     data = {
                         "library": results,
                         "request": request_item,
