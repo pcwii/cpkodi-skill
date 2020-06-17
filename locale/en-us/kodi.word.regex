@@ -1,1 +1,1 @@
-(?P<kodiRequest>(with |using )(kodi|codi|kody|cody))
+^.*(?<=(?P<kodiItem>.with kodi|using kodi))
