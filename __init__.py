@@ -47,6 +47,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_index = 0
         self.active_request = None
         self.kodi_specific_request = False
+
         # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
@@ -217,6 +218,10 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info("Show Name: " + str(request_item))
             request_episode = show_type.groupdict()['episode']
             LOG.info("Episode: " + str(request_episode))
+            show_details = re.match(self.translate_regex('show.details'), str(request_episode))
+            season_number = show_details.groupdict()['season']
+            episode_number = show_details.groupdict()['episode']
+            LOG.info(str(season_number) + ':'+ str(episode_number))
             # Todo: remove the following two lines after testing
             request_type = None
             request_item = None

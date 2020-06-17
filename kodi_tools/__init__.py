@@ -7,7 +7,7 @@ from .GetAllMusic import get_all_music
 from .GetPosterURL import get_poster_url
 from .GetRequestedMovies import get_requested_movies
 from .GetRequestedMusic import get_requested_music
-from .GetRequestedTVShows import get_requested_tv_shows
+from .GetRequestedTVShows import get_show
 from .HideSubtitles import hide_subtitles
 from .MoveCursor import move_cursor
 from .PausePlayer import pause_all
