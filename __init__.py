@@ -47,6 +47,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_index = 0
         self.active_request = None
         self.kodi_specific_request = False
+        self.artist_name = None
 
         # self.settings_change_callback = self.on_websettings_changed
 
@@ -170,7 +171,10 @@ class CPKodiSkill(CommonPlaySkill):
             matches the phrase against a series of regex's
             all files are .regex
             More types can be added to expand functions
+            request_type is the type of media being requested
+            request_item is the specific item that was requested
         """
+        request_atributes = {}
         youtube_type = None
         album_type = None
         artist_type = None
@@ -179,12 +183,19 @@ class CPKodiSkill(CommonPlaySkill):
         show_type = None
         random_movie_type = None
         random_music_type = None
+        self.artist_name = None
         youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
         if youtube_type:  # youtube request "the official captain marvel trailer from youtube"
             request_type = 'youtube'
             request_item = youtube_type.groupdict()['ytItem']
             LOG.info('Youtube Type was requested: ' + str(request_item))
-            return request_item, request_type  # returns the request details and the request type
+            # package the return json
+            request_data = {
+                "type": request_type,
+                "item": request_item,
+                "atributes": request_atributes,
+            }
+            return request_data  # request_item, request_type  # returns the request details and the request type
         else:
             album_type = re.match(self.translate_regex('album.type'), phrase)
             artist_type = re.match(self.translate_regex('artist.type'), phrase)
@@ -216,19 +227,26 @@ class CPKodiSkill(CommonPlaySkill):
             request_type = 'show'
             request_item = show_type.groupdict()['showname']
             LOG.info("Show Name: " + str(request_item))
-            request_episode = show_type.groupdict()['episode']
-            LOG.info("Episode: " + str(request_episode))
-            show_details = re.match(self.translate_regex('show.details'), str(request_episode))
+            request_specific = show_type.groupdict()['episode']
+            LOG.info("Episode: " + str(request_specific))
+            show_details = re.match(self.translate_regex('show.details'), str(request_specific))
             season_number = show_details.groupdict()['season']
             episode_number = show_details.groupdict()['episode']
-            LOG.info(str(season_number) + ':'+ str(episode_number))
-            # Todo: remove the following two lines after testing
-            request_type = None
-            request_item = None
+            LOG.info(str(season_number) + ':' + str(episode_number))
+            request_atributes = {
+                    "season": int(season_number),
+                    "episode": int(episode_number)
+            }
         else:
             request_type = None
             request_item = None
-        return request_item, request_type  # returns the request details and the request type
+        # package the return json
+        request_data = {
+            "type": request_type,
+            "item": request_item,
+            "atributes": request_atributes,
+        }
+        return request_data  # request_item, request_type # returns the request details and the request type
 
     def split_compound(self, sentance):
         """
@@ -245,6 +263,7 @@ class CPKodiSkill(CommonPlaySkill):
             The method is invoked by the PlayBackControlSkill.
             It should check to see if this skill can play the requested media
             Phrase is provided without the word "play"
+            We imediatly check for the kodi specific request and strip this from the phase
         """
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
@@ -260,14 +279,17 @@ class CPKodiSkill(CommonPlaySkill):
             kodi_request = re.match(self.translate_regex('kodi.word'), phrase)
             if kodi_request:  # kodi was specifically requested in the utterance
                 self.kodi_specific_request = True
-                match_found = kodi_request.groupdict()['kodiItem']
+                match_found = kodi_request.groupdict()['kodiItem']  # returns the phrase containing kodi
                 LOG.info('Kodi was specified in the utterance')
                 LOG.info('Old Phrase: ' + str(phrase))
-                phrase = str(phrase).replace(str(match_found), '')
+                phrase = str(phrase).replace(str(match_found), '')  # strip the kodi from the phrase
                 LOG.info('New Phrase: ' + str(phrase))
             else:
                 LOG.info('Kodi was NOT specified in the utterance')
-            request_item, request_type = self.get_request_details(phrase)  # extract the item name from the phrase
+            request_data = self.get_request_details(phrase)  # extract the item name from the phrase
+            request_item = request_data["item"]
+            request_type = request_data["type"]
+            # request_item, request_type = self.get_request_details(phrase)  # extract the item name from the phrase
             if (request_item is None) or (request_type is None):
                 LOG.info('GetRequest returned None')
                 return None
@@ -296,11 +318,16 @@ class CPKodiSkill(CommonPlaySkill):
                         match_level = CPSMatchLevel.EXACT
                     else:
                         match_level = CPSMatchLevel.MULTI_KEY
+#                    data = {
+#                        "library": results,
+#                        "request": request_item,
+#                        "type": request_type
+#                    }
                     data = {
                         "library": results,
-                        "request": request_item,
-                        "type": request_type
+                        "details": request_data
                     }
+
                     LOG.info('Searching kodi found a matching playable item!')
                     return phrase, match_level, data
                 else:
@@ -316,10 +343,10 @@ class CPKodiSkill(CommonPlaySkill):
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
         """
-        request_type = data["type"]  # album, artist, movie, title, youtube, show
+        request_type = data["details"]["type"]  # album, artist, movie, title, youtube, show
         self.active_library = data["library"]  # a list of what was found
         self.active_index = 0  # reinitialize the step counter for reading back the library
-        self.active_request = str(data["request"])  # what was requested
+        self.active_request = str(data["details"]["item"])  # what was requested
         playlist_count = len(self.active_library)  # how many items were returned
         playlist_type = request_type
         #LOG.info(str(self.active_library), str(playlist_type), str(playlist_count))
