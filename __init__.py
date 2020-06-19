@@ -433,10 +433,10 @@ class CPKodiSkill(CommonPlaySkill):
             self.on_websettings_changed()
 
     def random_movie_select(self):
-        item_count = 1
         full_list = get_all_movies(self.kodi_path)
-        random_entry = random.choices(full_list, k=item_count)
-        return random_entry
+        random_id = random.randint(1, len(full_list))
+        selected_entry = full_list[random_id]
+        return selected_entry
 
     def random_music_select(self):
         item_count = random.randint(10, 20)
