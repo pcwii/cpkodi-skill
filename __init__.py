@@ -207,6 +207,14 @@ class CPKodiSkill(CommonPlaySkill):
         if album_type:  # Music by: Album
             request_type = 'album'
             request_item = album_type.groupdict()['album']
+            artist_specified = re.match(self.translate_regex('artist.name'), phrase)
+            if artist_specified:
+                LOG.info('Artist also specified')
+                artist_name = artist_specified.groupdict()['artist_Name']
+                phrase = str(phrase).replace(str(artist_name), '')
+                request_atributes = {
+                    "artist": str(artist_name)
+                }
         elif artist_type:  # Music by: Artist
             request_type = 'artist'
             request_item = artist_type.groupdict()['artist']
@@ -216,6 +224,14 @@ class CPKodiSkill(CommonPlaySkill):
         elif song_type:  # Music: by Song
             request_type = 'title'
             request_item = song_type.groupdict()['title']
+            artist_specified = re.match(self.translate_regex('artist.name'), phrase)
+            if artist_specified:
+                LOG.info('Artist also specified')
+                artist_name = artist_specified.groupdict()['artist_Name']
+                phrase = str(phrase).replace(str(artist_name), '')
+                request_atributes = {
+                    "artist": str(artist_name)
+                }
         elif random_movie_type:
             request_type = 'movie'
             request_item = 'random'
