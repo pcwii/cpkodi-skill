@@ -205,6 +205,7 @@ class CPKodiSkill(CommonPlaySkill):
             random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
             random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
         if album_type:  # Music by: Album
+            LOG.info('Album Type')
             request_type = 'album'
             request_item = album_type.groupdict()['album']
             artist_specified = re.match(self.translate_regex('artist.name'), phrase)
@@ -216,12 +217,15 @@ class CPKodiSkill(CommonPlaySkill):
                     "artist": str(artist_name)
                 }
         elif artist_type:  # Music by: Artist
+            LOG.info('Artist Type')
             request_type = 'artist'
             request_item = artist_type.groupdict()['artist']
         elif movie_type:  # Movies
+            LOG.info('Movie Type')
             request_type = 'movie'
             request_item = movie_type.groupdict()['movie']
         elif song_type:  # Music: by Song
+            LOG.info('Song Type')
             request_type = 'title'
             request_item = song_type.groupdict()['title']
             artist_specified = re.match(self.translate_regex('artist.name'), phrase)
@@ -233,13 +237,16 @@ class CPKodiSkill(CommonPlaySkill):
                     "artist": str(artist_name)
                 }
         elif random_movie_type:
+            LOG.info('Random Movie Type')
             request_type = 'movie'
             request_item = 'random'
         elif random_music_type:  # rand
+            LOG.info('Random Music Type')
             request_type = 'title'
             request_item = 'random'
         elif show_type:  # TV Shows
             # play the outer limits season 1 episode 2
+            LOG.info('Show Type')
             request_type = 'show'
             request_item = show_type.groupdict()['showname']
             LOG.info("Show Name: " + str(request_item))
