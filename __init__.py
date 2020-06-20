@@ -433,6 +433,7 @@ class CPKodiSkill(CommonPlaySkill):
             self.on_websettings_changed()
 
     def random_movie_select(self):
+        LOG.info('Random Movie Selected')
         full_list = get_all_movies(self.kodi_path)
         random_id = random.randint(1, len(full_list))
         selected_entry = full_list[random_id]
