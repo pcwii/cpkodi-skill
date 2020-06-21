@@ -328,6 +328,7 @@ class CPKodiSkill(CommonPlaySkill):
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
                 if "random" in request_item:
                     results = self.random_music_select()
+                    LOG.info('Random Music List: ' + str(results))
                 else:
                     results = get_requested_music(self.kodi_path, request_item, request_type)
             if ("youtube" in request_type) and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
