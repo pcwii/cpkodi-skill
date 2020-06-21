@@ -447,10 +447,15 @@ class CPKodiSkill(CommonPlaySkill):
         return selected_entry
 
     def random_music_select(self):
-        item_count = random.randint(10, 20)
-        LOG.info('Randomly Selecting: ' + str(item_count) +' entries.')
+        item_count = random.randint(10, 20)  # how many items to grab
+        LOG.info('Randomly Selecting: ' + str(item_count) + ' entries.')
         full_list = get_all_music(self.kodi_path)
-        random_entry = random.choices(full_list, k=item_count)
+        # print(full_list)
+        random_id = random.sample(range(len(full_list)), item_count)
+        random_entry = []
+        for each_id in random_id:
+            # print(full_list[int(each_id)])
+            random_entry.append(full_list[int(each_id)])
         return random_entry
 
     def get_youtube_links(self, search_text):
