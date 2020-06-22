@@ -48,6 +48,8 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_request = None
         self.kodi_specific_request = False
         self.artist_name = None
+        self.music_library = None
+        self.movie_library = None
 
         # self.settings_change_callback = self.on_websettings_changed
 
@@ -291,6 +293,7 @@ class CPKodiSkill(CommonPlaySkill):
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
         results = None
+        self.music_library = get_all_music(self.kodi_path)
         self.kodi_specific_request = False
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
@@ -450,13 +453,11 @@ class CPKodiSkill(CommonPlaySkill):
     def random_music_select(self):
         item_count = random.randint(10, 20)  # how many items to grab
         LOG.info('Randomly Selecting: ' + str(item_count) + ' entries.')
-        full_list = get_all_music(self.kodi_path)
-        # print(full_list)
-        random_id = random.sample(range(len(full_list)), item_count)
+        random_id = random.sample(range(len(self.music_library)), item_count)
         random_entry = []
         for each_id in random_id:
             # print(full_list[int(each_id)])
-            random_entry.append(full_list[int(each_id)])
+            random_entry.append(self.music_library[int(each_id)])
         return random_entry
 
     def get_youtube_links(self, search_text):
