@@ -355,7 +355,8 @@ class CPKodiSkill(CommonPlaySkill):
                         "details": request_data
                     }
 
-                    LOG.info('Searching kodi found a matching playable item!')
+                    LOG.info('Searching kodi found a matching playable item! ' +str(match_level) )
+                    LOG.info(str(data))
                     return phrase, match_level, data
                 else:
                     return None  # until a match is found
