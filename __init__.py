@@ -374,6 +374,7 @@ class CPKodiSkill(CommonPlaySkill):
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
         """
+        self.music_library = get_all_music(self.kodi_path)
         request_type = data["details"]["type"]  # album, artist, movie, title, youtube, show
         self.active_library = data["library"]  # a list of what was found
         self.active_index = 0  # reinitialize the step counter for reading back the library
