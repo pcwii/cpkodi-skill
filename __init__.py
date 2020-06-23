@@ -5,6 +5,9 @@ import splitter
 import time
 import json
 import random
+#from threading import Timer
+import threading
+
 
 from .kodi_tools import *
 from importlib import reload
@@ -50,7 +53,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.artist_name = None
         self.music_library = None
         self.movie_library = None
-
+        self.read_library_thread = threading.Thread(target=self.update_library)
         # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
@@ -59,7 +62,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.add_event('recognizer_loop:wakeword', self.handle_listen)
         self.add_event('recognizer_loop:utterance', self.handle_utterance)
         self.add_event('speak', self.handle_speak)
-        self.music_library = get_all_music(self.kodi_path)
+
 
     def on_websettings_changed(self):  # called when updating mycroft home page
         # if not self._is_setup:
@@ -79,8 +82,13 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info(self.kodi_path)
                 self.kodi_image_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/image/"
                 self._is_setup = True
+                self.music_library = get_all_music(self.kodi_path)
         except Exception as e:
             LOG.error(e)
+
+    def update_library(self):
+        LOG.info('Reading Whole Library Thread...')
+        self.music_library = get_all_music(self.kodi_path)
 
     # listening event used for kodi notifications
     def handle_listen(self, message):
@@ -293,9 +301,10 @@ class CPKodiSkill(CommonPlaySkill):
         """
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
-        results = None
-
+        # Todo: create a background task to grab the music / movie library
+        self.read_library_thread.start()
         #self.music_library = get_all_music(self.kodi_path)
+        results = None
         self.kodi_specific_request = False
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
