@@ -59,6 +59,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.add_event('recognizer_loop:wakeword', self.handle_listen)
         self.add_event('recognizer_loop:utterance', self.handle_utterance)
         self.add_event('speak', self.handle_speak)
+        self.music_library = get_all_music(self.kodi_path)
 
     def on_websettings_changed(self):  # called when updating mycroft home page
         # if not self._is_setup:
@@ -293,7 +294,8 @@ class CPKodiSkill(CommonPlaySkill):
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
         results = None
-        self.music_library = get_all_music(self.kodi_path)
+
+        #self.music_library = get_all_music(self.kodi_path)
         self.kodi_specific_request = False
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
@@ -356,7 +358,7 @@ class CPKodiSkill(CommonPlaySkill):
                         "details": request_data
                     }
 
-                    LOG.info('Searching kodi found a matching playable item! ' +str(match_level) )
+                    LOG.info('Searching kodi found a matching playable item! ' + str(match_level))
                     LOG.info(str(data))
                     return phrase, match_level, data
                 else:
