@@ -344,7 +344,8 @@ class CPKodiSkill(CommonPlaySkill):
                     if self.kodi_specific_request:
                         match_level = CPSMatchLevel.EXACT
                     else:
-                        match_level = CPSMatchLevel.MULTI_KEY
+                        match_level = CPSMatchLevel.EXACT
+                        #match_level = CPSMatchLevel.MULTI_KEY
 #                    data = {
 #                        "library": results,
 #                        "request": request_item,
