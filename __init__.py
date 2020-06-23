@@ -90,6 +90,7 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('Reading Whole Library Thread...')
         self.music_library = get_all_music(self.kodi_path)
 
+
     # listening event used for kodi notifications
     def handle_listen(self, message):
         voice_payload = "Listening"
@@ -302,7 +303,8 @@ class CPKodiSkill(CommonPlaySkill):
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
         # Todo: create a background task to grab the music / movie library
-        self.read_library_thread.start()
+        #self.read_library_thread.start()
+
         #self.music_library = get_all_music(self.kodi_path)
         results = None
         self.kodi_specific_request = False
