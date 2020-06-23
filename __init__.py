@@ -828,6 +828,7 @@ class CPKodiSkill(CommonPlaySkill):
         method = "VideoLibrary.Clean"
         result = update_library(self.kodi_path, method)
         LOG.info('Kodi Update Library Result: ' + str(result))
+        self.music_library = get_all_music(self.kodi_path)
         update_kw = message.data.get("CleanKeyword")
         self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
 
@@ -837,6 +838,7 @@ class CPKodiSkill(CommonPlaySkill):
         method = "VideoLibrary.Scan"
         result = update_library(self.kodi_path, method)
         LOG.info('Kodi Update Library Result: ' + str(result))
+        self.music_library = get_all_music(self.kodi_path)
         update_kw = message.data.get("ScanKeyword")
         self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
 
