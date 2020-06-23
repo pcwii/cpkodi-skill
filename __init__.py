@@ -51,9 +51,8 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_request = None
         self.kodi_specific_request = False
         self.artist_name = None
-        self.music_library = None
-        self.movie_library = None
-        self.read_library_thread = threading.Thread(target=self.update_library)
+        #self.music_library = None
+        #self.read_library_thread = threading.Thread(target=self.update_library)
         # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
@@ -82,13 +81,13 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info(self.kodi_path)
                 self.kodi_image_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/image/"
                 self._is_setup = True
-                self.music_library = get_all_music(self.kodi_path)
+                #self.music_library = get_all_music(self.kodi_path)
         except Exception as e:
             LOG.error(e)
 
-    def update_library(self):
-        LOG.info('Reading Whole Library Thread...')
-        self.music_library = get_all_music(self.kodi_path)
+    #def update_library(self):
+    #    LOG.info('Reading Whole Library Thread...')
+        #self.music_library = get_all_music(self.kodi_path)
 
 
     # listening event used for kodi notifications
@@ -336,6 +335,7 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info("Requested search: " + str(request_item) + ", of type: " + str(request_type))
             if "movie" in request_type:
                 if "random" in request_item:
+                    # TODO: extend the timer for the query before executing get_all_music()
                     results = self.random_movie_select()
                 else:
                     word_list = self.split_compound(request_item)
@@ -343,6 +343,8 @@ class CPKodiSkill(CommonPlaySkill):
                     results = get_requested_movies(self.kodi_path, word_list)
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
                 if "random" in request_item:
+                    # TODO: extend the timer for the query before executing get_all_music()
+                    #self.music_library = get_all_music(self.kodi_path)
                     results = self.random_music_select()
                     LOG.info('Random Music List: ' + str(results))
                 else:
@@ -385,7 +387,7 @@ class CPKodiSkill(CommonPlaySkill):
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
         """
-        self.music_library = get_all_music(self.kodi_path)
+        #self.music_library = get_all_music(self.kodi_path)
         request_type = data["details"]["type"]  # album, artist, movie, title, youtube, show
         self.active_library = data["library"]  # a list of what was found
         self.active_index = 0  # reinitialize the step counter for reading back the library
@@ -467,13 +469,14 @@ class CPKodiSkill(CommonPlaySkill):
         return selected_entry
 
     def random_music_select(self):
+        full_list = get_all_music(self.kodi_path)
         item_count = random.randint(10, 20)  # how many items to grab
         LOG.info('Randomly Selecting: ' + str(item_count) + ' entries.')
-        random_id = random.sample(range(len(self.music_library)), item_count)
+        random_id = random.sample(range(len(full_list)), item_count)
         random_entry = []
         for each_id in random_id:
             # print(full_list[int(each_id)])
-            random_entry.append(self.music_library[int(each_id)])
+            random_entry.append(full_list[int(each_id)])
         return random_entry
 
     def get_youtube_links(self, search_text):
@@ -839,7 +842,7 @@ class CPKodiSkill(CommonPlaySkill):
         method = "VideoLibrary.Clean"
         result = update_library(self.kodi_path, method)
         LOG.info('Kodi Update Library Result: ' + str(result))
-        self.music_library = get_all_music(self.kodi_path)
+        #self.music_library = get_all_music(self.kodi_path)
         update_kw = message.data.get("CleanKeyword")
         self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
 
@@ -849,7 +852,7 @@ class CPKodiSkill(CommonPlaySkill):
         method = "VideoLibrary.Scan"
         result = update_library(self.kodi_path, method)
         LOG.info('Kodi Update Library Result: ' + str(result))
-        self.music_library = get_all_music(self.kodi_path)
+        #self.music_library = get_all_music(self.kodi_path
         update_kw = message.data.get("ScanKeyword")
         self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
 
