@@ -217,16 +217,29 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('Album Type')
             request_type = 'album'
             request_item = album_type.groupdict()['album']
-            artist_specified = re.match(self.translate_regex('artist.name'), str(request_item))
-            if artist_specified:
+            #artist_specified = re.match(self.translate_regex('artist.name'), str(request_item))
+            if artist_type:
                 LOG.info('Artist also specified')
-                artist_name = artist_specified.groupdict()['artist_Name']
+                artist_name = artist_type.groupdict()['artist']
                 phrase = str(phrase).replace(str(artist_name), '')
                 # Todo: add artist filter to album search
                 request_atributes = {
                     "artist": str(artist_name)
                 }
-        elif artist_type:  # Music by: Artist
+        elif song_type:  # Music: by Song
+            LOG.info('Song Type')
+            request_type = 'title'
+            request_item = song_type.groupdict()['title']
+            artist_specified = re.match(self.translate_regex('artist.name'), str(request_item))
+            if artist_type:
+                LOG.info('Artist also specified')
+                artist_name = artist_type.groupdict()['artist']
+                phrase = str(phrase).replace(str(artist_name), '')
+                # Todo: add artist filter to album search
+                request_atributes = {
+                    "artist": str(artist_name)
+                }
+        elif artist_type and not (album_type or artist_type):  # Music by: Artist only not a subtype
             LOG.info('Artist Type')
             request_type = 'artist'
             request_item = artist_type.groupdict()['artist']
@@ -234,19 +247,6 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('Movie Type')
             request_type = 'movie'
             request_item = movie_type.groupdict()['movie']
-        elif song_type:  # Music: by Song
-            LOG.info('Song Type')
-            request_type = 'title'
-            request_item = song_type.groupdict()['title']
-            artist_specified = re.match(self.translate_regex('artist.name'), str(request_item))
-            if artist_specified:
-                LOG.info('Artist also specified')
-                artist_name = artist_specified.groupdict()['artist_Name']
-                phrase = str(phrase).replace(str(artist_name), '')
-                # Todo: add artist filter to album search
-                request_atributes = {
-                    "artist": str(artist_name)
-                }
         elif random_movie_type:
             LOG.info('Random Movie Type')
             request_type = 'movie'
