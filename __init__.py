@@ -205,12 +205,14 @@ class CPKodiSkill(CommonPlaySkill):
             return request_data  # request_item, request_type  # returns the request details and the request type
         else:
             album_type = re.match(self.translate_regex('album.type'), phrase)
-            artist_type = re.match(self.translate_regex('artist.type'), phrase)
-            movie_type = re.match(self.translate_regex('movie.type'), phrase)
             song_type = re.match(self.translate_regex('song.type'), phrase)
             show_type = re.match(self.translate_regex('show.type'), phrase)
             random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
+            if random_movie_type is None:
+                movie_type = re.match(self.translate_regex('movie.type'), phrase)
             random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
+            if random_music_type is None:
+                artist_type = re.match(self.translate_regex('artist.type'), phrase)
         if album_type:  # Music by: Album
             LOG.info('Album Type')
             request_type = 'album'
