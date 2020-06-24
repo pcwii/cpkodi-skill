@@ -502,7 +502,7 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_stop_intent(self, message):
         try:
             active_player_id, active_player_type = get_active_player(self.kodi_path)
-            LOG.info(str(active_player_id), str(active_player_type))
+            LOG.info(str(active_player_id) + ', ' + str(active_player_type))
             if active_player_type:
                 result = stop_kodi(self.kodi_path, active_player_id)
                 if "OK" in result.text:
