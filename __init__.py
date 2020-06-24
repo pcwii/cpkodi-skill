@@ -222,6 +222,7 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info('Artist also specified')
                 artist_name = artist_specified.groupdict()['artist_Name']
                 phrase = str(phrase).replace(str(artist_name), '')
+                # Todo: add artist filter to album search
                 request_atributes = {
                     "artist": str(artist_name)
                 }
@@ -242,6 +243,7 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info('Artist also specified')
                 artist_name = artist_specified.groupdict()['artist_Name']
                 phrase = str(phrase).replace(str(artist_name), '')
+                # Todo: add artist filter to album search
                 request_atributes = {
                     "artist": str(artist_name)
                 }
@@ -299,7 +301,6 @@ class CPKodiSkill(CommonPlaySkill):
         """
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
-        # Todo: create a background task to grab the music / movie library
         results = None
         self.kodi_specific_request = False
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
@@ -328,7 +329,7 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info("Requested search: " + str(request_item) + ", of type: " + str(request_type))
             if "movie" in request_type:
                 if "random" in request_item:
-                    # TODO: extend the timer for the query before executing get_all_music()
+                    # Extend the CPS timeout while we search the whole library
                     self.bus.emit(Message('play:query.response', {"phrase": phrase,
                                                                   "skill_id": self.skill_id,
                                                                   "searching": True}))
@@ -338,7 +339,7 @@ class CPKodiSkill(CommonPlaySkill):
                     results = get_requested_movies(self.kodi_path, word_list)
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
                 if "random" in request_item:
-                    # TODO: extend the timer for the query before executing get_all_music()
+                    # Extend the CPS timeout while we search the whole library
                     self.bus.emit(Message('play:query.response', {"phrase": phrase,
                                                                   "skill_id": self.skill_id,
                                                                   "searching": True}))
