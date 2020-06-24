@@ -307,7 +307,7 @@ class CPKodiSkill(CommonPlaySkill):
             return None
         # try:
         if True:
-            kodi_request = re.match(self.translate_regex('kodi.word'), phrase)
+            kodi_request = re.match(self.translate_regex('with.kodi'), phrase)
             if kodi_request:  # kodi was specifically requested in the utterance
                 self.kodi_specific_request = True
                 match_found = kodi_request.groupdict()['kodiItem']  # returns the phrase containing kodi
