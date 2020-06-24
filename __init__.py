@@ -217,7 +217,7 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('Album Type')
             request_type = 'album'
             request_item = album_type.groupdict()['album']
-            artist_specified = re.match(self.translate_regex('artist.name'), phrase)
+            artist_specified = re.match(self.translate_regex('artist.name'), str(request_item))
             if artist_specified:
                 LOG.info('Artist also specified')
                 artist_name = artist_specified.groupdict()['artist_Name']
@@ -238,7 +238,7 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('Song Type')
             request_type = 'title'
             request_item = song_type.groupdict()['title']
-            artist_specified = re.match(self.translate_regex('artist.name'), phrase)
+            artist_specified = re.match(self.translate_regex('artist.name'), str(request_item))
             if artist_specified:
                 LOG.info('Artist also specified')
                 artist_name = artist_specified.groupdict()['artist_Name']
