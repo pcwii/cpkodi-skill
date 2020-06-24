@@ -12,10 +12,6 @@ def get_all_music(kodi_path):
         "id": 1,
         "params": {
             "properties": [
-                "artist",
-                "duration",
-                "album",
-                "track"
             ],
         }
     }
