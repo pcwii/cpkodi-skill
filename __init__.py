@@ -51,6 +51,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_request = None
         self.kodi_specific_request = False
         self.artist_name = None
+        self.skill_id = 'cpkodi-skill_pcwii'
         #self.music_library = None
         #self.read_library_thread = threading.Thread(target=self.update_library)
         # self.settings_change_callback = self.on_websettings_changed
