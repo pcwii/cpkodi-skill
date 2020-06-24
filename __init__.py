@@ -505,6 +505,9 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info(str(active_player_id), str(active_player_type))
             if active_player_type:
                 result = stop_kodi(self.kodi_path, active_player_id)
+                if "OK" in result.text:
+                    LOG.info("Stopped")
+                    self.speak_dialog('stopped', expect_response=False)
             else:
                 LOG.info('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
