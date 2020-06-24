@@ -5,8 +5,8 @@ import splitter
 import time
 import json
 import random
-#from threading import Timer
-import threading
+# from threading import Timer
+# import threading
 
 
 from .kodi_tools import *
@@ -85,11 +85,6 @@ class CPKodiSkill(CommonPlaySkill):
                 #self.music_library = get_all_music(self.kodi_path)
         except Exception as e:
             LOG.error(e)
-
-    #def update_library(self):
-    #    LOG.info('Reading Whole Library Thread...')
-        #self.music_library = get_all_music(self.kodi_path)
-
 
     # listening event used for kodi notifications
     def handle_listen(self, message):
@@ -303,9 +298,6 @@ class CPKodiSkill(CommonPlaySkill):
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
         # Todo: create a background task to grab the music / movie library
-        #self.read_library_thread.start()
-
-        #self.music_library = get_all_music(self.kodi_path)
         results = None
         self.kodi_specific_request = False
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
@@ -321,14 +313,13 @@ class CPKodiSkill(CommonPlaySkill):
                 match_found = kodi_request.groupdict()['kodiItem']  # returns the phrase containing kodi
                 LOG.info('Kodi was specified in the utterance')
                 LOG.info('Old Phrase: ' + str(phrase))
-                phrase = str(phrase).replace(str(match_found), '')  # strip the kodi from the phrase
-                LOG.info('New Phrase: ' + str(phrase))
+                clean_phrase = str(phrase).replace(str(match_found), '')  # strip the kodi from the phrase
+                LOG.info('New Phrase: ' + str(clean_phrase))
             else:
                 LOG.info('Kodi was NOT specified in the utterance')
-            request_data = self.get_request_details(phrase)  # extract the item name from the phrase
+            request_data = self.get_request_details(clean_phrase)  # extract the item name from the phrase
             request_item = request_data["item"]
             request_type = request_data["type"]
-            # request_item, request_type = self.get_request_details(phrase)  # extract the item name from the phrase
             if (request_item is None) or (request_type is None):
                 LOG.info('GetRequest returned None')
                 return None
@@ -343,17 +334,14 @@ class CPKodiSkill(CommonPlaySkill):
                     results = self.random_movie_select()
                 else:
                     word_list = self.split_compound(request_item)
-                    LOG.info(str(word_list))
                     results = get_requested_movies(self.kodi_path, word_list)
             if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
                 if "random" in request_item:
                     # TODO: extend the timer for the query before executing get_all_music()
-                    #self.music_library = get_all_music(self.kodi_path)
                     self.bus.emit(Message('play:query.response', {"phrase": phrase,
                                                                   "skill_id": self.skill_id,
                                                                   "searching": True}))
                     results = self.random_music_select()
-                    LOG.info('Random Music List: ' + str(results))
                 else:
                     results = get_requested_music(self.kodi_path, request_item, request_type)
             if ("youtube" in request_type) and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
@@ -366,20 +354,14 @@ class CPKodiSkill(CommonPlaySkill):
                     if self.kodi_specific_request:
                         match_level = CPSMatchLevel.EXACT
                     else:
-                        match_level = CPSMatchLevel.EXACT
-                        #match_level = CPSMatchLevel.MULTI_KEY
-#                    data = {
-#                        "library": results,
-#                        "request": request_item,
-#                        "type": request_type
-#                    }
+                        # match_level = CPSMatchLevel.EXACT
+                        match_level = CPSMatchLevel.MULTI_KEY
                     data = {
                         "library": results,
                         "details": request_data
                     }
 
                     LOG.info('Searching kodi found a matching playable item! ' + str(match_level))
-                    LOG.info(str(data))
                     return phrase, match_level, data
                 else:
                     return None  # until a match is found
@@ -394,14 +376,12 @@ class CPKodiSkill(CommonPlaySkill):
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
         """
-        #self.music_library = get_all_music(self.kodi_path)
         request_type = data["details"]["type"]  # album, artist, movie, title, youtube, show
         self.active_library = data["library"]  # a list of what was found
         self.active_index = 0  # reinitialize the step counter for reading back the library
         self.active_request = str(data["details"]["item"])  # what was requested
         playlist_count = len(self.active_library)  # how many items were returned
         playlist_type = request_type
-        #LOG.info(str(self.active_library), str(playlist_type), str(playlist_count))
         playlist_dict = []
         try:
             if "youtube" in playlist_type:
