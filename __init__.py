@@ -313,7 +313,7 @@ class CPKodiSkill(CommonPlaySkill):
                 match_found = kodi_request.groupdict()['kodiItem']  # returns the phrase containing kodi
                 LOG.info('Kodi was specified in the utterance')
                 LOG.info('Old Phrase: ' + str(phrase))
-                phrase = str(phrase).replace(str(match_found), '')  # strip the kodi from the phrase
+                phrase = str(phrase).replace(str(match_found), '').strip()  # strip the kodi from the phrase
             else:
                 LOG.info('Kodi was NOT specified in the utterance')
             request_data = self.get_request_details(phrase)  # extract the item name from the phrase
