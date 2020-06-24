@@ -336,6 +336,9 @@ class CPKodiSkill(CommonPlaySkill):
             if "movie" in request_type:
                 if "random" in request_item:
                     # TODO: extend the timer for the query before executing get_all_music()
+                    self.bus.emit(Message('play:query.response', {"phrase": phrase,
+                                                                  "skill_id": self.skill_id,
+                                                                  "searching": True}))
                     results = self.random_movie_select()
                 else:
                     word_list = self.split_compound(request_item)
@@ -345,6 +348,9 @@ class CPKodiSkill(CommonPlaySkill):
                 if "random" in request_item:
                     # TODO: extend the timer for the query before executing get_all_music()
                     #self.music_library = get_all_music(self.kodi_path)
+                    self.bus.emit(Message('play:query.response', {"phrase": phrase,
+                                                                  "skill_id": self.skill_id,
+                                                                  "searching": True}))
                     results = self.random_music_select()
                     LOG.info('Random Music List: ' + str(results))
                 else:
