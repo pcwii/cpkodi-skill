@@ -405,7 +405,7 @@ class CPKodiSkill(CommonPlaySkill):
             Phrase is provided without the word "play"
             We imediatly check for the kodi specific request and strip this from the phase
         """
-        LOG.info(str(self.get_request_info(self, phrase)))
+        LOG.info(str(self.get_request_info(phrase)))
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
         results = None
