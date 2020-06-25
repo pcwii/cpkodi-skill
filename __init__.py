@@ -191,7 +191,7 @@ class CPKodiSkill(CommonPlaySkill):
             'tv': {
                 'title': None,
                 'season': None,
-                'episode': None
+                'episode': None,
                 'active': False
             },
             'movies': {
