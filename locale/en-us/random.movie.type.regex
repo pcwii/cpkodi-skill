@@ -1,1 +1,1 @@
-(a|random|some|any) (?=.*movie)(?P<random>.+)
+(a|random|some|any) (?=.*(movie|film))(?P<random>.+)

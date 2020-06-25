@@ -173,6 +173,105 @@ class CPKodiSkill(CommonPlaySkill):
             repeat_value = 1
         return repeat_value
 
+    def get_request_info(self, phrase):
+        request_info = {
+            'utternace': phrase,
+            'random': False,
+            'destination': None,
+            'youtube': {
+                'item': None,
+                'active': False
+            },
+            'music': {
+                'album': None,
+                'title': None,
+                'artist': None,
+                'active': False
+            },
+            'tv': {
+                'title': None,
+                'season': None,
+                'episode': None
+                'active': False
+            },
+            'movies': {
+                'title': None,
+                'active': False
+            },
+        }
+        """
+        (the|some|)(?P<ytItem>.+)(?=\s+(from|with|using|on) youtube)
+        """
+        youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
+        if youtube_type:  # youtube request "the official captain marvel trailer from youtube"
+            request_info['youtube']['item'] = youtube_type.groupdict()['ytItem']
+            request_info['youtube']['active'] = True
+        """
+        (the |)(album|disc|lp|cd) (?P<album>.+)
+        """
+        album_type = re.match(self.translate_regex('album.type'), phrase)
+        if album_type:
+            request_info['music']['album'] = album_type.groupdict()['album']
+            request_info['music']['active'] = True
+        """
+        (the |)(song|single) (?P<title>.+)
+        """
+        song_type = re.match(self.translate_regex('song.type'), phrase)
+        if song_type:
+            request_info['music']['title'] = song_type.groupdict()['title']
+            request_info['music']['active'] = True
+        """
+        (the |)(artist|group|band|(something|anything|stuff|music|songs) (by|from)|(some|by)) (?P<artist>.+)
+        """
+        artist_type = re.match(self.translate_regex('artist.type'), phrase)
+        if artist_type:
+            request_info['music']['artist'] = artist_type.groupdict()['artist']
+            request_info['music']['active'] = True
+        """
+        (the |)(movie|film) (?P<movie>.+)
+        """
+        movie_type = re.match(self.translate_regex('movie.type'), phrase)
+        if movie_type:  # Movies
+            request_info['movies']['title'] = movie_type.groupdict()['movie']
+            request_info['movies']['active'] = True
+        """
+        (a|random|some|any) (?=.*(movie|film))(?P<random>.+)
+        """
+        random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
+        if random_movie_type is None:
+            request_info['random'] = True
+            request_info['movies']['active'] = True
+        """
+        (a|random|some|any) (?=.*(music|song))(?P<random>.+)
+        """
+        random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
+        if random_music_type:  # rand
+            request_info['random'] = True
+            request_info['music']['active'] = True
+        """
+        play the outer limits season 1 episode 2
+        (the\s+|)(?P<showname>.+)(?=\s+season)(?P<episode>.+)       
+        """
+        show_details_type = re.match(self.translate_regex('show.details.type'), phrase)
+        if show_details_type:  # TV Shows
+            request_info['tv']['title'] = show_details_type.groupdict()['showname']
+            request_info['tv']['details'] = show_details_type.groupdict()['episode']
+            show_details = re.match(self.translate_regex('show.details'), request_info['tv']['details'])
+            request_info['tv']['season'] = show_details.groupdict()['season']
+            request_info['tv']['episode'] = show_details.groupdict()['episode']
+            request_info['tv']['active'] = True
+        """
+        play the tv show stargirl
+        (the |)(tv|)(show|episode) (?P<showname>.+)     
+        """
+        show_type = re.match(self.translate_regex('show.type'), phrase)
+        if show_details_type:  # TV Shows
+            request_info['tv']['title'] = show_type.groupdict()['showname']
+            request_info['tv']['active'] = True
+            #ToDo: get last episode played
+        return request_info
+
+
     def get_request_details(self, phrase):
         """
             matches the phrase against a series of regex's
@@ -299,6 +398,7 @@ class CPKodiSkill(CommonPlaySkill):
             Phrase is provided without the word "play"
             We imediatly check for the kodi specific request and strip this from the phase
         """
+        LOG.info(str(self.get_request_info(self, phrase)))
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
         results = None

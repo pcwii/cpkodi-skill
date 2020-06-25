@@ -1,1 +1,1 @@
-(the|some|)(?P<ytItem>.+)(?=\s+from youtube)
+(the|some|)(?P<ytItem>.+)(?=\s+(from|with|using|on) youtube)

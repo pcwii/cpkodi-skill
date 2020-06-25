@@ -1,1 +1,1 @@
-(random|some|any) (?=.*music)(?P<random>.+)
+(a|random|some|any) (?=.*(music|song))(?P<random>.+)
