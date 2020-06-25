@@ -200,6 +200,7 @@ class CPKodiSkill(CommonPlaySkill):
             },
         }
         """
+        play third day from youtube
         (the|some|)(?P<ytItem>.+)(?=\s+(from|with|using|on) youtube)
         """
         youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
@@ -207,6 +208,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['youtube']['item'] = youtube_type.groupdict()['ytItem']
             request_info['youtube']['active'] = True
         """
+        play the album eye on it
         (the |)(album|disc|lp|cd) (?P<album>.+)
         """
         album_type = re.match(self.translate_regex('album.type'), phrase)
@@ -214,6 +216,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['music']['album'] = album_type.groupdict()['album']
             request_info['music']['active'] = True
         """
+        play the song eye on it
         (the |)(song|single) (?P<title>.+)
         """
         song_type = re.match(self.translate_regex('song.type'), phrase)
@@ -221,6 +224,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['music']['title'] = song_type.groupdict()['title']
             request_info['music']['active'] = True
         """
+        play the artist toby mac
         (the |)(artist|group|band|(something|anything|stuff|music|songs) (by|from)|(some|by)) (?P<artist>.+)
         """
         artist_type = re.match(self.translate_regex('artist.type'), phrase)
@@ -228,6 +232,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['music']['artist'] = artist_type.groupdict()['artist']
             request_info['music']['active'] = True
         """
+        play the movie spiderman homecoming
         (the |)(movie|film) (?P<movie>.+)
         """
         movie_type = re.match(self.translate_regex('movie.type'), phrase)
@@ -235,6 +240,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['movies']['title'] = movie_type.groupdict()['movie']
             request_info['movies']['active'] = True
         """
+        play a movie
         (a|random|some|any) (?=.*(movie|film))(?P<random>.+)
         """
         random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
@@ -242,6 +248,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['random'] = True
             request_info['movies']['active'] = True
         """
+        play some music
         (a|random|some|any) (?=.*(music|song))(?P<random>.+)
         """
         random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
