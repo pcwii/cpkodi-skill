@@ -203,6 +203,7 @@ class CPKodiSkill(CommonPlaySkill):
         play third day from youtube
         (the|some|)(?P<ytItem>.+)(?=\s+(from|with|using|on) youtube)
         """
+        # Todo: this caused ['random'] = True and ['movies']['active'] = true
         youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
         if youtube_type:  # youtube request "the official captain marvel trailer from youtube"
             request_info['youtube']['item'] = youtube_type.groupdict()['ytItem']
@@ -244,7 +245,7 @@ class CPKodiSkill(CommonPlaySkill):
         (a|random|some|any) (?=.*(movie|film))(?P<random>.+)
         """
         random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
-        if random_movie_type is None:
+        if random_movie_type:
             request_info['random'] = True
             request_info['movies']['active'] = True
         """
