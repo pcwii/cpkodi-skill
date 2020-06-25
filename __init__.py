@@ -201,6 +201,7 @@ class CPKodiSkill(CommonPlaySkill):
         }
         """
         play third day from youtube
+        *passed*
         (the|some|)(?P<ytItem>.+)(?=\s+(from|with|using|on) youtube)
         """
         youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
@@ -209,6 +210,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['youtube']['active'] = True
         """
         play the album eye on it
+        *passed*
         (the |)(album|disc|lp|cd) (?P<album>.+)
         """
         album_type = re.match(self.translate_regex('album.type'), phrase)
@@ -217,6 +219,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['music']['active'] = True
         """
         play the song eye on it
+        *passed*
         (the |)(song|single) (?P<title>.+)
         """
         song_type = re.match(self.translate_regex('song.type'), phrase)
@@ -233,6 +236,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['music']['active'] = True
         """
         play the movie spiderman homecoming
+        *passed*
         (the |)(movie|film) (?P<movie>.+)
         """
         movie_type = re.match(self.translate_regex('movie.type'), phrase)
@@ -241,6 +245,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['movies']['active'] = True
         """
         play a movie
+        *passed*
         (a|random|some|any) (?=.*(movie|film))(?P<random>.+)
         """
         random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
@@ -249,6 +254,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['movies']['active'] = True
         """
         play some music
+        *faild, random and music artist*
         (a|random|some|any) (?=.*(music|song))(?P<random>.+)
         """
         random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
@@ -263,9 +269,9 @@ class CPKodiSkill(CommonPlaySkill):
         if show_details_type:  # TV Shows
             request_info['tv']['title'] = show_details_type.groupdict()['showname']
             request_info['tv']['details'] = show_details_type.groupdict()['episode']
-            show_details = re.match(self.translate_regex('show.details'), request_info['tv']['details'])
-            request_info['tv']['season'] = show_details.groupdict()['season']
-            request_info['tv']['episode'] = show_details.groupdict()['episode']
+            show_details = re.match(self.translate_regex('show.details'), str(request_info['tv']['details']))
+            request_info['tv']['season'] = int(show_details.groupdict()['season'])
+            request_info['tv']['episode'] = int(show_details.groupdict()['episode'])
             request_info['tv']['active'] = True
         """
         play the tv show stargirl

@@ -1,1 +1,11 @@
  tail -f /var/log/mycroft/skills.log | grep cpkodi
+
+play third day from youtube - correctly evaluated
+play the album eye on it - correctly evaluated
+play the song eye on it - correctly evaluated
+play the artist toby mac - correctly evaluated
+play the movie spiderman homecoming - correctly evaluated
+play a movie - correctly evaluated
+play some music - correctly triggered random, but also triggerd artist, some music could be interpreted as some <artist>
+play the outer limits season 1 episode 2
+
