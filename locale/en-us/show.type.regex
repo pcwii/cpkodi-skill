@@ -1,1 +1,1 @@
-(the |)(tv|)(show|episode) (?P<showname>.+)
+(the |)(tv|)(show) (?P<showname>.+)

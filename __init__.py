@@ -279,7 +279,7 @@ class CPKodiSkill(CommonPlaySkill):
                 request_info['tv']['active'] = True
         """
         play the tv show stargirl
-        (the |)(tv|)(show|episode) (?P<showname>.+)     
+        (the |)(tv|)(show) (?P<showname>.+)     
         """
         show_type = re.match(self.translate_regex('show.type'), phrase)
         if show_details_type:  # TV Shows
