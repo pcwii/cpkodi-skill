@@ -269,10 +269,14 @@ class CPKodiSkill(CommonPlaySkill):
         if show_details_type:  # TV Shows
             request_info['tv']['title'] = show_details_type.groupdict()['showname']
             request_info['tv']['details'] = show_details_type.groupdict()['episode']
+            """
+            (season (?P<season>\d{1,3}))(.+episode (?P<episode>\d{1,3}))
+            """
             show_details = re.match(self.translate_regex('show.details'), str(request_info['tv']['details']))
-            request_info['tv']['season'] = int(show_details.groupdict()['season'])
-            request_info['tv']['episode'] = int(show_details.groupdict()['episode'])
-            request_info['tv']['active'] = True
+            if show_details:
+                request_info['tv']['season'] = int(show_details.groupdict()['season'])
+                request_info['tv']['episode'] = int(show_details.groupdict()['episode'])
+                request_info['tv']['active'] = True
         """
         play the tv show stargirl
         (the |)(tv|)(show|episode) (?P<showname>.+)     

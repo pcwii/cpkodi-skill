@@ -1,1 +1,1 @@
-season (?P<season>[0-9]+) episode (?P<episode>[0-9]+)([^\\/]*)$
+(season (?P<season>\d{1,3}))(.+episode (?P<episode>\d{1,3}))
