@@ -52,8 +52,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.kodi_specific_request = False
         self.artist_name = None
         self.skill_id = 'cpkodi-skill_pcwii'
-        #self.music_library = None
-        #self.read_library_thread = threading.Thread(target=self.update_library)
+        self.movie_library = None
         # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
@@ -351,6 +350,9 @@ class CPKodiSkill(CommonPlaySkill):
                                                                       "skill_id": self.skill_id,
                                                                       "searching": True}))
                         LOG.info('Searching for Random movie')
+                        self.bus.emit(Message('play:query.response', {"phrase": phrase,
+                                                                      "skill_id": self.skill_id,
+                                                                      "searching": True}))
                         results = self.random_movie_select()
                     else:
                         word_list = self.split_compound(request_data['movies']['title'])
