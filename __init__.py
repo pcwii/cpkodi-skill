@@ -408,18 +408,16 @@ class CPKodiSkill(CommonPlaySkill):
                     If type is movie then ask if there are multiple, if one then add to playlist and play
                 """
                 LOG.info('Preparing to Play Movie' + str(self.active_library))
-                for each_item in self.active_library:
-                    movie_id = str(each_item["movieid"]) # Todo: Generating an Error when random movie type
+                if len(data["library"]) == 1:  # Only one item was returned so go ahead and play
+                    movie_id = str(self.active_library["movieid"])
                     playlist_dict.append(movie_id)
-                if len(data["library"]) == 1:
-                    # Only one item was returned so go ahead and play
                     self.clear_queue_and_play(playlist_dict, 'movie')
                 elif len(data["library"]):  # confirm the library does not have a zero length or is None
                     # Todo: give the option to add all items to the playlist imediatly
                     self.set_context('NavigateContextKeyword', 'NavigateContext')
                     wait_while_speaking()
                     self.speak_dialog('multiple.results', data={"result": str(playlist_count)}, expect_response=True)
-                else:
+                else:  # no items were found in the library
                     wait_while_speaking()
                     self.speak_dialog('no.results', data={"result": str(data["request"])}, expect_response=False)
             if request_data['music']['active']:
