@@ -350,6 +350,7 @@ class CPKodiSkill(CommonPlaySkill):
                         self.bus.emit(Message('play:query.response', {"phrase": phrase,
                                                                       "skill_id": self.skill_id,
                                                                       "searching": True}))
+                        LOG.info('Searching for Random movie')
                         results = self.random_movie_select()
                     else:
                         word_list = self.split_compound(request_data['movies']['title'])
@@ -360,6 +361,7 @@ class CPKodiSkill(CommonPlaySkill):
                         self.bus.emit(Message('play:query.response', {"phrase": phrase,
                                                                       "skill_id": self.skill_id,
                                                                       "searching": True}))
+                        LOG.info('Searching for Random music')
                         results = self.random_music_select()
                     else:
                         request_type = request_data['music']['type']
