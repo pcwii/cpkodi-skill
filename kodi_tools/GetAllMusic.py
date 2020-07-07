@@ -16,7 +16,7 @@ def get_all_music(kodi_path):
             ],
             "limits": {
                 "start": 0,
-                "end": max_items
+                "end": int(max_items)
             }
         }
     }
