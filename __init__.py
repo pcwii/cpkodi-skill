@@ -393,7 +393,8 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_library = data["library"]  # a results list of what was found
         playlist_count = len(self.active_library)  # how many items were returned
         playlist_dict = []
-        try:
+        #try:
+        if True:
             if request_data['youtube']['active']:
                 """
                     if Type is youtube then plugin and source has already been confirmed so go ahead and play
@@ -430,10 +431,10 @@ class CPKodiSkill(CommonPlaySkill):
                     song_id = str(each_item["songid"])
                     playlist_dict.append(song_id)
                 self.clear_queue_and_play(playlist_dict, request_data['music']['type'])
-        except Exception as e:
-            LOG.info('An error was detected in: CPS_match_query_phrase')
-            LOG.error(e)
-            self.on_websettings_changed()
+#        except Exception as e:
+#            LOG.info('An error was detected in: CPS_match_query_phrase')
+#            LOG.error(e)
+#            self.on_websettings_changed()
 
     def clear_queue_and_play(self, playlist_items, playlist_type):
         result = None
