@@ -344,44 +344,44 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info('GetRequest returned None, no regex matches were found')
                 return None
             else:
-            if request_data['movies']['active']:
-                if request_data['random']:
-                    # Extend the CPS timeout while we search the whole library
-                    self.bus.emit(Message('play:query.response', {"phrase": phrase,
-                                                                  "skill_id": self.skill_id,
-                                                                  "searching": True}))
-                    results = self.random_movie_select()
-                else:
-                    word_list = self.split_compound(request_data['movies']['title'])
-                    results = get_requested_movies(self.kodi_path, word_list)
-            if request_data['music']['active']:
-                if request_data['random']:
-                    # Extend the CPS timeout while we search the whole library
-                    self.bus.emit(Message('play:query.response', {"phrase": phrase,
-                                                                  "skill_id": self.skill_id,
-                                                                  "searching": True}))
-                    results = self.random_music_select()
-                else:
-                    request_type = request_data['music']['type']
-                    request_item = request_data['music'][request_type]
-                    results = get_requested_music(self.kodi_path, request_item, request_type)
-            if request_data['youtube']['active'] and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
-                results = self.get_youtube_links(request_data['youtube']['item'])
-            else:
-                if len(results) > 0:
-                    if request_data['kodi']['active']:
-                        match_level = CPSMatchLevel.EXACT
+                if request_data['movies']['active']:
+                    if request_data['random']:
+                        # Extend the CPS timeout while we search the whole library
+                        self.bus.emit(Message('play:query.response', {"phrase": phrase,
+                                                                      "skill_id": self.skill_id,
+                                                                      "searching": True}))
+                        results = self.random_movie_select()
                     else:
-                        # match_level = CPSMatchLevel.EXACT
-                        match_level = CPSMatchLevel.MULTI_KEY
-                    data = {
-                        "library": results,
-                        "details": request_data
-                    }
-                    LOG.info('Searching kodi found a matching playable item! ' + str(match_level))
-                    return phrase, match_level, data
+                        word_list = self.split_compound(request_data['movies']['title'])
+                        results = get_requested_movies(self.kodi_path, word_list)
+                if request_data['music']['active']:
+                    if request_data['random']:
+                        # Extend the CPS timeout while we search the whole library
+                        self.bus.emit(Message('play:query.response', {"phrase": phrase,
+                                                                      "skill_id": self.skill_id,
+                                                                      "searching": True}))
+                        results = self.random_music_select()
+                    else:
+                        request_type = request_data['music']['type']
+                        request_item = request_data['music'][request_type]
+                        results = get_requested_music(self.kodi_path, request_item, request_type)
+                if request_data['youtube']['active'] and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
+                    results = self.get_youtube_links(request_data['youtube']['item'])
                 else:
-                    return None  # until a match is found
+                    if len(results) > 0:
+                        if request_data['kodi']['active']:
+                            match_level = CPSMatchLevel.EXACT
+                        else:
+                            # match_level = CPSMatchLevel.EXACT
+                            match_level = CPSMatchLevel.MULTI_KEY
+                        data = {
+                            "library": results,
+                            "details": request_data
+                        }
+                        LOG.info('Searching kodi found a matching playable item! ' + str(match_level))
+                        return phrase, match_level, data
+                    else:
+                        return None  # until a match is found
 
     def CPS_start(self, phrase, data):
         """ Starts playback.
