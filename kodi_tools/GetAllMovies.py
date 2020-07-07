@@ -12,9 +12,6 @@ def get_all_movies(kodi_path):
         "id": 1,
         "params": {
             "properties": [
-                "file",
-                "thumbnail",
-                "fanart"
             ],
         }
     }
