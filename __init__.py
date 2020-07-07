@@ -411,7 +411,7 @@ class CPKodiSkill(CommonPlaySkill):
                     playlist_dict.append(movie_id)
                 if len(data["library"]) == 1:
                     # Only one item was returned so go ahead and play
-                    self.clear_queue_and_play(playlist_dict, playlist_type)
+                    self.clear_queue_and_play(playlist_dict, 'movie')
                 elif len(data["library"]):  # confirm the library does not have a zero length or is None
                     # Todo: give the option to add all items to the playlist imediatly
                     self.set_context('NavigateContextKeyword', 'NavigateContext')
