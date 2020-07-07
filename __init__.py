@@ -407,9 +407,9 @@ class CPKodiSkill(CommonPlaySkill):
                 """
                     If type is movie then ask if there are multiple, if one then add to playlist and play
                 """
-                LOG.info('Preparing to Play Movie')
+                LOG.info('Preparing to Play Movie' + str(self.active_library))
                 for each_item in self.active_library:
-                    movie_id = str(each_item["movieid"])
+                    movie_id = str(each_item["movieid"]) # Todo: Generating an Error when random movie type
                     playlist_dict.append(movie_id)
                 if len(data["library"]) == 1:
                     # Only one item was returned so go ahead and play
