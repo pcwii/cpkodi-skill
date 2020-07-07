@@ -161,7 +161,7 @@ class CPKodiSkill(CommonPlaySkill):
                         return repeat_value
 
     def get_repeat_words(self, message):
-        # Todo This routine is not language agnostic
+        # Todo This routine is not language agnostic, use regex files
         value = extract_number(message)
         if value:
             repeat_value = value
@@ -173,16 +173,32 @@ class CPKodiSkill(CommonPlaySkill):
             repeat_value = 1
         return repeat_value
 
+    def split_compound(self, sentance):
+        """
+            Used to split compound words that are found in the utterance
+            This will make it easier to confirm that all words are found in the search
+        """
+        search_words = re.split(r'\W+', str(sentance))
+        separator = " "
+        words_list = splitter.split(separator.join(search_words))
+        return words_list
+
     def get_request_info(self, phrase):
         request_info = {
             'utternace': phrase,
             'random': False,
-            'destination': None,
+            'activeItem': False,
+            'requestItem': phrase,
+            'kodi': {
+                'active': False,
+                'item': None
+            },
             'youtube': {
                 'item': None,
                 'active': False
             },
             'music': {
+                'type': None,
                 'album': None,
                 'title': None,
                 'artist': None,
@@ -215,6 +231,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         album_type = re.match(self.translate_regex('album.type'), phrase)
         if album_type:
+            request_info['music']['type'] = 'album'
             request_info['music']['album'] = album_type.groupdict()['album']
             request_info['music']['active'] = True
         """
@@ -224,6 +241,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         song_type = re.match(self.translate_regex('song.type'), phrase)
         if song_type:
+            request_info['music']['type'] = 'title'
             request_info['music']['title'] = song_type.groupdict()['title']
             request_info['music']['active'] = True
         """
@@ -232,6 +250,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         artist_type = re.match(self.translate_regex('artist.type'), phrase)
         if artist_type:
+            request_info['music']['type'] = 'artist'
             request_info['music']['artist'] = artist_type.groupdict()['artist']
             request_info['music']['active'] = True
         """
@@ -286,127 +305,21 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['tv']['title'] = show_type.groupdict()['showname']
             request_info['tv']['active'] = True
             #ToDo: get last episode played
+        """
+        specify with Kodi
+        (the |some|)(?P<kodiItem>.+)(?=\s+(from|with|using|on) kodi)
+        """
+        kodi_request = re.match(self.translate_regex('with.kodi'), phrase)
+        if kodi_request:  # kodi was specifically requested in the utterance
+            request_info['kodi']['active'] = True
+            request_info['kodi']['item'] = kodi_request.groupdict()['kodiItem']
+        # Todo: need to correct item requested from utterance
+        request_info['activeItem'] = (request_info['youtube']['active'] or
+                                   request_info['tv']['active'] or
+                                   request_info['music']['active'] or
+                                   request_info['movies']['active'])
         return request_info
 
-
-    def get_request_details(self, phrase):
-        """
-            matches the phrase against a series of regex's
-            all files are .regex
-            More types can be added to expand functions
-            request_type is the type of media being requested
-            request_item is the specific item that was requested
-        """
-        request_atributes = {}
-        youtube_type = None
-        album_type = None
-        artist_type = None
-        movie_type = None
-        song_type = None
-        show_type = None
-        random_movie_type = None
-        random_music_type = None
-        self.artist_name = None
-        youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
-        if youtube_type:  # youtube request "the official captain marvel trailer from youtube"
-            request_type = 'youtube'
-            request_item = youtube_type.groupdict()['ytItem']
-            LOG.info('Youtube Type was requested: ' + str(request_item))
-            # package the return json
-            request_data = {
-                "type": request_type,
-                "item": request_item,
-                "atributes": request_atributes,
-            }
-            return request_data  # request_item, request_type  # returns the request details and the request type
-        else:
-            album_type = re.match(self.translate_regex('album.type'), phrase)
-            song_type = re.match(self.translate_regex('song.type'), phrase)
-            show_type = re.match(self.translate_regex('show.type'), phrase)
-            random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
-            if random_movie_type is None:
-                movie_type = re.match(self.translate_regex('movie.type'), phrase)
-            random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
-            if random_music_type is None:
-                artist_type = re.match(self.translate_regex('artist.type'), phrase)
-        if album_type:  # Music by: Album
-            LOG.info('Album Type')
-            request_type = 'album'
-            request_item = album_type.groupdict()['album']
-            # artist_specified = re.match(self.translate_regex('artist.name'), str(request_item))
-            if artist_type:
-                LOG.info('Artist also specified')
-                artist_name = artist_type.groupdict()['artist']
-                phrase = str(phrase).replace(str(artist_name), '')
-                # Todo: add artist filter to album search
-                request_atributes = {
-                    "artist": str(artist_name)
-                }
-        elif song_type:  # Music: by Song
-            LOG.info('Song Type')
-            request_type = 'title'
-            request_item = song_type.groupdict()['title']
-            # artist_specified = re.match(self.translate_regex('artist.name'), str(request_item))
-            if artist_type:
-                LOG.info('Artist also specified')
-                artist_name = artist_type.groupdict()['artist']
-                phrase = str(phrase).replace(str(artist_name), '')
-                # Todo: add artist filter to album search
-                request_atributes = {
-                    "artist": str(artist_name)
-                }
-        elif artist_type and not (album_type or artist_type):  # Music by: Artist only not a subtype
-            LOG.info('Artist Type')
-            request_type = 'artist'
-            request_item = artist_type.groupdict()['artist']
-        elif movie_type:  # Movies
-            LOG.info('Movie Type')
-            request_type = 'movie'
-            request_item = movie_type.groupdict()['movie']
-        elif random_movie_type:
-            LOG.info('Random Movie Type')
-            request_type = 'movie'
-            request_item = 'random'
-        elif random_music_type:  # rand
-            LOG.info('Random Music Type')
-            request_type = 'title'
-            request_item = 'random'
-        elif show_type:  # TV Shows
-            # play the outer limits season 1 episode 2
-            LOG.info('Show Type')
-            request_type = 'show'
-            request_item = show_type.groupdict()['showname']
-            LOG.info("Show Name: " + str(request_item))
-            request_specific = show_type.groupdict()['episode']
-            LOG.info("Episode: " + str(request_specific))
-            show_details = re.match(self.translate_regex('show.details'), str(request_specific))
-            season_number = show_details.groupdict()['season']
-            episode_number = show_details.groupdict()['episode']
-            LOG.info(str(season_number) + ':' + str(episode_number))
-            request_atributes = {
-                    "season": int(season_number),
-                    "episode": int(episode_number)
-            }
-        else:
-            request_type = None
-            request_item = None
-        # package the return json
-        request_data = {
-            "type": request_type,
-            "item": request_item,
-            "atributes": request_atributes,
-        }
-        return request_data  # request_item, request_type # returns the request details and the request type
-
-    def split_compound(self, sentance):
-        """
-            Used to split compound words that are found in the utterance
-            This will make it easier to confirm that all words are found in the search
-        """
-        search_words = re.split(r'\W+', str(sentance))
-        separator = " "
-        words_list = splitter.split(separator.join(search_words))
-        return words_list
 
     def CPS_match_query_phrase(self, phrase):
         """
@@ -415,11 +328,9 @@ class CPKodiSkill(CommonPlaySkill):
             Phrase is provided without the word "play"
             We imediatly check for the kodi specific request and strip this from the phase
         """
-        LOG.info(str(self.get_request_info(phrase)))
+        # LOG.info(str(self.get_request_info(phrase)))
         # Todo: Handle Cinemavision options
         # Todo: Handle Youtube searches
-        results = None
-        self.kodi_specific_request = False
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
             LOG.info('CPKodi Skill must be setup at the home.mycroft.ai')
@@ -427,50 +338,38 @@ class CPKodiSkill(CommonPlaySkill):
             return None
         # try:
         if True:
-            kodi_request = re.match(self.translate_regex('with.kodi'), phrase)
-            if kodi_request:  # kodi was specifically requested in the utterance
-                self.kodi_specific_request = True
-                match_found = kodi_request.groupdict()['kodiItem']  # returns the phrase containing kodi
-                LOG.info('Kodi was specified in the utterance')
-                LOG.info('Old Phrase: ' + str(phrase))
-                phrase = str(phrase).replace(str(match_found), '').strip()  # strip the kodi from the phrase
-            else:
-                LOG.info('Kodi was NOT specified in the utterance')
-            request_data = self.get_request_details(phrase)  # extract the item name from the phrase
-            request_item = request_data["item"]
-            request_type = request_data["type"]
-            if (request_item is None) or (request_type is None):
-                LOG.info('GetRequest returned None')
+            #request_data = self.get_request_details(phrase)  # extract the item name from the phrase
+            request_data = self.get_request_info(phrase)
+            if not request_data['activeItem']:
+                LOG.info('GetRequest returned None, no regex matches were found')
                 return None
             else:
-                LOG.info("Requested search: " + str(request_item) + ", of type: " + str(request_type))
-            if "movie" in request_type:
-                if "random" in request_item:
+            if request_data['movies']['active']:
+                if request_data['random']:
                     # Extend the CPS timeout while we search the whole library
                     self.bus.emit(Message('play:query.response', {"phrase": phrase,
                                                                   "skill_id": self.skill_id,
                                                                   "searching": True}))
                     results = self.random_movie_select()
                 else:
-                    word_list = self.split_compound(request_item)
+                    word_list = self.split_compound(request_data['movies']['title'])
                     results = get_requested_movies(self.kodi_path, word_list)
-            if ("album" in request_type) or ("title" in request_type) or ("artist" in request_type):
-                if "random" in request_item:
+            if request_data['music']['active']:
+                if request_data['random']:
                     # Extend the CPS timeout while we search the whole library
                     self.bus.emit(Message('play:query.response', {"phrase": phrase,
                                                                   "skill_id": self.skill_id,
                                                                   "searching": True}))
                     results = self.random_music_select()
                 else:
+                    request_type = request_data['music']['type']
+                    request_item = request_data['music'][request_type]
                     results = get_requested_music(self.kodi_path, request_item, request_type)
-            if ("youtube" in request_type) and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
-                results = self.get_youtube_links(request_item)
-            if results is None:
-                LOG.info("Found Nothing!")
-                return None
+            if request_data['youtube']['active'] and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
+                results = self.get_youtube_links(request_data['youtube']['item'])
             else:
                 if len(results) > 0:
-                    if self.kodi_specific_request:
+                    if request_data['kodi']['active']:
                         match_level = CPSMatchLevel.EXACT
                     else:
                         # match_level = CPSMatchLevel.EXACT
@@ -479,31 +378,22 @@ class CPKodiSkill(CommonPlaySkill):
                         "library": results,
                         "details": request_data
                     }
-
                     LOG.info('Searching kodi found a matching playable item! ' + str(match_level))
                     return phrase, match_level, data
                 else:
                     return None  # until a match is found
-        # except Exception as e:
-        #    LOG.info('An error was detected in: CPS_match_query_phrase')
-        #    LOG.info('An error was detected in: CPS_match_query_phrase')
-        #    LOG.error(e)
-        #    self.on_websettings_changed()
 
     def CPS_start(self, phrase, data):
         """ Starts playback.
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
         """
-        request_type = data["details"]["type"]  # album, artist, movie, title, youtube, show
-        self.active_library = data["library"]  # a list of what was found
-        self.active_index = 0  # reinitialize the step counter for reading back the library
-        self.active_request = str(data["details"]["item"])  # what was requested
+        request_data = data["details"]  # the original data
+        self.active_library = data["library"]  # a results list of what was found
         playlist_count = len(self.active_library)  # how many items were returned
-        playlist_type = request_type
         playlist_dict = []
         try:
-            if "youtube" in playlist_type:
+            if request_data['youtube']['active']:
                 """
                     if Type is youtube then plugin and source has already been confirmed so go ahead and play
                 """
@@ -511,7 +401,7 @@ class CPKodiSkill(CommonPlaySkill):
                 self.speak_dialog('play.youtube', data={"result": self.active_request}, expect_response=False)
                 LOG.info('Attempting to Play youtube items: ' + str(self.active_library))
                 play_yt(self.kodi_path, self.active_library[0])
-            if "movie" in playlist_type:
+            if request_data['movies']['active']:
                 """
                     If type is movie then ask if there are multiple, if one then add to playlist and play
                 """
@@ -530,7 +420,7 @@ class CPKodiSkill(CommonPlaySkill):
                 else:
                     wait_while_speaking()
                     self.speak_dialog('no.results', data={"result": str(data["request"])}, expect_response=False)
-            if ("album" in playlist_type) or ("title" in playlist_type) or ("artist" in playlist_type):
+            if request_data['music']['active']:
                 """
                     If type is music then add all to playlist and play
                 """
@@ -538,7 +428,7 @@ class CPKodiSkill(CommonPlaySkill):
                 for each_item in self.active_library:
                     song_id = str(each_item["songid"])
                     playlist_dict.append(song_id)
-                self.clear_queue_and_play(playlist_dict, playlist_type)
+                self.clear_queue_and_play(playlist_dict, request_data['music']['type'])
         except Exception as e:
             LOG.info('An error was detected in: CPS_match_query_phrase')
             LOG.error(e)

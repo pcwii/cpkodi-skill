@@ -1,1 +1,1 @@
-^.*(?P<kodiItem>(with|using|on) (kodi))
+(the |some|)(?P<kodiItem>.+)(?=\s+(from|with|using|on) kodi)
