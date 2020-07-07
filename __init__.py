@@ -350,9 +350,6 @@ class CPKodiSkill(CommonPlaySkill):
                                                                       "skill_id": self.skill_id,
                                                                       "searching": True}))
                         LOG.info('Searching for Random movie')
-                        self.bus.emit(Message('play:query.response', {"phrase": phrase,
-                                                                      "skill_id": self.skill_id,
-                                                                      "searching": True}))
                         results = self.random_movie_select()
                     else:
                         word_list = self.split_compound(request_data['movies']['title'])
