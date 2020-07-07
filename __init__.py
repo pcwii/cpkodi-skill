@@ -483,14 +483,16 @@ class CPKodiSkill(CommonPlaySkill):
         html = response.read()
         # Get all video links from page
         temp_links = []
-        all_video_links = re.findall(r'href=\"\/watch\?v=(.{11})', html.decode())
+        # all_video_links = re.findall(r'href=\"\/watch\?v=(.{11})', html.decode())
+        all_video_links = re.findall(r'/watch\?v=(.{11})', html.decode())
         for each_video in all_video_links:
             if each_video not in temp_links:
                 temp_links.append(each_video)
         video_links = temp_links
         # Get all playlist links from page
         temp_links = []
-        all_playlist_results = re.findall(r'href=\"\/playlist\?list\=(.{34})', html.decode())
+        # all_playlist_results = re.findall(r'href=\"\/playlist\?list\=(.{34})', html.decode())
+        all_playlist_results = re.findall(r'list\=(.{18})', html.decode())
         sep = '"'
         for each_playlist in all_playlist_results:
             if each_playlist not in temp_links:
