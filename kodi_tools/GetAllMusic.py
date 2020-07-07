@@ -4,6 +4,7 @@ import json
 
 
 def get_all_music(kodi_path):
+    max_items = 50  # Limits response to the first 50 movies as it takes too long on large libraries
     json_header = {'content-type': 'application/json'}
     method = "AudioLibrary.GetSongs"
     kodi_payload = {
@@ -13,6 +14,10 @@ def get_all_music(kodi_path):
         "params": {
             "properties": [
             ],
+            "limits": {
+                "start": 0,
+                "end": max_items
+            }
         }
     }
     try:

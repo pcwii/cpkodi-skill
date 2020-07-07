@@ -4,7 +4,7 @@ import json
 
 
 def get_all_movies(kodi_path):
-    max_items = 50
+    max_items = 50  # Limits response to the first 50 movies as it takes too long on large libraries
     json_header = {'content-type': 'application/json'}
     method = "VideoLibrary.GetMovies"
     kodi_payload = {
