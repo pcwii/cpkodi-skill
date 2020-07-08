@@ -369,20 +369,23 @@ class CPKodiSkill(CommonPlaySkill):
                 if request_data['youtube']['active'] and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
                     results = self.get_youtube_links(request_data['youtube']['item'])
                 else:
-                    if len(results) > 0:
-                        if request_data['kodi']['active']:
-                            match_level = CPSMatchLevel.EXACT
+                    if results:
+                        if len(results) > 0:
+                            if request_data['kodi']['active']:
+                                match_level = CPSMatchLevel.EXACT
+                            else:
+                                # match_level = CPSMatchLevel.EXACT
+                                match_level = CPSMatchLevel.MULTI_KEY
+                            data = {
+                                "library": results,
+                                "details": request_data
+                            }
+                            LOG.info('Searching kodi found a matching playable item! ' + str(match_level))
+                            return phrase, match_level, data
                         else:
-                            # match_level = CPSMatchLevel.EXACT
-                            match_level = CPSMatchLevel.MULTI_KEY
-                        data = {
-                            "library": results,
-                            "details": request_data
-                        }
-                        LOG.info('Searching kodi found a matching playable item! ' + str(match_level))
-                        return phrase, match_level, data
+                            return None  # until a match is found
                     else:
-                        return None  # until a match is found
+                        return None
 
     def CPS_start(self, phrase, data):
         """ Starts playback.
