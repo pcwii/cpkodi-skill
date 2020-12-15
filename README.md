@@ -96,4 +96,10 @@ Tested on platform_picroft (others untested)
 - Under Kodi settings:services note the port number (8080)
 - Configure home.mycroft.ai to set your kodi instance ip address and port number
 ## Todo
-- Future features listed here... 
+- ~~Added movies search with roman numerals based on numbers in the utterance~~ (Completed 20201214)
+- ~~Make repeat words language agnostic "MultiplicativeList.json"~~ (Completed 2021214)
+- Add the ability to search music by album and artist (Todo 20201214)
+- Correct the random music request "play some music" (Todo 20201214) 
+- Confirm TV Show request by season and episode "play the outer limits season 1 episode 2" (Todo 20201214)
+- Confirm music request by artist "play the artist Elvis" (Todo 20201214)
+- Confirm TV Show request by Title with dialog "play the tv show stargirl" (Todo 20201214)

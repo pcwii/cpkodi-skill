@@ -10,6 +10,7 @@ import random
 
 
 from .kodi_tools import *
+from .misc_tools import *  # used to
 from importlib import reload
 import urllib.error
 import urllib.parse
@@ -33,8 +34,8 @@ _author__ = 'PCWii'
 # Release - '20200603 - Covid-19 Build'
 
 for each_module in sys.modules:
-    if "kodi_tools" in each_module:
-        LOG.info("Attempting to reload Kodi_tools Module: " + str(each_module))
+    if ("kodi_tools" or "misc_tools") in each_module:
+        LOG.info("Attempting to reload tools Modules: " + str(each_module))
         reload(sys.modules[each_module])
 
 
@@ -61,7 +62,6 @@ class CPKodiSkill(CommonPlaySkill):
         self.add_event('recognizer_loop:wakeword', self.handle_listen)
         self.add_event('recognizer_loop:utterance', self.handle_utterance)
         self.add_event('speak', self.handle_speak)
-
 
     def on_websettings_changed(self):  # called when updating mycroft home page
         # if not self._is_setup:
@@ -144,7 +144,7 @@ class CPKodiSkill(CommonPlaySkill):
             This routine replaces the get_repeat_words routine
         """
         value = extract_number(message)
-        path = self.find_resource("CardrdinalList.json")
+        path = self.find_resource("MultiplicativeList.json")
         if value:
             repeat_value = value
             return repeat_value
@@ -158,19 +158,6 @@ class CPKodiSkill(CommonPlaySkill):
                     if cardinal in message:
                         repeat_value = value
                         return repeat_value
-
-    def get_repeat_words(self, message):
-        # Todo This routine is not language agnostic, use regex files
-        value = extract_number(message)
-        if value:
-            repeat_value = value
-        elif "once" in message:
-            repeat_value = 1
-        elif "twice" in message:
-            repeat_value = 2
-        else:
-            repeat_value = 1
-        return repeat_value
 
     def split_compound(self, sentance):
         """
@@ -272,7 +259,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['movies']['active'] = True
         """
         play some music
-        *faild, random and music artist*
+        *failed, random and music artist*
         (a|random|some|any) (?=.*(music|song))(?P<random>.+)
         """
         random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
@@ -412,11 +399,14 @@ class CPKodiSkill(CommonPlaySkill):
                 """
                 LOG.info('Preparing to Play Movie' + str(self.active_library))
                 if len(data["library"]) == 1:  # Only one item was returned so go ahead and play
-                    movie_id = str(self.active_library["movieid"])
+                    # Todo: is this an issue if only one item is returned?
+                    # Proposed fix:
+                    movie_id = str(self.active_library[0]["movieid"])
+                    # movie_id = str(self.active_library["movieid"])
                     playlist_dict.append(movie_id)
                     self.clear_queue_and_play(playlist_dict, 'movie')
                 elif len(data["library"]):  # confirm the library does not have a zero length or is None
-                    # Todo: give the option to add all items to the playlist imediatly
+                    # Todo: give the option to add all items to the playlist immediatly
                     self.set_context('NavigateContextKeyword', 'NavigateContext')
                     wait_while_speaking()
                     self.speak_dialog('multiple.results', data={"result": str(playlist_count)}, expect_response=True)
@@ -510,7 +500,7 @@ class CPKodiSkill(CommonPlaySkill):
         return yt_links
 
     """
-        All vocal intents apear here
+        All vocal intents appear here
     """
     # stop kodi was requested in the utterance
     @intent_handler(IntentBuilder("").require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
@@ -634,7 +624,8 @@ class CPKodiSkill(CommonPlaySkill):
             direction_kw = "Select"  # these english words are required by the kodi api
         if "BackKeyword" in message.data:
             direction_kw = "Back"  # these english words are required by the kodi api
-        repeat_count = self.get_repeat_words(message.data.get('utterance'))
+        # repeat_count = self.get_repeat_words(message.data.get('utterance'))
+        repeat_count = self.convert_cardinal(message.data.get('utterance'))
         if direction_kw:
             for each_count in range(0, int(repeat_count)):
                 response = move_cursor(self.kodi_path, direction_kw)

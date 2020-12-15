@@ -4,15 +4,20 @@ import json
 import re
 import splitter
 # requires apt-get install libenchant1c2a
+from misc_tools import *
 
 
 def get_requested_movies(kodi_path, search_words):
     """
         Searches the Kodi Library for movies that contain all the words in movie_name
         first we build a filter that contains each word in the requested phrase
+        will only return the movies that contain the words from the utterance
+        It will exclude the numbers in the utterance initially
     """
+    all_numbers = [int(s) for s in search_words if s.isdigit()]
+    all_words = [str(s) for s in search_words if not s.isdigit()]
     filter_key = []
-    for each_word in search_words:
+    for each_word in all_words:
         search_key = {
             "field": "title",
             "operator": "contains",
@@ -60,7 +65,22 @@ def get_requested_movies(kodi_path, search_words):
                     LOG.info('Removing Duplicate Entries')
                 else:
                     clean_list.append(info)
+        '''
+        At this point we have the list returned based on the words in the utterance. We will now filter again based
+        on any numbers returned in the utterance. We will also check the numbers against roman numerals.
+        if there are no numbers in the utterance then clean_list is retained
+        '''
+        for each_number in all_numbers:
+            filtered_dict = [x for x in clean_list if str(each_number) in str(x['label']).split()]
+            if len(filtered_dict) > 0:
+                clean_list = filtered_dict
+            else:
+                roman_value = int_to_Roman(each_number)
+                filtered_dict = [x for x in clean_list if roman_value in str(x['label']).split()]
+                if len(filtered_dict) > 0:
+                    clean_list = filtered_dict
         return clean_list  # returns a dictionary of matched movies
     except Exception as e:
         print(e)
         return None
+
