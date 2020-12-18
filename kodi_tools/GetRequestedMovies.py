@@ -1,11 +1,8 @@
 from mycroft.util.log import LOG
 import requests
 import json
-import re
-import splitter
 # requires apt-get install libenchant1c2a
-from misc_tools import convertRoman
-
+from kodi_tools import convertRoman
 
 
 def get_requested_movies(kodi_path, search_words):
