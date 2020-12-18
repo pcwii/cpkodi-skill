@@ -5,7 +5,7 @@ from .GetActivePlayer import get_active_player
 from .GetAllMovies import get_all_movies
 from .GetAllMusic import get_all_music
 from .GetPosterURL import get_poster_url
-from .GetRequestedMovies import get_requested_movies
+from .GetRequestedMovies import get_requested_movies,int_to_Roman, roman_to_int
 from .GetRequestedMusic import get_requested_music
 from .GetRequestedTVShows import get_show
 from .HideSubtitles import hide_subtitles
@@ -24,6 +24,5 @@ from .ShowWindow import show_window
 from .SkipPlay import skip_play
 from .StopKodi import stop_kodi
 from .UpdateLibrary import update_library
-from .convertRoman import int_to_Roman, roman_to_int
 
 
