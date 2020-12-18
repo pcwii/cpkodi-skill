@@ -1,8 +1,8 @@
 from mycroft.util.log import LOG
 import requests
 import json
-# requires apt-get install libenchant1c2a
-from kodi_tools import convertRoman
+import kodi_tools.convertRoman as RomanNumerals
+
 
 
 def get_requested_movies(kodi_path, search_words):
@@ -73,7 +73,7 @@ def get_requested_movies(kodi_path, search_words):
             if len(filtered_dict) > 0:
                 clean_list = filtered_dict
             else:
-                roman_value = convertRoman.int_to_Roman(each_number)
+                roman_value = RomanNumerals.int_to_Roman(each_number)
                 filtered_dict = [x for x in clean_list if roman_value in str(x['label']).split()]
                 if len(filtered_dict) > 0:
                     clean_list = filtered_dict
