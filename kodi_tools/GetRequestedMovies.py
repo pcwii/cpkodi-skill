@@ -4,7 +4,8 @@ import json
 import re
 import splitter
 # requires apt-get install libenchant1c2a
-from misc_tools import *
+from misc_tools import convertRoman
+
 
 
 def get_requested_movies(kodi_path, search_words):
@@ -75,7 +76,7 @@ def get_requested_movies(kodi_path, search_words):
             if len(filtered_dict) > 0:
                 clean_list = filtered_dict
             else:
-                roman_value = int_to_Roman(each_number)
+                roman_value = convertRoman.int_to_Roman(each_number)
                 filtered_dict = [x for x in clean_list if roman_value in str(x['label']).split()]
                 if len(filtered_dict) > 0:
                     clean_list = filtered_dict
