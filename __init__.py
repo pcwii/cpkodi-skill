@@ -137,7 +137,7 @@ class CPKodiSkill(CommonPlaySkill):
             return None
         return str(self.regexes[regex])
 
-    def convert_cardinal(self, message):
+    def convert_multiplicative(self, message):
         """
             This routine will take words like once, twice, three times and convert them to numbers 1, 2, 3
             Since it uses a file we can ensure it is language agnostic
@@ -170,37 +170,14 @@ class CPKodiSkill(CommonPlaySkill):
         return words_list
 
     def get_request_info(self, phrase):
-        request_info = {
-            'utternace': phrase,
-            'random': False,
-            'activeItem': False,
-            'requestItem': phrase,
-            'kodi': {
-                'active': False,
-                'item': None
-            },
-            'youtube': {
-                'item': None,
-                'active': False
-            },
-            'music': {
-                'type': None,
-                'album': None,
-                'title': None,
-                'artist': None,
-                'active': False
-            },
-            'tv': {
-                'title': None,
-                'season': None,
-                'episode': None,
-                'active': False
-            },
-            'movies': {
-                'title': None,
-                'active': False
-            },
-        }
+        """
+        Retrieve the base data structure form the json file
+        parse the phrase with regex to determine what is being requested
+        populate the dataStructure accordingly
+        """
+        resource_path = self.find_resource("baseDataStructure.json")
+        with open(resource_path) as resource_file:
+            request_info = json.load(resource_file)
         """
         play third day from youtube
         *passed*
@@ -268,7 +245,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['music']['active'] = True
         """
         play the outer limits season 1 episode 2
-        (the\s+|)(?P<showname>.+)(?=\s+season)(?P<episode>.+)       
+        (the\s+|)(?P<showname>.+)(?=\s+season)(?P<episode>.+)
         """
         show_details_type = re.match(self.translate_regex('show.details.type'), phrase)
         if show_details_type:  # TV Shows
@@ -324,12 +301,11 @@ class CPKodiSkill(CommonPlaySkill):
             return None
         # try:
         if True:
-            #request_data = self.get_request_details(phrase)  # extract the item name from the phrase
-            request_data = self.get_request_info(phrase)
+            request_data = self.get_request_info(phrase)  # Parse the utterance (phrase)
             if not request_data['activeItem']:
                 LOG.info('GetRequest returned None, no regex matches were found')
                 return None
-            else:
+            else:  # Active regex data was parsed
                 if request_data['movies']['active']:
                     if request_data['random']:
                         # Extend the CPS timeout while we search the whole library
@@ -364,8 +340,8 @@ class CPKodiSkill(CommonPlaySkill):
                                 # match_level = CPSMatchLevel.EXACT
                                 match_level = CPSMatchLevel.MULTI_KEY
                             data = {
-                                "library": results,
-                                "details": request_data
+                                "library": results,  # Contains the playlist items
+                                "details": request_data  # Contains the json object for the request
                             }
                             LOG.info('Searching kodi found a matching playable item! ' + str(match_level))
                             return phrase, match_level, data
@@ -378,6 +354,11 @@ class CPKodiSkill(CommonPlaySkill):
         """ Starts playback.
             Called by the playback control skill to start playback if the
             skill is selected (has the best match level)
+            data contains the following json data
+            {
+                "library": results,  # Contains the playlist items
+                "details": request_data  # Contains the json object for the request
+            }
         """
         request_data = data["details"]  # the original data
         self.active_library = data["library"]  # a results list of what was found
@@ -476,7 +457,6 @@ class CPKodiSkill(CommonPlaySkill):
         html = response.read()
         # Get all video links from page
         temp_links = []
-        # all_video_links = re.findall(r'href=\"\/watch\?v=(.{11})', html.decode())
         all_video_links = re.findall(r'/watch\?v=(.{11})', html.decode())
         for each_video in all_video_links:
             if each_video not in temp_links:
@@ -484,7 +464,6 @@ class CPKodiSkill(CommonPlaySkill):
         video_links = temp_links
         # Get all playlist links from page
         temp_links = []
-        # all_playlist_results = re.findall(r'href=\"\/playlist\?list\=(.{34})', html.decode())
         all_playlist_results = re.findall(r'list\=(.{18})', html.decode())
         sep = '"'
         for each_playlist in all_playlist_results:
@@ -625,7 +604,7 @@ class CPKodiSkill(CommonPlaySkill):
         if "BackKeyword" in message.data:
             direction_kw = "Back"  # these english words are required by the kodi api
         # repeat_count = self.get_repeat_words(message.data.get('utterance'))
-        repeat_count = self.convert_cardinal(message.data.get('utterance'))
+        repeat_count = self.convert_multiplicative(message.data.get('utterance'))
         if direction_kw:
             for each_count in range(0, int(repeat_count)):
                 response = move_cursor(self.kodi_path, direction_kw)
@@ -660,7 +639,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         if "AddKeyword" in message.data:
             """
-                User reqested to add this item to the playlist
+                User requested to add this item to the playlist
                 Context does not change
             """
             LOG.info('User responded with...' + message.data.get('AddKeyword'))
@@ -668,7 +647,7 @@ class CPKodiSkill(CommonPlaySkill):
             playlist_dict.append(self.active_library[self.active_index]['movieid'])
             create_playlist(self.kodi_path, playlist_dict, "movie")
             """
-                Next we must readback the next item in the list and ask what to do
+                Next we must read back the next item in the list and ask what to do
             """
             self.active_index += 1
             msg_payload = str(self.active_library[self.active_index]['label'])
@@ -676,7 +655,7 @@ class CPKodiSkill(CommonPlaySkill):
             self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
         elif "NextKeyword" in message.data:
             """
-                User reqested the next item in the list therfore we need to readback
+                User requested the next item in the list therefore we need to read back
                 the next item in the list and ask what to do
                 Context does not change
             """
@@ -704,7 +683,7 @@ class CPKodiSkill(CommonPlaySkill):
             wait_while_speaking()
             self.speak_dialog('cancel', expect_response=False)
 
-    # the movie information dialog was requested in the utterance
+    # Adjust the volume in kodi
     @intent_handler(IntentBuilder('').require('SetsKeyword').require('KodiKeyword').require('VolumeKeyword'))
     def handle_set_volume_intent(self, message):
         str_remainder = str(message.utterance_remainder())
