@@ -166,7 +166,8 @@ class CPKodiSkill(CommonPlaySkill):
         """
         search_words = re.split(r'\W+', str(sentance))
         separator = " "
-        words_list = splitter.split(separator.join(search_words))
+        raw_list = splitter.split(separator.join(search_words))
+        words_list = [list_item.strip() for list_item in raw_list]
         return words_list
 
     def get_request_info(self, phrase):
