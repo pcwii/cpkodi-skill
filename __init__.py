@@ -432,12 +432,12 @@ class CPKodiSkill(CommonPlaySkill):
                 result = create_playlist(self.kodi_path, playlist_items, playlist_type)
             if "OK" in result.text:
                 result = None
-                LOG.info("Add Playlist Successful")
+                LOG.info("Add Playlist Successful: " + str(playlist_items))
                 wait_while_speaking()
                 self.speak_dialog("now.playing", data={"result_type": str(playlist_type),
-                                                       "result_label": str(playlist_items['label'])},
+                                                       "result_label": "movie Name"},
                                   expect_response=False)
-                time.sleep(2) # wait for playlist before playback
+                time.sleep(2)  # wait for playlist before playback
                 result = play_normal(self.kodi_path, playlist_type)
             if "OK" in result.text:
                 LOG.info("Now Playing..." + str(result.text))
