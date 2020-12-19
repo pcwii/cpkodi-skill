@@ -30,6 +30,7 @@ def roman_to_int(input_string):
     result_string = ' '.join(result_list)
     return result_string
 
+
 def int_to_Roman(input_num):
     val = [
         1000, 900, 500, 400,
@@ -89,10 +90,7 @@ def get_requested_movies(kodi_path, search_words):
     }
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
-        # LOG.info(kodi_response.text)
         movie_list = json.loads(kodi_response.text)["result"]["movies"]
-        # LOG.info('GetReqeustedMovies found: ' + str(movie_list))
-        # remove duplicates
         clean_list = []  # this is a dict
         for each_movie in movie_list:
             movie_title = str(each_movie['label'])
@@ -115,14 +113,18 @@ def get_requested_movies(kodi_path, search_words):
         on any numbers returned in the utterance. We will also check the numbers against roman numerals.
         if there are no numbers in the utterance then clean_list is retained
         '''
+        LOG.info('Searching for Numbers in title')
         for each_number in all_numbers:
             filtered_dict = [x for x in clean_list if str(each_number) in str(x['label']).split()]
             if len(filtered_dict) > 0:
+                LOG.info('Found Integers in Titles')
                 clean_list = filtered_dict
             else:
+                LOG.info('No Integers Found in Titles, Searching Roman Numerals')
                 roman_value = int_to_Roman(each_number)
                 filtered_dict = [x for x in clean_list if roman_value in str(x['label']).split()]
                 if len(filtered_dict) > 0:
+                    LOG.info('Found Roman Numerals in Titles')
                     clean_list = filtered_dict
         return clean_list  # returns a dictionary of matched movies
     except Exception as e:
