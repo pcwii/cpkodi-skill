@@ -178,7 +178,7 @@ class CPKodiSkill(CommonPlaySkill):
         resource_path = self.find_resource("baseDataStructure.json")
         with open(resource_path) as resource_file:
             request_info = json.load(resource_file)
-        LOG.info(str(request_info))
+        #LOG.info(str(request_info))
         request_info['utterance'] = phrase
         """
         play third day from youtube
@@ -187,6 +187,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
         if youtube_type:  # youtube request "the official captain marvel trailer from youtube"
+            LOG.info('Youtube Type Detected')
             request_info['youtube']['item'] = youtube_type.groupdict()['ytItem']
             request_info['youtube']['active'] = True
         """
@@ -196,6 +197,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         album_type = re.match(self.translate_regex('album.type'), phrase)
         if album_type:
+            LOG.info('Album Type Detected')
             request_info['music']['type'] = 'album'
             request_info['music']['album'] = album_type.groupdict()['album']
             request_info['music']['active'] = True
@@ -206,6 +208,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         song_type = re.match(self.translate_regex('song.type'), phrase)
         if song_type:
+            LOG.info('Song Type Detected')
             request_info['music']['type'] = 'title'
             request_info['music']['title'] = song_type.groupdict()['title']
             request_info['music']['active'] = True
@@ -215,6 +218,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         artist_type = re.match(self.translate_regex('artist.type'), phrase)
         if artist_type:
+            LOG.info('Artist Type Detected')
             request_info['music']['type'] = 'artist'
             request_info['music']['artist'] = artist_type.groupdict()['artist']
             request_info['music']['active'] = True
@@ -225,7 +229,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         movie_type = re.match(self.translate_regex('movie.type'), phrase)
         if movie_type:  # Movies
-            LOG.info('Movie request made')
+            LOG.info('Movie Type Detected')
             request_info['movies']['title'] = movie_type.groupdict()['movie']
             request_info['movies']['active'] = True
         """
@@ -235,6 +239,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
         if random_movie_type:
+            LOG.info('Random Movie Type Detected')
             request_info['random'] = True
             request_info['movies']['active'] = True
         """
@@ -244,6 +249,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
         if random_music_type:  # rand
+            LOG.info('Random Music Type Detected')
             request_info['random'] = True
             request_info['music']['active'] = True
         """
@@ -252,6 +258,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         show_details_type = re.match(self.translate_regex('show.details.type'), phrase)
         if show_details_type:  # TV Shows
+            LOG.info('TV Show Type Detected')
             request_info['tv']['title'] = show_details_type.groupdict()['showname']
             request_info['tv']['details'] = show_details_type.groupdict()['episode']
             """
@@ -268,6 +275,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         show_type = re.match(self.translate_regex('show.type'), phrase)
         if show_details_type:  # TV Shows
+            LOG.info('Show Details Type Detected')
             request_info['tv']['title'] = show_type.groupdict()['showname']
             request_info['tv']['active'] = True
             #ToDo: get last episode played
@@ -277,6 +285,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         kodi_request = re.match(self.translate_regex('with.kodi'), phrase)
         if kodi_request:  # kodi was specifically requested in the utterance
+            LOG.info('Kodi Type Detected')
             request_info['kodi']['active'] = True
             request_info['kodi']['item'] = kodi_request.groupdict()['kodiItem']
         # Todo: need to correct item requested from utterance
