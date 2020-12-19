@@ -31,7 +31,8 @@ def roman_to_int(input_string):
     return result_string
 
 
-def int_to_Roman(input_num):
+def int_to_Roman(str_integer):
+    input_num = int(str_integer)
     val = [
         1000, 900, 500, 400,
         100, 90, 50, 40,
@@ -124,12 +125,14 @@ def get_requested_movies(kodi_path, search_words):
                 LOG.info('Found Integers in Titles')
                 clean_list = filtered_dict
             else:
-                LOG.info('No Integers Found in Titles, Searching Roman Numerals')
-                roman_value = int_to_Roman(each_number)
+                LOG.info('No Integers Found in Titles, Searching Roman Numerals for: ' + str(each_number))
+                roman_value = int_to_Roman(int(each_number))
                 filtered_dict = [x for x in clean_list if roman_value in str(x['label']).split()]
                 if len(filtered_dict) > 0:
                     LOG.info('Found Roman Numerals in Titles')
                     clean_list = filtered_dict
+                else:
+                    LOG.info('No Roman Numerals in Selected Titles')
         return clean_list  # returns a dictionary of matched movies
     except Exception as e:
         print(e)
