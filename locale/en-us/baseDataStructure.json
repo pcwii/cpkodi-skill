@@ -1,31 +1,31 @@
 {
-    'utternace': phrase,
-    'random': False,
-    'activeItem': False,
-    'requestItem': phrase,
-    'kodi': {
-        'active': False,
-        'item': None
+    "utternace": "phrase",
+    "random": "False",
+    "activeItem": "False",
+    "requestItem": "phrase",
+    "kodi": {
+        "active": "False",
+        "item": "None"
     },
-    'youtube': {
-        'item': None,
-        'active': False
+    "youtube": {
+        "item": "None",
+        "active": "False"
     },
-    'music': {
-        'type': None,
-        'album': None,
-        'title': None,
-        'artist': None,
-        'active': False
+    "music": {
+        "type": "None",
+        "album": "None",
+        "title": "None",
+        "artist": "None",
+        "active": "False"
     },
-    'tv': {
-        'title': None,
-        'season': None,
-        'episode': None,
-        'active': False
+    "tv": {
+        "title": "None",
+        "season": "None",
+        "episode": "None",
+        "active": "False"
     },
-    'movies': {
-        'title': None,
-        'active': False
+    "movies": {
+        "title": "None",
+        "active": "False"
     }
 }
