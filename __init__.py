@@ -314,6 +314,7 @@ class CPKodiSkill(CommonPlaySkill):
         # try:
         if True:
             request_data = self.get_request_info(phrase)  # Parse the utterance (phrase)
+            LOG.info('Phrase was parsed with the following request... ' + str(request_data))
             if not request_data['activeItem']:
                 LOG.info('GetRequest returned None, no regex matches were found')
                 return None
