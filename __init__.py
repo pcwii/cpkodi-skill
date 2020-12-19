@@ -179,6 +179,7 @@ class CPKodiSkill(CommonPlaySkill):
         with open(resource_path) as resource_file:
             request_info = json.load(resource_file)
         LOG.info(str(request_info))
+        request_info['utterance'] = phrase
         """
         play third day from youtube
         *passed*
@@ -224,6 +225,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         movie_type = re.match(self.translate_regex('movie.type'), phrase)
         if movie_type:  # Movies
+            LOG.info('Movie request made')
             request_info['movies']['title'] = movie_type.groupdict()['movie']
             request_info['movies']['active'] = True
         """
