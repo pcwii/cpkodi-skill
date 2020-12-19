@@ -147,6 +147,7 @@ class CPKodiSkill(CommonPlaySkill):
         path = self.find_resource("MultiplicativeList.json")
         if value:
             repeat_value = value[0]
+            LOG.info("Multiplicative returning the value, " + str(repeat_value))
             return repeat_value
         else:
             with open(path) as f:
@@ -155,6 +156,7 @@ class CPKodiSkill(CommonPlaySkill):
             for each_item in data:
                 if each_item in message:
                     repeat_value = data[each_item]
+                    LOG.info("Multiplicative returning the value, " + str(repeat_value))
                     return repeat_value
 
     def split_compound(self, sentance):
@@ -174,6 +176,7 @@ class CPKodiSkill(CommonPlaySkill):
         populate the dataStructure accordingly
         """
         resource_path = self.find_resource("baseDataStructure.json")
+        LOG.info("DataStructure Json Path, " + str(resource_path))
         with open(resource_path) as resource_file:
             request_info = json.load(resource_file)
         """
