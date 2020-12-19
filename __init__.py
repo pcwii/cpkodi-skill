@@ -146,18 +146,16 @@ class CPKodiSkill(CommonPlaySkill):
         value = extract_number(message)
         path = self.find_resource("MultiplicativeList.json")
         if value:
-            repeat_value = value
+            repeat_value = value[0]
             return repeat_value
         else:
             with open(path) as f:
                 data = json.load(f)
             LOG.info(str(data))
             for each_item in data:
-                for cardinal, value in each_item.items():
-                    print(cardinal, value)  # example usage
-                    if cardinal in message:
-                        repeat_value = value
-                        return repeat_value
+                if each_item in message:
+                    repeat_value = data[each_item]
+                    return repeat_value
 
     def split_compound(self, sentance):
         """
