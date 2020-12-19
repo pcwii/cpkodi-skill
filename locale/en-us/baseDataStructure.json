@@ -1,31 +1,31 @@
 {
-    "utterance": "phrase",
-    "random": "False",
-    "activeItem": "False",
-    "requestItem": "phrase",
+    "utterance": "None",
+    "random": false,
+    "activeItem": false,
+    "requestItem": "None",
     "kodi": {
-        "active": "False",
+        "active": false,
         "item": "None"
     },
     "youtube": {
         "item": "None",
-        "active": "False"
+        "active": false
     },
     "music": {
         "type": "None",
         "album": "None",
         "title": "None",
         "artist": "None",
-        "active": "False"
+        "active": false
     },
     "tv": {
         "title": "None",
         "season": "None",
         "episode": "None",
-        "active": "False"
+        "active": false
     },
     "movies": {
         "title": "None",
-        "active": "False"
+        "active": false
     }
 }
