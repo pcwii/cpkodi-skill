@@ -62,6 +62,10 @@ def get_requested_movies(kodi_path, search_words):
     """
     all_numbers = [int(s) for s in search_words if s.isdigit()]
     all_words = [str(s) for s in search_words if not s.isdigit()]
+    LOG.info('Searching Movies for... ' + str(search_words))
+    LOG.info('Movies keydigits... ' + str(all_numbers))
+    LOG.info('Movies keywords... ' + str(all_words))
+
     filter_key = []
     for each_word in all_words:
         search_key = {
