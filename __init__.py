@@ -175,8 +175,10 @@ class CPKodiSkill(CommonPlaySkill):
         parse the phrase with regex to determine what is being requested
         populate the dataStructure accordingly
         """
-        with open('baseDataStructure.json') as resource_file:
+        resource_path = self.find_resource("baseDataStructure.json")
+        with open(resource_path) as resource_file:
             request_info = json.load(resource_file)
+        LOG.info(str(request_info))
         """
         play third day from youtube
         *passed*
