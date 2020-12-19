@@ -424,6 +424,9 @@ class CPKodiSkill(CommonPlaySkill):
 
     def clear_queue_and_play(self, playlist_items, playlist_type):
         result = None
+        if playlist_type == "movie":
+            playlistLabel = str(self.active_library[0]["label"])
+
         try:
             result = playlist_clear(self.kodi_path, playlist_type)
             if "OK" in result.text:
@@ -435,7 +438,7 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info("Add Playlist Successful: " + str(playlist_items))
                 wait_while_speaking()
                 self.speak_dialog("now.playing", data={"result_type": str(playlist_type),
-                                                       "result_label": str(playlist_items[0]['label'])},
+                                                       "result_label": str(playlistLabel)},
                                   expect_response=False)
                 time.sleep(2)  # wait for playlist before playback
                 result = play_normal(self.kodi_path, playlist_type)
