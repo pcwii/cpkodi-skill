@@ -197,7 +197,7 @@ class CPKodiSkill(CommonPlaySkill):
         (the |)(album|disc|lp|cd) (?P<album>.+)
         """
         album_type = re.match(self.translate_regex('album.type'), phrase)
-        if album_type:
+        if album_type and not request_info['youtube']['active']:
             LOG.info('Album Type Detected')
             request_info['music']['type'] = 'album'
             request_info['music']['album'] = album_type.groupdict()['album']
@@ -208,7 +208,7 @@ class CPKodiSkill(CommonPlaySkill):
         (the |)(song|single) (?P<title>.+)
         """
         song_type = re.match(self.translate_regex('song.type'), phrase)
-        if song_type:
+        if song_type and not request_info['youtube']['active']:
             LOG.info('Song Type Detected')
             request_info['music']['type'] = 'title'
             request_info['music']['title'] = song_type.groupdict()['title']
@@ -218,7 +218,7 @@ class CPKodiSkill(CommonPlaySkill):
         (the |)(artist|group|band|(something|anything|stuff|music|songs) (by|from)|(some|by)) (?P<artist>.+)
         """
         artist_type = re.match(self.translate_regex('artist.type'), phrase)
-        if artist_type:
+        if artist_type and not request_info['youtube']['active']:
             LOG.info('Artist Type Detected')
             request_info['music']['type'] = 'artist'
             request_info['music']['artist'] = artist_type.groupdict()['artist']
@@ -229,7 +229,7 @@ class CPKodiSkill(CommonPlaySkill):
         (the |)(movie|film) (?P<movie>.+)
         """
         movie_type = re.match(self.translate_regex('movie.type'), phrase)
-        if movie_type:  # Movies
+        if movie_type and not request_info['youtube']['active']:  # Movies
             LOG.info('Movie Type Detected')
             request_info['movies']['title'] = movie_type.groupdict()['movie']
             request_info['movies']['active'] = True
@@ -239,7 +239,7 @@ class CPKodiSkill(CommonPlaySkill):
         (a|random|some|any) (?=.*(movie|film))(?P<random>.+)
         """
         random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
-        if random_movie_type:
+        if random_movie_type and not request_info['youtube']['active']:
             LOG.info('Random Movie Type Detected')
             request_info['random'] = True
             request_info['movies']['active'] = True
@@ -249,7 +249,7 @@ class CPKodiSkill(CommonPlaySkill):
         (a|random|some|any) (?=.*(music|song))(?P<random>.+)
         """
         random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
-        if random_music_type:  # rand
+        if random_music_type and not request_info['youtube']['active']:  # rand
             LOG.info('Random Music Type Detected')
             request_info['random'] = True
             request_info['music']['active'] = True
@@ -258,7 +258,7 @@ class CPKodiSkill(CommonPlaySkill):
         (the\s+|)(?P<showname>.+)(?=\s+season)(?P<episode>.+)
         """
         show_details_type = re.match(self.translate_regex('show.details.type'), phrase)
-        if show_details_type:  # TV Shows
+        if show_details_type and not request_info['youtube']['active']:  # TV Shows
             LOG.info('TV Show Type Detected')
             request_info['tv']['title'] = show_details_type.groupdict()['showname']
             request_info['tv']['details'] = show_details_type.groupdict()['episode']
@@ -275,7 +275,7 @@ class CPKodiSkill(CommonPlaySkill):
         (the |)(tv|)(show) (?P<showname>.+)     
         """
         show_type = re.match(self.translate_regex('show.type'), phrase)
-        if show_details_type:  # TV Shows
+        if show_details_type and not request_info['youtube']['active']:  # TV Shows
             LOG.info('Show Details Type Detected')
             request_info['tv']['title'] = show_type.groupdict()['showname']
             request_info['tv']['active'] = True
