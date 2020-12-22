@@ -10,12 +10,13 @@ import random
 
 
 from .kodi_tools import *
-from .misc_tools import *  # used to
-from importlib import reload
-import urllib.error
-import urllib.parse
-import urllib.request
+# from .misc_tools import *  # used to
+from .youtube_searcher import search_youtube
 
+from importlib import reload
+# import urllib.error
+# import urllib.parse
+# import urllib.request
 
 from adapt.intent import IntentBuilder
 
@@ -66,6 +67,7 @@ class CPKodiSkill(CommonPlaySkill):
     def on_websettings_changed(self):  # called when updating mycroft home page
         # if not self._is_setup:
         LOG.info('Websettings have changed! Updating path data')
+        LOG.error
         kodi_ip = self.settings.get("kodi_ip", "192.168.0.32")
         kodi_port = self.settings.get("kodi_port", "8080")
         kodi_user = self.settings.get("kodi_user", "")
@@ -344,25 +346,24 @@ class CPKodiSkill(CommonPlaySkill):
                         request_item = request_data['music'][request_type]
                         results = get_requested_music(self.kodi_path, request_item, request_type)
                 if request_data['youtube']['active'] and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
-                    results = self.get_youtube_links(request_data['youtube']['item'])
-                else:
-                    if results:
-                        if len(results) > 0:
-                            if request_data['kodi']['active']:
-                                match_level = CPSMatchLevel.EXACT
-                            else:
-                                # match_level = CPSMatchLevel.EXACT
-                                match_level = CPSMatchLevel.MULTI_KEY
-                            data = {
-                                "library": results,  # Contains the playlist items
-                                "details": request_data  # Contains the json object for the request
-                            }
-                            LOG.info('Searching kodi found a matching playable item! ' + str(match_level))
-                            return phrase, match_level, data
+                    results = search_youtube(request_data['youtube']['item'])
+                if results:
+                    if len(results) > 0:
+                        if request_data['kodi']['active']:
+                            match_level = CPSMatchLevel.EXACT
                         else:
-                            return None  # until a match is found
+                            # match_level = CPSMatchLevel.EXACT
+                            match_level = CPSMatchLevel.MULTI_KEY
+                        data = {
+                            "library": results,  # Contains the playlist items
+                            "details": request_data  # Contains the json object for the request
+                        }
+                        LOG.info('Searching kodi found a matching playable item! ' + str(match_level))
+                        return phrase, match_level, data
                     else:
                         return None
+                else:
+                    return None
 
     def CPS_start(self, phrase, data):
         """ Starts playback.
@@ -375,7 +376,7 @@ class CPKodiSkill(CommonPlaySkill):
             }
         """
         request_data = data["details"]  # the original data
-        self.active_library = data["library"]  # a results list of what was found
+        self.active_library = data["library"]  # a results playlist of what was found
         playlist_count = len(self.active_library)  # how many items were returned
         playlist_dict = []
         #try:
@@ -383,11 +384,18 @@ class CPKodiSkill(CommonPlaySkill):
             if request_data['youtube']['active']:
                 """
                     if Type is youtube then plugin and source has already been confirmed so go ahead and play
+                    we only currently extract the first item in the results
                 """
+                if self.active_library['playlists']:  # Youtube Requests contains a playlist item
+                    yt_ID = self.active_library['playlists'][0]['playlistId']
+                    yt_title = self.active_library['playlists'][0]['title']
+                else:  # Youtube Requests does not contain a playlist item
+                    yt_ID = self.active_library['videos'][0]['videoId']
+                    yt_title = self.active_library['videos'][0]['title']
                 wait_while_speaking()
-                self.speak_dialog('play.youtube', data={"result": self.active_request}, expect_response=False)
-                LOG.info('Attempting to Play youtube items: ' + str(self.active_library))
-                play_yt(self.kodi_path, self.active_library[0])
+                self.speak_dialog('play.youtube', data={"result": str(yt_title)}, expect_response=False)
+                LOG.info('Attempting to Play youtube items: ' + str(yt_title))
+                play_yt(self.kodi_path, yt_ID)
             if request_data['movies']['active']:
                 """
                     If type is movie then ask if there are multiple, if one then add to playlist and play
@@ -467,35 +475,6 @@ class CPKodiSkill(CommonPlaySkill):
             # print(full_list[int(each_id)])
             random_entry.append(full_list[int(each_id)])
         return random_entry
-
-    def get_youtube_links(self, search_text):
-        LOG.info(search_text)
-        query = urllib.parse.quote(search_text)
-        url = "https://www.youtube.com/results?search_query=" + query
-        response = urllib.request.urlopen(url)
-        html = response.read()
-        # Get all video links from page
-        temp_links = []
-        all_video_links = re.findall(r'/watch\?v=(.{11})', html.decode())
-        for each_video in all_video_links:
-            if each_video not in temp_links:
-                temp_links.append(each_video)
-        video_links = temp_links
-        # Get all playlist links from page
-        temp_links = []
-        all_playlist_results = re.findall(r'list\=(.{18})', html.decode())
-        sep = '"'
-        for each_playlist in all_playlist_results:
-            if each_playlist not in temp_links:
-                cleaned_pl = each_playlist.split(sep, 1)[0]
-                temp_links.append(cleaned_pl)
-        playlist_links = temp_links
-        yt_links = []
-        if video_links:
-            yt_links.append("?video_id=" + video_links[0])
-        if playlist_links:
-            yt_links.append("?playlist_id=" + playlist_links[0] + "&play=1&order=shuffle")
-        return yt_links
 
     """
         All vocal intents appear here

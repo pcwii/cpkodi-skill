@@ -1,9 +1,9 @@
 dependencies:
   python:
     - requests
+    - bs4
+    - requests_cache
     - pychromecast
-    - pafy>=0.5.4
-    - youtube_dl>=2019.9.1
     - pyenchant
     - compound-word-splitter
   system:
