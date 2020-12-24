@@ -461,8 +461,9 @@ class CPKodiSkill(CommonPlaySkill):
         LOG.info('Random Movie Selected')
         full_list = get_all_movies(self.kodi_path)
         random_id = random.randint(1, len(full_list))
-        selected_entry = full_list[random_id]
-        return selected_entry
+        random_entry = []
+        random_entry.append(full_list[random_id])
+        return random_entry
 
     def random_music_select(self):
         full_list = get_all_music(self.kodi_path)
