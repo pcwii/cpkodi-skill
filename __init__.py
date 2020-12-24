@@ -633,7 +633,7 @@ class CPKodiSkill(CommonPlaySkill):
             Conversational Context to handle listing of found movies
             This will walk you through each movie in the found list
         """
-        LOG.info("list length is: " + str(len(self.active_library)))
+        LOG.info("list length is: " + str(len(self.active_library)) +", Processing item: " + str(self.active_index))
         if "AddKeyword" in message.data:
             """
                 User requested to add this item to the playlist
