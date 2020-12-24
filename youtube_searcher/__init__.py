@@ -1,7 +1,7 @@
 import bs4
 import re
 import json
-# from youtube_searcher.session import session
+from youtube_searcher.session import session
 from mycroft.util.log import LOG
 
 def _get_json(soup_blob):
