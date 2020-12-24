@@ -11,7 +11,7 @@ import random
 
 from .kodi_tools import *
 # from .misc_tools import *  # used to
-from .youtube_searcher import search_youtube
+from .youtube_searcher import *
 
 from importlib import reload
 # import urllib.error
