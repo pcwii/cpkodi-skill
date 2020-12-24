@@ -34,7 +34,7 @@ _author__ = 'PCWii'
 # Release - '20200603 - Covid-19 Build'
 
 for each_module in sys.modules:
-    if ("kodi_tools" or "misc_tools") in each_module:
+    if ("kodi_tools" or "youtube_searcher") in each_module:
         LOG.info("Attempting to reload tools Modules: " + str(each_module))
         reload(sys.modules[each_module])
 
