@@ -633,6 +633,7 @@ class CPKodiSkill(CommonPlaySkill):
             Conversational Context to handle listing of found movies
             This will walk you through each movie in the found list
         """
+        last_index = len(self.active_library) - 1
         LOG.info("list length is: " + str(len(self.active_library)) +", Processing item: " + str(self.active_index))
         if "AddKeyword" in message.data:
             """
@@ -658,7 +659,7 @@ class CPKodiSkill(CommonPlaySkill):
             """
             LOG.info('User responded with...' + message.data.get('NextKeyword'))
             self.active_index += 1
-            if self.active_library[self.active_index]:  # We have not reached the end of the list
+            if (self.active_index <= last_index):  # We have not reached the end of the list
                 msg_payload = str(self.active_library[self.active_index]['label'])
                 wait_while_speaking()
                 self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
