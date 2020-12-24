@@ -7,7 +7,6 @@ import json
 import random
 # from threading import Timer
 # import threading
-import
 
 from .kodi_tools import *
 # from .misc_tools import *  # used to
