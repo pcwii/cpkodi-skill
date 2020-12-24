@@ -634,7 +634,7 @@ class CPKodiSkill(CommonPlaySkill):
             This will walk you through each movie in the found list
         """
         last_index = len(self.active_library) - 1
-        LOG.info("list length is: " + str(len(self.active_library)) +", Processing item: " + str(self.active_index))
+        LOG.info("list length is: " + str(len(self.active_library)) +", Processing item: " + str(self.active_index+1))
         if "AddKeyword" in message.data:
             """
                 User requested to add this item to the playlist
