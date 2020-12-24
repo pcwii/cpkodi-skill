@@ -39,6 +39,8 @@ for each_module in sys.modules:
         reload(sys.modules[each_module])
 
 
+
+
 class CPKodiSkill(CommonPlaySkill):
     def __init__(self):
         super(CPKodiSkill, self).__init__('CPKodiSkill')
@@ -304,9 +306,7 @@ class CPKodiSkill(CommonPlaySkill):
             Phrase is provided without the word "play"
             We imediatly check for the kodi specific request and strip this from the phase
         """
-        # LOG.info(str(self.get_request_info(phrase)))
         # Todo: Handle Cinemavision options
-        # Todo: Handle Youtube searches
         LOG.info('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
             LOG.info('CPKodi Skill must be setup at the home.mycroft.ai')
@@ -434,7 +434,8 @@ class CPKodiSkill(CommonPlaySkill):
         if playlist_type == "movie":
             playlist_label = str(self.active_library[0]["label"])
 
-        try:
+        #try:
+        if True:  # Remove after testing
             result = playlist_clear(self.kodi_path, playlist_type)
             if "OK" in result.text:
                 result = None
@@ -452,10 +453,10 @@ class CPKodiSkill(CommonPlaySkill):
             if "OK" in result.text:
                 LOG.info("Now Playing..." + str(result.text))
                 result = None
-        except Exception as e:
-            LOG.info('An error was detected in: clear_queue_and_play')
-            LOG.error(e)
-            self.on_websettings_changed()
+        #except Exception as e:
+        #    LOG.info('An error was detected in: clear_queue_and_play')
+        #    LOG.error(e)
+        #    self.on_websettings_changed()
 
     def random_movie_select(self):
         LOG.info('Random Movie Selected')
