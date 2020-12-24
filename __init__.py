@@ -664,6 +664,7 @@ class CPKodiSkill(CommonPlaySkill):
                 wait_while_speaking()
                 self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
             else:
+                # Todo Add new dialog response when we reach the end of the list
                 self.active_index = 0
                 self.set_context('ListContextKeyword', '')
                 LOG.info('We have reached the end of the list')
