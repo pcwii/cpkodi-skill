@@ -83,7 +83,7 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info(self.kodi_path)
                 self.kodi_image_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/image/"
                 self._is_setup = True
-                #self.music_library = get_all_music(self.kodi_path)
+                # self.music_library = get_all_music(self.kodi_path)
         except Exception as e:
             LOG.error(e)
 
@@ -161,12 +161,12 @@ class CPKodiSkill(CommonPlaySkill):
                     LOG.info("Multiplicative returning the value, " + str(repeat_value))
                     return repeat_value
 
-    def split_compound(self, sentance):
+    def split_compound(self, sentence):
         """
             Used to split compound words that are found in the utterance
             This will make it easier to confirm that all words are found in the search
         """
-        search_words = re.split(r'\W+', str(sentance))
+        search_words = re.split(r'\W+', str(sentence))
         separator = " "
         raw_list = splitter.split(separator.join(search_words))
         words_list = [list_item.strip() for list_item in raw_list]
@@ -181,7 +181,7 @@ class CPKodiSkill(CommonPlaySkill):
         resource_path = self.find_resource("baseDataStructure.json")
         with open(resource_path) as resource_file:
             request_info = json.load(resource_file)
-        #LOG.info(str(request_info))
+        # LOG.info(str(request_info))
         request_info['utterance'] = phrase
         """
         play third day from youtube
@@ -281,7 +281,7 @@ class CPKodiSkill(CommonPlaySkill):
             LOG.info('Show Details Type Detected')
             request_info['tv']['title'] = show_type.groupdict()['showname']
             request_info['tv']['active'] = True
-            #ToDo: get last episode played
+            # ToDo: get last episode played
         """
         specify with Kodi
         (the |some|)(?P<kodiItem>.+)(?=\s+(from|with|using|on) kodi)
@@ -293,11 +293,10 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['kodi']['item'] = kodi_request.groupdict()['kodiItem']
         # Todo: need to correct item requested from utterance
         request_info['activeItem'] = (request_info['youtube']['active'] or
-                                   request_info['tv']['active'] or
-                                   request_info['music']['active'] or
-                                   request_info['movies']['active'])
+                                      request_info['tv']['active'] or
+                                      request_info['music']['active'] or
+                                      request_info['movies']['active'])
         return request_info
-
 
     def CPS_match_query_phrase(self, phrase):
         """
@@ -379,7 +378,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_library = data["library"]  # a results playlist of what was found
         playlist_count = len(self.active_library)  # how many items were returned
         playlist_dict = []
-        #try:
+        # try:
         if True:
             if request_data['youtube']['active']:
                 """
@@ -387,15 +386,15 @@ class CPKodiSkill(CommonPlaySkill):
                     we only currently extract the first item in the results
                 """
                 if self.active_library['playlists']:  # Youtube Requests contains a playlist item
-                    yt_ID = self.active_library['playlists'][0]['playlistId']
+                    yt_id = self.active_library['playlists'][0]['playlistId']
                     yt_title = self.active_library['playlists'][0]['title']
                 else:  # Youtube Requests does not contain a playlist item
-                    yt_ID = self.active_library['videos'][0]['videoId']
+                    yt_id = self.active_library['videos'][0]['videoId']
                     yt_title = self.active_library['videos'][0]['title']
                 wait_while_speaking()
                 self.speak_dialog('play.youtube', data={"result": str(yt_title)}, expect_response=False)
                 LOG.info('Attempting to Play youtube items: ' + str(yt_title))
-                play_yt(self.kodi_path, yt_ID)
+                play_yt(self.kodi_path, yt_id)
             if request_data['movies']['active']:
                 """
                     If type is movie then ask if there are multiple, if one then add to playlist and play
@@ -433,7 +432,7 @@ class CPKodiSkill(CommonPlaySkill):
     def clear_queue_and_play(self, playlist_items, playlist_type):
         result = None
         if playlist_type == "movie":
-            playlistLabel = str(self.active_library[0]["label"])
+            playlist_label = str(self.active_library[0]["label"])
 
         try:
             result = playlist_clear(self.kodi_path, playlist_type)
@@ -446,7 +445,7 @@ class CPKodiSkill(CommonPlaySkill):
                 LOG.info("Add Playlist Successful: " + str(playlist_items))
                 wait_while_speaking()
                 self.speak_dialog("now.playing", data={"result_type": str(playlist_type),
-                                                       "result_label": str(playlistLabel)},
+                                                       "result_label": str(playlist_label)},
                                   expect_response=False)
                 time.sleep(2)  # wait for playlist before playback
                 result = play_normal(self.kodi_path, playlist_type)
@@ -814,7 +813,7 @@ class CPKodiSkill(CommonPlaySkill):
         method = "VideoLibrary.Clean"
         result = update_library(self.kodi_path, method)
         LOG.info('Kodi Update Library Result: ' + str(result))
-        #self.music_library = get_all_music(self.kodi_path)
+        # self.music_library = get_all_music(self.kodi_path)
         update_kw = message.data.get("CleanKeyword")
         self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
 
@@ -824,7 +823,7 @@ class CPKodiSkill(CommonPlaySkill):
         method = "VideoLibrary.Scan"
         result = update_library(self.kodi_path, method)
         LOG.info('Kodi Update Library Result: ' + str(result))
-        #self.music_library = get_all_music(self.kodi_path
+        # self.music_library = get_all_music(self.kodi_path
         update_kw = message.data.get("ScanKeyword")
         self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
 
