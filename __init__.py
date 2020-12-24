@@ -399,6 +399,7 @@ class CPKodiSkill(CommonPlaySkill):
                     If type is movie then ask if there are multiple, if one then add to playlist and play
                 """
                 LOG.info('Preparing to Play Movie' + str(self.active_library))
+                LOG.info('Returned Library Length = ' + str(len(data["library"])))
                 if len(data["library"]) == 1:  # Only one item was returned so go ahead and play
                     # Todo: is this an issue if only one item is returned?
                     # Proposed fix:
@@ -406,7 +407,7 @@ class CPKodiSkill(CommonPlaySkill):
                     # movie_id = str(self.active_library["movieid"])
                     playlist_dict.append(movie_id)
                     self.clear_queue_and_play(playlist_dict, 'movie')
-                elif len(data["library"]):  # confirm the library does not have a zero length or is None
+                elif len(data["library"]) > 1:  # confirm the library does not have a zero length or is None
                     # Todo: give the option to add all items to the playlist immediatly
                     self.set_context('NavigateContextKeyword', 'NavigateContext')
                     wait_while_speaking()
@@ -659,15 +660,16 @@ class CPKodiSkill(CommonPlaySkill):
             """
             LOG.info('User responded with...' + message.data.get('NextKeyword'))
             self.active_index += 1
-            if (self.active_index <= last_index):  # We have not reached the end of the list
+            if (self.active_index < last_index):  # We have not reached the end of the list
                 msg_payload = str(self.active_library[self.active_index]['label'])
                 wait_while_speaking()
                 self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
             else:
-                # Todo Add new dialog response when we reach the end of the list
+                LOG.info('We have reached the last item in the list')
+                msg_payload = str(self.active_library[self.active_index]['label'])
+                wait_while_speaking()
+                self.speak_dialog('last.result', data={"result": msg_payload}, expect_response=True)
                 self.active_index = 0
-                self.set_context('ListContextKeyword', '')
-                LOG.info('We have reached the end of the list')
         elif "StartKeyword" in message.data:
             """
                 The user requested to play the currently listed item
