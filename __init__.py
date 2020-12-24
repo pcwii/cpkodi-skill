@@ -433,7 +433,8 @@ class CPKodiSkill(CommonPlaySkill):
         result = None
         if playlist_type == "movie":
             playlist_label = str(self.active_library[0]["label"])
-
+        else:
+            playlist_label = ""
         #try:
         if True:  # Remove after testing
             result = playlist_clear(self.kodi_path, playlist_type)
