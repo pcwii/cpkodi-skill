@@ -627,7 +627,7 @@ class CPKodiSkill(CommonPlaySkill):
             self.speak_dialog('cancel', expect_response=False)
 
     @intent_handler(IntentBuilder('').require('ListContextKeyword').
-                    one_of('AddKeyword', 'NextKeyword', 'PlayKeyword', 'StopKeyword'))
+                    one_of('AddKeyword', 'NextKeyword', 'StartKeyword', 'StopKeyword'))
     def handle_navigate_library_intent(self, message):
         """
             Conversational Context to handle listing of found movies
@@ -657,25 +657,33 @@ class CPKodiSkill(CommonPlaySkill):
             """
             LOG.info('User responded with...' + message.data.get('NextKeyword'))
             self.active_index += 1
-            msg_payload = str(self.active_library[self.active_index]['label'])
-            wait_while_speaking()
-            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
-        elif "PlayKeyword" in message.data:
+            if self.active_library[self.active_index]:  # We have not reached the end of the list
+                msg_payload = str(self.active_library[self.active_index]['label'])
+                wait_while_speaking()
+                self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
+            else:
+                self.active_index = 0
+                self.set_context('ListContextKeyword', '')
+                LOG.info('We have reached the end of the list')
+        elif "StartKeyword" in message.data:
             """
                 The user requested to play the currently listed item
                 Any active playlists are cleared and this item is played
                 Context is cleared
             """
-            LOG.info('User responded with...' + message.data.get('PlayKeyword'))
+            LOG.info('User responded with...' + message.data.get('StartKeyword'))
             self.set_context('ListContextKeyword', '')
             playlist_dict = []
             playlist_dict.append(self.active_library[self.active_index]['movieid'])
+            self.active_index = 0
             self.clear_queue_and_play(playlist_dict, "movie")
         elif "StopKeyword" in message.data:
+            self.active_index = 0
             LOG.info('User responded with...' + message.data.get('StopKeyword'))
             self.set_context('ListContextKeyword', '')
         else:
             self.set_context('ListContextKeyword', '')
+            self.active_index = 0
             wait_while_speaking()
             self.speak_dialog('cancel', expect_response=False)
 
