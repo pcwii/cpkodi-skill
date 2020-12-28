@@ -16,6 +16,7 @@
         "album": "None",
         "title": "None",
         "artist": "None",
+        "title_artist": "None",
         "active": false
     },
     "tv": {

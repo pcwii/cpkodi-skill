@@ -10,29 +10,63 @@ def get_requested_music(kodi_path, search_item, search_type):
     """
     json_header = {'content-type': 'application/json'}
     method = "AudioLibrary.GetSongs"
-    kodi_payload = {
-        "jsonrpc": "2.0",
-        "method": method,
-        "id": 1,
-        "params": {
-            "properties": [
-                "artist",
-                "duration",
-                "album",
-                "track"
-            ],
-            "filter": {
-                "field": search_type,
-                "operator": "contains",
-                "value": search_item
-            },
-            "sort": {
-                "order": "ascending",
-                "method": "track",
-                "ignorearticle": True
+    if search_type == 'title_artist':
+        kodi_payload = {
+            "jsonrpc": "2.0",
+            "method": method,
+            "id": 1,
+            "params": {
+                "properties": [
+                    "artist",
+                    "duration",
+                    "album",
+                    "track"
+                ],
+                "filter": {
+                    "and": [
+                        {
+                            "field": "title",
+                            "operator": "contains",
+                            "value": search_item[0]
+                        },
+                        {
+                            "field": "artist",
+                            "operator": "contains",
+                            "value": search_item[1]
+                        }
+                    ]
+                },
+                "sort": {
+                    "order": "ascending",
+                    "method": "track",
+                    "ignorearticle": True
+                }
             }
         }
-    }
+    else:
+        kodi_payload = {
+            "jsonrpc": "2.0",
+            "method": method,
+            "id": 1,
+            "params": {
+                "properties": [
+                    "artist",
+                    "duration",
+                    "album",
+                    "track"
+                ],
+                "filter": {
+                    "field": search_type,
+                    "operator": "contains",
+                    "value": search_item
+                },
+                "sort": {
+                    "order": "ascending",
+                    "method": "track",
+                    "ignorearticle": True
+                }
+            }
+        }
     try:
         kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
         song_list = json.loads(kodi_response.text)["result"]["songs"]
