@@ -213,6 +213,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['music']['artist'] = match_song_artist_type.groupdict()['artist']
             request_info['music']['active'] = True
         else:
+            LOG.info('Checking other song types')
             """
             play the song eye on it
             *passed*
