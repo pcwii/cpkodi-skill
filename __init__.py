@@ -205,27 +205,35 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['music']['type'] = 'album'
             request_info['music']['album'] = album_type.groupdict()['album']
             request_info['music']['active'] = True
-        """
-        play the song eye on it
-        *passed*
-        (the |)(song|single) (?P<title>.+)
-        """
-        song_type = re.match(self.translate_regex('song.type'), phrase)
-        if song_type and not request_info['youtube']['active']:
-            LOG.info('Song Type Detected')
-            request_info['music']['type'] = 'title'
-            request_info['music']['title'] = song_type.groupdict()['title']
+        match_song_artist_type = re.match(self.translate_regex('song.artist.type'), phrase)
+        if match_song_artist_type and not request_info['youtube']['active']:
+            LOG.info('Song and Artist Type Detected')
+            request_info['music']['type'] = 'title_artist'
+            request_info['music']['title'] = match_song_artist_type.groupdict()['title']
+            request_info['music']['artist'] = match_song_artist_type.groupdict()['artist']
             request_info['music']['active'] = True
-        """
-        play the artist toby mac
-        (the |)(artist|group|band|(something|anything|stuff|music|songs) (by|from)|(some|by)) (?P<artist>.+)
-        """
-        artist_type = re.match(self.translate_regex('artist.type'), phrase)
-        if artist_type and not request_info['youtube']['active']:
-            LOG.info('Artist Type Detected')
-            request_info['music']['type'] = 'artist'
-            request_info['music']['artist'] = artist_type.groupdict()['artist']
-            request_info['music']['active'] = True
+        else:
+            """
+            play the song eye on it
+            *passed*
+            (the |)(song|single) (?P<title>.+)
+            """
+            song_type = re.match(self.translate_regex('song.type'), phrase)
+            if song_type and not request_info['youtube']['active']:
+                LOG.info('Song Type Detected')
+                request_info['music']['type'] = 'title'
+                request_info['music']['title'] = song_type.groupdict()['title']
+                request_info['music']['active'] = True
+            """
+            play the artist toby mac
+            (the |)(artist|group|band|(something|anything|stuff|music|songs) (by|from)|(some|by)) (?P<artist>.+)
+            """
+            artist_type = re.match(self.translate_regex('artist.type'), phrase)
+            if artist_type and not request_info['youtube']['active']:
+                LOG.info('Artist Type Detected')
+                request_info['music']['type'] = 'artist'
+                request_info['music']['artist'] = artist_type.groupdict()['artist']
+                request_info['music']['active'] = True
         """
         play the movie spiderman homecoming
         *passed*

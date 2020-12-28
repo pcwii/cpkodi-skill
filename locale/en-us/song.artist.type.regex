@@ -1,0 +1,1 @@
+(.*) (song|single) (?P<title>.*)(.*) (((by|from)) (?P<artist_Name>.*))
