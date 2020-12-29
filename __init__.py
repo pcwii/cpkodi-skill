@@ -5,33 +5,25 @@ import splitter
 import time
 import json
 import random
-# from threading import Timer
-# import threading
-
-from .kodi_tools import *
-# from .misc_tools import *  # used to
-from .youtube_searcher import *
 
 from importlib import reload
-# import urllib.error
-# import urllib.parse
-# import urllib.request
+
+from .kodi_tools import *
+from .youtube_searcher import *
+from websocket import create_connection
 
 from adapt.intent import IntentBuilder
 
 from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.skills.core import intent_handler, intent_file_handler
-
 from mycroft.util.parse import extract_number, match_one, fuzzy_match
 from mycroft.util.log import LOG
-
 from mycroft.audio import wait_while_speaking
-
 from mycroft.messagebus import Message
 
 
 _author__ = 'PCWii'
-# Release - '20200603 - Covid-19 Build'
+# Release - '20201229 - Covid-19 Build'
 
 for each_module in sys.modules:
     if ("kodi_tools" or "youtube_searcher") in each_module:
@@ -39,11 +31,12 @@ for each_module in sys.modules:
         reload(sys.modules[each_module])
 
 
-
-
 class CPKodiSkill(CommonPlaySkill):
     def __init__(self):
         super(CPKodiSkill, self).__init__('CPKodiSkill')
+        self.debug_log = False
+        self.enable_chromecast = False
+        self.cast_ip = ""
         self.kodi_path = ""
         self.kodi_image_path = ""
         self._is_setup = False
@@ -58,6 +51,10 @@ class CPKodiSkill(CommonPlaySkill):
         self.movie_library = None
         # self.settings_change_callback = self.on_websettings_changed
 
+    def dLOG(self, log_message):
+        if self.debug_log:
+            self.dLOG(log_message)
+            
     def initialize(self):
         self.load_data_files(dirname(__file__))
         self.on_websettings_changed()
@@ -67,8 +64,12 @@ class CPKodiSkill(CommonPlaySkill):
 
     def on_websettings_changed(self):  # called when updating mycroft home page
         # if not self._is_setup:
-        LOG.info('Websettings have changed! Updating path data')
-        LOG.error
+        self.debug_log = self.settings.get("debug_log", False)
+        self.dLOG('Websettings have changed! Updating path data')
+        self.enable_chromecast = self.settings.get("enable_chromecast", False)
+        self.cast_ip = self.settings.get("cast_ip", "")
+        if len(self.cast_ip) == 0:
+            self.enable_chromecast = False
         kodi_ip = self.settings.get("kodi_ip", "192.168.0.32")
         kodi_port = self.settings.get("kodi_port", "8080")
         kodi_user = self.settings.get("kodi_user", "")
@@ -81,12 +82,26 @@ class CPKodiSkill(CommonPlaySkill):
                 kodi_pass = self.settings["kodi_pass"]
                 self.kodi_path = "http://" + kodi_user + ":" + kodi_pass + "@" + kodi_ip + ":" + str(kodi_port) + \
                                  "/jsonrpc"
-                LOG.info(self.kodi_path)
+                self.dLOG(self.kodi_path)
                 self.kodi_image_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/image/"
                 self._is_setup = True
                 # self.music_library = get_all_music(self.kodi_path)
         except Exception as e:
             LOG.error(e)
+
+    def send_message(self, message):  # Sends the remote received commands to the messagebus
+        self.dLOG("Sending a command to the message bus: " + message)
+        payload = json.dumps({
+            "type": "recognizer_loop:utterance",
+            "context": "",
+            "data": {
+                "utterances": [message]
+            }
+        })
+        uri = 'ws://localhost:8181/core'
+        ws = create_connection(uri)
+        ws.send(payload)
+        ws.close()
 
     # listening event used for kodi notifications
     def handle_listen(self, message):
@@ -95,8 +110,7 @@ class CPKodiSkill(CommonPlaySkill):
             try:
                 post_notification(self.kodi_path, voice_payload)
             except Exception as e:
-                LOG.info('An error was detected in: handle_listen')
-                LOG.error(e)
+                LOG.error('An error was detected in: handle_listen: ' + str(e))
                 self.on_websettings_changed()
 
     # utterance event used for kodi notifications
@@ -107,8 +121,7 @@ class CPKodiSkill(CommonPlaySkill):
             try:
                 post_notification(self.kodi_path, voice_payload)
             except Exception as e:
-                LOG.info('An error was detected in: handle_utterance')
-                LOG.error(e)
+                self.dLOG('An error was detected in: handle_utterance, ' + str(e))
                 self.on_websettings_changed()
 
     # mycroft speaking event used for kodi notificatons
@@ -118,8 +131,7 @@ class CPKodiSkill(CommonPlaySkill):
             try:
                 post_notification(self.kodi_path, voice_payload)
             except Exception as e:
-                LOG.info('An error was detected in: handle_speak')
-                LOG.error(e)
+                self.dLOG('An error was detected in: handle_speak, ' + str(e))
                 self.on_websettings_changed()
 
     def translate_regex(self, regex):
@@ -150,16 +162,16 @@ class CPKodiSkill(CommonPlaySkill):
         path = self.find_resource("MultiplicativeList.json")
         if value:
             repeat_value = value[0]
-            LOG.info("Multiplicative returning the value, " + str(repeat_value))
+            self.dLOG("Multiplicative returning the value, " + str(repeat_value))
             return repeat_value
         else:
             with open(path) as f:
                 data = json.load(f)
-            LOG.info(str(data))
+            self.dLOG(str(data))
             for each_item in data:
                 if each_item in message:
                     repeat_value = data[each_item]
-                    LOG.info("Multiplicative returning the value, " + str(repeat_value))
+                    self.dLOG("Multiplicative returning the value, " + str(repeat_value))
                     return repeat_value
 
     def split_compound(self, sentence):
@@ -182,7 +194,7 @@ class CPKodiSkill(CommonPlaySkill):
         resource_path = self.find_resource("baseDataStructure.json")
         with open(resource_path) as resource_file:
             request_info = json.load(resource_file)
-        # LOG.info(str(request_info))
+        # self.dLOG(str(request_info))
         request_info['utterance'] = phrase
         """
         play third day from youtube
@@ -191,7 +203,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         youtube_type = re.match(self.translate_regex('youtube.type'), phrase)
         if youtube_type:  # youtube request "the official captain marvel trailer from youtube"
-            LOG.info('Youtube Type Detected')
+            self.dLOG('Youtube Type Detected')
             request_info['youtube']['item'] = youtube_type.groupdict()['ytItem']
             request_info['youtube']['active'] = True
         """
@@ -201,19 +213,19 @@ class CPKodiSkill(CommonPlaySkill):
         """
         album_type = re.match(self.translate_regex('album.type'), phrase)
         if album_type and not request_info['youtube']['active']:
-            LOG.info('Album Type Detected')
+            self.dLOG('Album Type Detected')
             request_info['music']['type'] = 'album'
             request_info['music']['album'] = album_type.groupdict()['album']
             request_info['music']['active'] = True
         match_song_artist_type = re.match(self.translate_regex('song.artist.type'), phrase)
         if match_song_artist_type and not request_info['youtube']['active']:
-            LOG.info('Song and Artist Type Detected')
+            self.dLOG('Song and Artist Type Detected')
             request_info['music']['type'] = 'title_artist'
-            request_info['music']['title_artist'] = match_song_artist_type.groupdict()['title'],\
+            request_info['music']['title_artist'] = match_song_artist_type.groupdict()['title'], \
                                                     match_song_artist_type.groupdict()['artist']
             request_info['music']['active'] = True
         else:
-            LOG.info('Checking other song types')
+            self.dLOG('Checking other song types')
             """
             play the song eye on it
             *passed*
@@ -221,7 +233,7 @@ class CPKodiSkill(CommonPlaySkill):
             """
             song_type = re.match(self.translate_regex('song.type'), phrase)
             if song_type and not request_info['youtube']['active']:
-                LOG.info('Song Type Detected')
+                self.dLOG('Song Type Detected')
                 request_info['music']['type'] = 'title'
                 request_info['music']['title'] = song_type.groupdict()['title']
                 request_info['music']['active'] = True
@@ -231,7 +243,7 @@ class CPKodiSkill(CommonPlaySkill):
             """
             artist_type = re.match(self.translate_regex('artist.type'), phrase)
             if artist_type and not request_info['youtube']['active']:
-                LOG.info('Artist Type Detected')
+                self.dLOG('Artist Type Detected')
                 request_info['music']['type'] = 'artist'
                 request_info['music']['artist'] = artist_type.groupdict()['artist']
                 request_info['music']['active'] = True
@@ -242,7 +254,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         movie_type = re.match(self.translate_regex('movie.type'), phrase)
         if movie_type and not request_info['youtube']['active']:  # Movies
-            LOG.info('Movie Type Detected')
+            self.dLOG('Movie Type Detected')
             request_info['movies']['title'] = movie_type.groupdict()['movie']
             request_info['movies']['active'] = True
         """
@@ -252,7 +264,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         random_movie_type = re.match(self.translate_regex('random.movie.type'), phrase)
         if random_movie_type and not request_info['youtube']['active']:
-            LOG.info('Random Movie Type Detected')
+            self.dLOG('Random Movie Type Detected')
             request_info['random'] = True
             request_info['movies']['active'] = True
         """
@@ -262,7 +274,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         random_music_type = re.match(self.translate_regex('random.music.type'), phrase)
         if random_music_type and not request_info['youtube']['active']:  # rand
-            LOG.info('Random Music Type Detected')
+            self.dLOG('Random Music Type Detected')
             request_info['random'] = True
             request_info['music']['active'] = True
         """
@@ -271,7 +283,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         show_details_type = re.match(self.translate_regex('show.details'), phrase)
         if show_details_type and not request_info['youtube']['active']:  # TV Shows
-            LOG.info('TV Show Type Detected')
+            self.dLOG('TV Show Type Detected')
             request_info['tv']['title'] = show_details_type.groupdict()['showname']
             request_info['tv']['season'] = show_details_type.groupdict()['season']
             request_info['tv']['episode'] = show_details_type.groupdict()['episode']
@@ -284,7 +296,7 @@ class CPKodiSkill(CommonPlaySkill):
             """
             show_type = re.match(self.translate_regex('show.type'), phrase)
             if show_details_type and not request_info['youtube']['active']:  # TV Shows
-                LOG.info('Show Details Type Detected')
+                self.dLOG('Show Details Type Detected')
                 request_info['tv']['title'] = show_type.groupdict()['showname']
                 request_info['tv']['active'] = True
                 request_info['tv']['type'] = "title"
@@ -294,10 +306,18 @@ class CPKodiSkill(CommonPlaySkill):
         """
         kodi_request = re.match(self.translate_regex('with.kodi'), phrase)
         if kodi_request:  # kodi was specifically requested in the utterance
-            LOG.info('Kodi Type Detected')
+            self.dLOG('Kodi Type Detected')
             request_info['kodi']['active'] = True
             request_info['kodi']['item'] = kodi_request.groupdict()['kodiItem']
-        # Todo: need to correct item requested from utterance
+        """
+        specify with chromecast
+        (the |some|)(?P<castItem>.+)(?=\s+(from|with|using|on) chromecast)
+        """
+        cast_request = re.match(self.translate_regex('with.chromecast'), phrase)
+        if self.enable_chromecast and cast_request:  # kodi was specifically requested in the utterance
+            self.dLOG('Cast Type Detected')
+            request_info['chromecast']['active'] = True
+            request_info['chromecast']['item'] = cast_request.groupdict()['castItem']
         request_info['activeItem'] = (request_info['youtube']['active'] or
                                       request_info['tv']['active'] or
                                       request_info['music']['active'] or
@@ -312,17 +332,17 @@ class CPKodiSkill(CommonPlaySkill):
             We imediatly check for the kodi specific request and strip this from the phase
         """
         # Todo: Handle Cinemavision options
-        LOG.info('CPKodiSkill received the following phrase: ' + phrase)
+        self.dLOG('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
-            LOG.info('CPKodi Skill must be setup at the home.mycroft.ai')
+            self.dLOG('CPKodi Skill must be setup at the home.mycroft.ai')
             self.on_websettings_changed()
             return None
         # try:
         if True:
             request_data = self.get_request_info(phrase)  # Parse the utterance (phrase)
-            LOG.info('Phrase was parsed with the following request... ' + str(request_data))
+            self.dLOG('Phrase was parsed with the following request... ' + str(request_data))
             if not request_data['activeItem']:
-                LOG.info('GetRequest returned None, no regex matches were found')
+                self.dLOG('GetRequest returned None, no regex matches were found')
                 return None
             else:  # Active regex data was parsed
                 if request_data['movies']['active']:
@@ -331,7 +351,7 @@ class CPKodiSkill(CommonPlaySkill):
                         self.bus.emit(Message('play:query.response', {"phrase": phrase,
                                                                       "skill_id": self.skill_id,
                                                                       "searching": True}))
-                        LOG.info('Searching for Random movie')
+                        self.dLOG('Searching for Random movie')
                         results = self.random_movie_select()
                     else:
                         word_list = self.split_compound(request_data['movies']['title'])
@@ -342,7 +362,7 @@ class CPKodiSkill(CommonPlaySkill):
                         self.bus.emit(Message('play:query.response', {"phrase": phrase,
                                                                       "skill_id": self.skill_id,
                                                                       "searching": True}))
-                        LOG.info('Searching for Random music')
+                        self.dLOG('Searching for Random music')
                         results = self.random_music_select()
                     else:
                         request_type = request_data['music']['type']
@@ -356,7 +376,7 @@ class CPKodiSkill(CommonPlaySkill):
                                               request_data['tv']['season'],
                                               request_data['tv']['episode'])
                     if "title" in request_type:
-                        results = get_show(self.kodi_path,request_data['tv']['title'])
+                        results = get_show(self.kodi_path, request_data['tv']['title'])
                 if request_data['youtube']['active'] and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
                     results = search_youtube(request_data['youtube']['item'])
                 if results:
@@ -370,7 +390,7 @@ class CPKodiSkill(CommonPlaySkill):
                             "library": results,  # Contains the playlist items
                             "details": request_data  # Contains the json object for the request
                         }
-                        LOG.info('Searching kodi found a matching playable item! ' + str(match_level))
+                        self.dLOG('Searching kodi found a matching playable item! ' + str(match_level))
                         return phrase, match_level, data
                     else:
                         return None
@@ -406,23 +426,21 @@ class CPKodiSkill(CommonPlaySkill):
                     yt_title = self.active_library['videos'][0]['title']
                 wait_while_speaking()
                 self.speak_dialog('play.youtube', data={"result": str(yt_title)}, expect_response=False)
-                LOG.info('Attempting to Play youtube items: ' + str(yt_title))
+                self.dLOG('Attempting to Play youtube items: ' + str(yt_title))
                 play_yt(self.kodi_path, yt_id)
             if request_data['movies']['active']:
                 """
                     If type is movie then ask if there are multiple, if one then add to playlist and play
                 """
-                LOG.info('Preparing to Play Movie' + str(self.active_library))
-                LOG.info('Returned Library Length = ' + str(len(data["library"])))
+                self.dLOG('Preparing to Play Movie' + str(self.active_library))
+                self.dLOG('Returned Library Length = ' + str(len(data["library"])))
                 if len(data["library"]) == 1:  # Only one item was returned so go ahead and play
-                    # Todo: is this an issue if only one item is returned?
-                    # Proposed fix:
                     movie_id = str(self.active_library[0]["movieid"])
-                    # movie_id = str(self.active_library["movieid"])
                     playlist_dict.append(movie_id)
+                    # Todo: add the Cast Option here
                     self.clear_queue_and_play(playlist_dict, 'movie')
                 elif len(data["library"]) > 1:  # confirm the library does not have a zero length or is None
-                    # Todo: give the option to add all items to the playlist immediatly
+                    # Todo: give the option to add all items to the playlist immediately
                     self.set_context('NavigateContextKeyword', 'NavigateContext')
                     wait_while_speaking()
                     self.speak_dialog('multiple.results', data={"result": str(playlist_count)}, expect_response=True)
@@ -433,13 +451,14 @@ class CPKodiSkill(CommonPlaySkill):
                 """
                     If type is music then add all to playlist and play
                 """
-                LOG.info('Preparing to Play Music')
+                self.dLOG('Preparing to Play Music')
                 for each_item in self.active_library:
                     song_id = str(each_item["songid"])
                     playlist_dict.append(song_id)
+                # Todo: add the Cast Option here
                 self.clear_queue_and_play(playlist_dict, request_data['music']['type'])
 #        except Exception as e:
-#            LOG.info('An error was detected in: CPS_match_query_phrase')
+#            self.dLOG('An error was detected in: CPS_match_query_phrase')
 #            LOG.error(e)
 #            self.on_websettings_changed()
 
@@ -449,16 +468,16 @@ class CPKodiSkill(CommonPlaySkill):
             playlist_label = str(self.active_library[0]["label"])
         else:
             playlist_label = ""
-        #try:
+        # try:
         if True:  # Remove after testing
             result = playlist_clear(self.kodi_path, playlist_type)
             if "OK" in result.text:
                 result = None
-                LOG.info("Clear Playlist Successful")
+                self.dLOG("Clear Playlist Successful")
                 result = create_playlist(self.kodi_path, playlist_items, playlist_type)
             if "OK" in result.text:
                 result = None
-                LOG.info("Add Playlist Successful: " + str(playlist_items))
+                self.dLOG("Add Playlist Successful: " + str(playlist_items))
                 wait_while_speaking()
                 self.speak_dialog("now.playing", data={"result_type": str(playlist_type),
                                                        "result_label": str(playlist_label)},
@@ -466,15 +485,15 @@ class CPKodiSkill(CommonPlaySkill):
                 time.sleep(2)  # wait for playlist before playback
                 result = play_normal(self.kodi_path, playlist_type)
             if "OK" in result.text:
-                LOG.info("Now Playing..." + str(result.text))
+                self.dLOG("Now Playing..." + str(result.text))
                 result = None
-        #except Exception as e:
-        #    LOG.info('An error was detected in: clear_queue_and_play')
+        # except Exception as e:
+        #    self.dLOG('An error was detected in: clear_queue_and_play')
         #    LOG.error(e)
         #    self.on_websettings_changed()
 
     def random_movie_select(self):
-        LOG.info('Random Movie Selected')
+        self.dLOG('Random Movie Selected')
         full_list = get_all_movies(self.kodi_path)
         random_id = random.randint(1, len(full_list))
         random_entry = []
@@ -484,7 +503,7 @@ class CPKodiSkill(CommonPlaySkill):
     def random_music_select(self):
         full_list = get_all_music(self.kodi_path)
         item_count = random.randint(10, 20)  # how many items to grab
-        LOG.info('Randomly Selecting: ' + str(item_count) + ' entries.')
+        self.dLOG('Randomly Selecting: ' + str(item_count) + ' entries.')
         random_id = random.sample(range(len(full_list)), item_count)
         random_entry = []
         for each_id in random_id:
@@ -500,16 +519,16 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_stop_intent(self, message):
         try:
             active_player_id, active_player_type = get_active_player(self.kodi_path)
-            LOG.info(str(active_player_id) + ', ' + str(active_player_type))
+            self.dLOG(str(active_player_id) + ', ' + str(active_player_type))
             if active_player_type:
                 result = stop_kodi(self.kodi_path, active_player_id)
                 if "OK" in result.text:
-                    LOG.info("Stopped")
+                    self.dLOG("Stopped")
                     self.speak_dialog('stopped', expect_response=False)
             else:
-                LOG.info('Kodi does not appear to be playing anything at the moment')
+                self.dLOG('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
-            LOG.info('An error was detected in: handle_stop_intent')
+            self.dLOG('An error was detected in: handle_stop_intent')
             LOG.error(e)
             self.on_websettings_changed()
 
@@ -521,12 +540,12 @@ class CPKodiSkill(CommonPlaySkill):
             if active_player_id:
                 result = pause_all(self.kodi_path, active_player_id)
                 if "OK" in result.text:
-                    LOG.info("paused")
+                    self.dLOG("paused")
                     self.speak_dialog('paused', expect_response=False)
             else:
-                LOG.info('Kodi does not appear to be playing anything at the moment')
+                self.dLOG('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
-            LOG.info('An error was detected in: handle_pause_intent')
+            self.dLOG('An error was detected in: handle_pause_intent')
             LOG.error(e)
             self.on_websettings_changed()
 
@@ -538,12 +557,12 @@ class CPKodiSkill(CommonPlaySkill):
             if active_player_id:
                 result = resume_play(self.kodi_path, active_player_id)
                 if "OK" in result.text:
-                    LOG.info("Resumed")
+                    self.dLOG("Resumed")
                     self.speak_dialog('resumed', expect_response=False)
             else:
-                LOG.info('Kodi does not appear to be playing anything at the moment')
+                self.dLOG('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
-            LOG.info('An error was detected in: handle_resume_intent')
+            self.dLOG('An error was detected in: handle_resume_intent')
             LOG.error(e)
             self.on_websettings_changed()
 
@@ -557,25 +576,25 @@ class CPKodiSkill(CommonPlaySkill):
                 result = playlist_clear(self.kodi_path, "audio")
                 if "OK" in result.text:
                     result = None
-                    LOG.info("Clear Audio Playlist Successful")
+                    self.dLOG("Clear Audio Playlist Successful")
             elif "video" in message.data:
                 result = None
                 result = playlist_clear(self.kodi_path, "video")
                 if "OK" in result.text:
                     result = None
-                    LOG.info("Clear Video Playlist Successful")
+                    self.dLOG("Clear Video Playlist Successful")
             else:
                 result = None
                 result = playlist_clear(self.kodi_path, "audio")
                 if "OK" in result.text:
                     result = None
-                    LOG.info("Clear Audio Playlist Successful")
+                    self.dLOG("Clear Audio Playlist Successful")
                     result = playlist_clear(self.kodi_path, "video")
                     if "OK" in result.text:
                         result = None
-                        LOG.info("Clear Video Playlist Successful")
+                        self.dLOG("Clear Video Playlist Successful")
         except Exception as e:
-            LOG.info('An error was detected in: handle_clear_playlist_intent')
+            self.dLOG('An error was detected in: handle_clear_playlist_intent')
             LOG.error(e)
             self.on_websettings_changed()
 
@@ -636,12 +655,12 @@ class CPKodiSkill(CommonPlaySkill):
             """
                 If yes was spoken the read the first item and request next stesp
             """
-            LOG.info('User responded with...' + message.data.get('YesKeyword'))
+            self.dLOG('User responded with...' + message.data.get('YesKeyword'))
             self.set_context('ListContextKeyword', 'ListContext')
             msg_payload = str(self.active_library[self.active_index]['label'])
             self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
         else:  # No was spoken to navigate the list, reading the first item
-            LOG.info('User responded with...' + message.data.get('NoKeyword'))
+            self.dLOG('User responded with...' + message.data.get('NoKeyword'))
             self.speak_dialog('cancel', expect_response=False)
 
     @intent_handler(IntentBuilder('').require('ListContextKeyword').
@@ -652,13 +671,13 @@ class CPKodiSkill(CommonPlaySkill):
             This will walk you through each movie in the found list
         """
         last_index = len(self.active_library) - 1
-        LOG.info("list length is: " + str(len(self.active_library)) +", Processing item: " + str(self.active_index+1))
+        self.dLOG("list length is: " + str(len(self.active_library)) + ", Processing item: " + str(self.active_index+1))
         if "AddKeyword" in message.data:
             """
                 User requested to add this item to the playlist
                 Context does not change
             """
-            LOG.info('User responded with...' + message.data.get('AddKeyword'))
+            self.dLOG('User responded with...' + message.data.get('AddKeyword'))
             playlist_dict = []
             playlist_dict.append(self.active_library[self.active_index]['movieid'])
             create_playlist(self.kodi_path, playlist_dict, "movie")
@@ -675,14 +694,14 @@ class CPKodiSkill(CommonPlaySkill):
                 the next item in the list and ask what to do
                 Context does not change
             """
-            LOG.info('User responded with...' + message.data.get('NextKeyword'))
+            self.dLOG('User responded with...' + message.data.get('NextKeyword'))
             self.active_index += 1
-            if (self.active_index < last_index):  # We have not reached the end of the list
+            if self.active_index < last_index:  # We have not reached the end of the list
                 msg_payload = str(self.active_library[self.active_index]['label'])
                 wait_while_speaking()
                 self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
             else:
-                LOG.info('We have reached the last item in the list')
+                self.dLOG('We have reached the last item in the list')
                 msg_payload = str(self.active_library[self.active_index]['label'])
                 wait_while_speaking()
                 self.speak_dialog('last.result', data={"result": msg_payload}, expect_response=True)
@@ -693,7 +712,7 @@ class CPKodiSkill(CommonPlaySkill):
                 Any active playlists are cleared and this item is played
                 Context is cleared
             """
-            LOG.info('User responded with...' + message.data.get('StartKeyword'))
+            self.dLOG('User responded with...' + message.data.get('StartKeyword'))
             self.set_context('ListContextKeyword', '')
             playlist_dict = []
             playlist_dict.append(self.active_library[self.active_index]['movieid'])
@@ -701,7 +720,7 @@ class CPKodiSkill(CommonPlaySkill):
             self.clear_queue_and_play(playlist_dict, "movie")
         elif "StopKeyword" in message.data:
             self.active_index = 0
-            LOG.info('User responded with...' + message.data.get('StopKeyword'))
+            self.dLOG('User responded with...' + message.data.get('StopKeyword'))
             self.set_context('ListContextKeyword', '')
         else:
             self.set_context('ListContextKeyword', '')
@@ -717,7 +736,7 @@ class CPKodiSkill(CommonPlaySkill):
         if volume_level:
             if int(volume_level[0]) < 101:
                 new_volume = set_volume(self.kodi_path, int(volume_level[0]))
-                LOG.info("Kodi Volume Now: " + str(new_volume))
+                self.dLOG("Kodi Volume Now: " + str(new_volume))
                 self.speak_dialog('volume.set', data={'result': str(new_volume)}, expect_response=False)
             else:
                 self.speak_dialog('volume.error', data={'result': str(int(volume_level[0]))}, expect_response=False)
@@ -732,53 +751,53 @@ class CPKodiSkill(CommonPlaySkill):
         else:
             dir_skip = "smallforward"
         active_player_id, active_player_type = get_active_player(self.kodi_path)
-        LOG.info(str(active_player_id), str(active_player_type))
+        self.dLOG(str(active_player_id) + ', ' + str(active_player_type))
         if active_player_type:
             result = skip_play(self.kodi_path, dir_skip)
-            LOG.info('Kodi Skip Result: ' + str(result))
+            self.dLOG('Kodi Skip Result: ' + str(result))
         else:
-            LOG.info('Kodi does not appear to be playing anything at the moment')
+            self.dLOG('Kodi does not appear to be playing anything at the moment')
 
     # the movie information dialog was requested in the utterance
     @intent_handler(IntentBuilder('').require('VisibilityKeyword').require('InfoKeyword').
                     optionally('KodiKeyword').optionally('FilmKeyword'))
     def handle_show_movie_info_intent(self, message):
         active_player_id, active_player_type = get_active_player(self.kodi_path)
-        LOG.info(str(active_player_id), str(active_player_type))
+        self.dLOG(str(active_player_id) + ', ' + str(active_player_type))
         if active_player_type:
             result = show_movie_info(self.kodi_path)
-            LOG.info('Kodi Show Info Result: ' + str(result))
+            self.dLOG('Kodi Show Info Result: ' + str(result))
         else:
-            LOG.info('Kodi does not appear to be playing anything at the moment')
+            self.dLOG('Kodi does not appear to be playing anything at the moment')
 
     # user has requested to turn on the movie subtitles
     @intent_handler(IntentBuilder('').require("KodiKeyword").require('SubtitlesKeyword').require('OnKeyword'))
     def handle_subtitles_on_intent(self, message):
         active_player_id, active_player_type = get_active_player(self.kodi_path)
-        LOG.info(str(active_player_id), str(active_player_type))
+        self.dLOG(str(active_player_id) + ', ' + str(active_player_type))
         if active_player_type:
             result = show_subtitles(self.kodi_path)
-            LOG.info('Kodi Show Subtitles Result: ' + str(result))
+            self.dLOG('Kodi Show Subtitles Result: ' + str(result))
         else:
-            LOG.info('Kodi does not appear to be playing anything at the moment')
+            self.dLOG('Kodi does not appear to be playing anything at the moment')
 
     # user has requested to turn off the movie subtitles
     @intent_handler(IntentBuilder('').require("KodiKeyword").require('SubtitlesKeyword').require('OffKeyword'))
     def handle_subtitles_off_intent(self, message):
         active_player_id, active_player_type = get_active_player(self.kodi_path)
-        LOG.info(str(active_player_id), str(active_player_type))
+        self.dLOG(str(active_player_id) + ', ' + str(active_player_type))
         if active_player_type:
             result = hide_subtitles(self.kodi_path)
-            LOG.info('Kodi Hide Subtitles Result: ' + str(result))
+            self.dLOG('Kodi Hide Subtitles Result: ' + str(result))
         else:
-            LOG.info('Kodi does not appear to be playing anything at the moment')
+            self.dLOG('Kodi does not appear to be playing anything at the moment')
 
     # user has requested to show the recently added movies list
     @intent_handler(IntentBuilder('').require("ListKeyword").require('RecentKeyword').require('FilmKeyword'))
     def handle_show_movies_added_intent(self, message):
         window_path = "videodb://recentlyaddedmovies/"
         result = show_window(self.kodi_path, window_path)
-        LOG.info('Kodi Show Window Result: ' + str(result))
+        self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("RecentKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
 
@@ -787,7 +806,7 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_show_movies_genres_intent(self, message):
         window_path = "videodb://movies/genres/"
         result = show_window(self.kodi_path, window_path)
-        LOG.info('Kodi Show Window Result: ' + str(result))
+        self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("GenreKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
 
@@ -796,7 +815,7 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_show_movies_actors_intent(self, message):
         window_path = "videodb://movies/actors/"
         result = show_window(self.kodi_path, window_path)
-        LOG.info('Kodi Show Window Result: ' + str(result))
+        self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("ActorKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
 
@@ -805,7 +824,7 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_show_movies_studio_intent(self, message):
         window_path = "videodb://movies/studios/"
         result = show_window(self.kodi_path, window_path)
-        LOG.info('Kodi Show Window Result: ' + str(result))
+        self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("StudioKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
 
@@ -814,7 +833,7 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_show_movies_title_intent(self, message):
         window_path = "videodb://movies/titles/"
         result = show_window(self.kodi_path, window_path)
-        LOG.info('Kodi Show Window Result: ' + str(result))
+        self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("TitleKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
 
@@ -823,7 +842,7 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_show_movies_sets_intent(self, message):
         window_path = "videodb://movies/sets/"
         result = show_window(self.kodi_path, window_path)
-        LOG.info('Kodi Show Window Result: ' + str(result))
+        self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("SetsKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
 
@@ -832,7 +851,7 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_show_all_movies_intent(self, message):
         window_path = "videodb://movies/sets/"
         result = show_window(self.kodi_path, window_path)
-        LOG.info('Kodi Show Window Result: ' + str(result))
+        self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("AllKeyword")
         self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
 
@@ -841,7 +860,7 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_clean_library_intent(self, message):
         method = "VideoLibrary.Clean"
         result = update_library(self.kodi_path, method)
-        LOG.info('Kodi Update Library Result: ' + str(result))
+        self.dLOG('Kodi Update Library Result: ' + str(result))
         # self.music_library = get_all_music(self.kodi_path)
         update_kw = message.data.get("CleanKeyword")
         self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
@@ -851,11 +870,26 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_scan_library_intent(self, message):
         method = "VideoLibrary.Scan"
         result = update_library(self.kodi_path, method)
-        LOG.info('Kodi Update Library Result: ' + str(result))
+        self.dLOG('Kodi Update Library Result: ' + str(result))
         # self.music_library = get_all_music(self.kodi_path
         update_kw = message.data.get("ScanKeyword")
         self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
 
+    # user has requested to cast something
+    @intent_handler(IntentBuilder('').require("CastKeyword"))
+    def handle_cast_movies_intent(self, message):
+        """
+            This intent will re-format the request and send it to the messagebus to be handled by the
+            common play system
+            "cast something" will be re-formated to "play something with chromecast"
+        """
+        if self.enable_chromecast:
+            str_remainder = str(message.utterance_remainder())
+            self.dLOG('Request to CAST something: ' + str_remainder)
+            new_request = "play " + str(str_remainder) + ' with chromecast'
+            self.send_message(new_request)
+        else:
+            return False  # if Chromecast is not enabled then fallback to another skill
 
 def create_skill():
     return CPKodiSkill()

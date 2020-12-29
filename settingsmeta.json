@@ -31,8 +31,25 @@
                         "type": "password",
                         "label": "Password of your device",
                         "value": ""
+                    },
+                    {
+                        "name": "enable_chromecast",
+                        "type": "checkbox",
+                        "label": "Enable Chromecast Support",
+                        "value": "false"
+                    },
+                    {
+                        "name": "cast_ip",
+                        "type": "text",
+                        "label": "IP Address of the Chromecast device",
+                        "value": "0.0.0.0"
+                    },
+                    {
+                        "name": "kodi_pass",
+                        "type": "checkbox",
+                        "label": "Enable Extra Logging for debug",
+                        "value": "false"
                     }
-
                 ]
             }
         ]

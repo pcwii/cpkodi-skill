@@ -7,6 +7,10 @@
         "active": false,
         "item": "None"
     },
+    "chromecast": {
+        "active": false,
+        "item": "None"
+    },
     "youtube": {
         "item": "None",
         "active": false

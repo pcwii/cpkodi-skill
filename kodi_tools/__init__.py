@@ -4,6 +4,7 @@ from .CreatePlaylist import create_playlist
 from .GetActivePlayer import get_active_player
 from .GetAllMovies import get_all_movies
 from .GetAllMusic import get_all_music
+from .GetMoviePath import get_movie_path
 from .GetPosterURL import get_poster_url
 from .GetRequestedMovies import get_requested_movies,int_to_Roman, roman_to_int
 from .GetRequestedMusic import get_requested_music

@@ -1,61 +1,67 @@
-#This is currently unde active development
 # <img src='https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/tv.svg' card_color='#40DBB0' width='50' height='50' style='vertical-align:bottom'/> CP Kodi Control
 Control KODI open source media center with Mycroft.ai using the Common Play architecture
 
 ## About 
-Utilize the kodi API and Python library for controlling the KODI open source media center with Mycroft.ai. The control is mostly geared towards videos/movies but is capable of handling cursor navigation as well.
+Utilize the kodi API and Python library for controlling the KODI open source media center with Mycroft.ai.
 The Kodi Skill uses conversational dialog to help you to control your KODI instance more naturally. 
 
 ## Examples -Movies-
-* "play the movie guardians of the galaxy"
-* "play the film planet of the apes"
-* "play a random movie"
-* "turn kodi subtitles on"
-* "turn kodi subtitles off"
-* "skip kodi forward"
-* "skip kodi backward"
-* "pause the film"
-* "re-start the film"
-* "stop the movie"
-* "show kodi movie information"
-* "hide kodi movie information"
-* "list recently added movies"
-* "list the movies by genre"
-* "list the movies by studio"
-* "list movie sets"
-* "list movies by title"
-* "list movies by actor"
-* "list all movies"
-* "clear the movie playlist"
+*[ ] "play the movie guardians of the galaxy"
+*[ ] "play the film planet of the apes"
+*[ ] "play a random movie"
+*[ ] "turn kodi subtitles on"
+*[ ] "turn kodi subtitles off"
+*[ ] "skip kodi forward"
+*[ ] "skip kodi backward"
+*[ ] "pause the film"
+*[ ] "re-start the film"
+*[ ] "stop the movie"
+*[ ] "show kodi movie information"
+*[ ] "hide kodi movie information"
+*[ ] "list recently added movies"
+*[ ] "list the movies by genre"
+*[ ] "list the movies by studio"
+*[ ] "list movie sets"
+*[ ] "list movies by title"
+*[ ] "list movies by actor"
+*[ ] "list all movies"
+*[ ] "clear the movie playlist"
+* **Movie titles containing Roman Numerals will automatically be searched**
+**eg.** 
+*[ ] "play the movie star wars 3" - will locate *star wars III* 
 ## Examples -Music-
-* "play the artist elvis presley”
-* "play all shook up”
-* "play the song blue suede shoes"
-* "play the album appeal to reason”
-* "play some music" --will play a random selection
-* "clear the music playlist"
-* "pause the music"
-* "resume the music"
-## Examples -Youtube-
-* "play the captain marvel official trailer from youtube”
-* "play helix from youtube”
-## Examples -Miscelaneous-
-* "pause kodi"
-* "re-start kodi"
-* "stop kodi"
-* "clear the kodi playlist"
-* "set kodi volume to 100"
-* "set kodi volume to 25"
-* "turn kodi notifications on"
-* "turn kodi notifications off"
-* "move the kodi cursor up / down / left / right / back / select / cancel"
-  - After the first cursor comand just say the direction "up / down / left / right / back / select / cancel"
-* "move the kodi cursor right 3 times"
-* "move the kodi cursor down twice"
-* "update the kodi library"
-* "clean the kodi library"
+*[ ] "play the artist elvis presley”
+*[ ] "play all shook up”
+*[ ] "play the song blue suede shoes"
+*[ ] "play the album appeal to reason”
+*[ ] "the song blue christmas by elvis presley"
+*[ ] "play some music" --will play a random selection
+*[ ] "clear the music playlist"
+*[ ] "pause the music"
+*[ ] "resume the music"
+## Examples -Youtube- **Requires Youtube Kodi Plugin**
+*[ ] "play the captain marvel official trailer from youtube”
+*[ ] "play helix from youtube”
+*[ ] "play some Elton John from youtube"
+## Examples -TV Shows-
+*[ ] "play the outer limits season 1 episode 2”
+## Examples -Miscellaneous-
+*[ ] "pause kodi"
+*[ ] "re-start kodi"
+*[ ] "stop kodi"
+*[ ] "clear the kodi playlist"
+*[ ] "set kodi volume to 100"
+*[ ] "set kodi volume to 25"
+*[ ] "turn kodi notifications on"
+*[ ] "turn kodi notifications off"
+*[ ] "move the kodi cursor up / down / left / right / back / select / cancel"
+  - After the first cursor command just say the direction "up / down / left / right / back / select / cancel"
+*[ ] "move the kodi cursor right 3 times"
+*[ ] "move the kodi cursor down twice"
+*[ ] "update the kodi library"
+*[ ] "clean the kodi library"
 ## Conversational Context
-** If mycroft.ai locates more than one movie that matches your request it will permit you to itterate through your requests
+*[ ] If mycroft.ai locates more than one movie that matches your request it will permit you to itterate through your requests
 using conversational context.
 * eg. "hey mycroft:"
 * Request: "play the move Iron Man"
@@ -68,24 +74,34 @@ using conversational context.
 * Request: "play" / "select"
 * Response: "o-k, attempting to play, Iron Man 2"
 ## Cinemavision Addon
-If mycroft.ai locates the addon CinemaVision it will prompt the user if this addon should be used during the 
+*[ ] If mycroft.ai locates the addon CinemaVision it will prompt the user if this addon should be used during the 
 playback of the movie that was selected.
 * Response: "Would you like to play the movie using cinemavision?"
 * Request: "yes / no"
-## Youtube Addon
-* Request: "play some Elton John from youtube
-* Request: "Play the official captain marvel trailer from youtube"
-* Request: "Stop kodi"
+## Chromecast Support
+CP Kodi skill is capable of "casting" any of your personal library files to a chromecast enabled device
+*[ ] "cast the movie guardians of the galaxy"
 ## Credits 
 * PCWii
+* Youtube Scraping Elements borrowed from 
 ## Category
 **Media**
 ## Tags
 '#kodi, #Krypton #Leia, #mycroft.ai, #python, #skills #youtube #common play #cps'
-## Require 
+## Require
 Tested on platform_picroft (others untested) 
 ## Other Requirements
 - [Mycroft](https://docs.mycroft.ai/installing.and.running/installation)
+## Dependancies **Automatically Installed**
+* python:
+    - requests
+    - bs4
+    - requests_cache
+    - pychromecast
+    - pyenchant
+    - compound-word-splitter
+* system:
+    - apt-get: libenchant1c2a
 ## Further Reading
 - [KODI API](https://kodi.wiki/index.php?title=JSON-RPC_API/v8)
 - [CinemaVision](https://kodi.wiki/view/Add-on:CinemaVision)
@@ -100,9 +116,10 @@ Tested on platform_picroft (others untested)
 - ~~Make repeat words language agnostic "MultiplicativeList.json"~~ (Completed 2021214)
 - Add the ability to search music by album and artist (Todo 20201214)
 - ~~Correct the random music request "play some music"~~ (Completed 20201228) 
-- Confirm TV Show request by season and episode "play the outer limits season 1 episode 2" (Todo 20201214)
+- ~~Confirm TV Show request by season and episode "play the outer limits season 1 episode 2"~~ (Completed 20201229)
 - Confirm music request by artist "play the artist Elvis" (Todo 20201214)
 - Confirm TV Show request by Title with dialog "play the tv show stargirl" (Todo 20201214)
 - ~~Correct index out of range when iterating through a list of found movies~~ (Complete 20201223)
 - ~~Todo Add new dialog response when we reach the end of the list~~ (Completed 20201224)
-- Add Option to toggle debug log entries in websettings (20201224)
+- ~~Add Option to toggle debug log entries in websettings~~ (Completed 20201229)
+- Confirm Chromecast support for local library (20201229)
