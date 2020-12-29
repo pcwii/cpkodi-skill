@@ -4,6 +4,11 @@ import json
 
 
 def get_tv_show(kodi_path, show_title, season_number, episode_number):
+    """
+        1. Need to retrieve the tvshowid based on it's name
+        2. Need to retreive the episode from the season
+        2. return the episode details
+    """
     show_id = get_show(kodi_path, show_title)[0]['tvshowid']
     LOG.info('Found ShowID: ' + str(show_id))
     episode_details = get_episode(kodi_path, show_id, season_number, episode_number)

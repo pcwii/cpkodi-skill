@@ -20,6 +20,7 @@
         "active": false
     },
     "tv": {
+        "type": "None",
         "title": "None",
         "season": "None",
         "episode": "None",

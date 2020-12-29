@@ -267,31 +267,27 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['music']['active'] = True
         """
         play the outer limits season 1 episode 2
-        (the\s+|)(?P<showname>.+)(?=\s+season)(?P<episode>.+)
+        (.*) (?P<showname>.*)(season (?P<season>\d{1,3}))(.+episode (?P<episode>\d{1,3}))
         """
-        show_details_type = re.match(self.translate_regex('show.details.type'), phrase)
+        show_details_type = re.match(self.translate_regex('show.details'), phrase)
         if show_details_type and not request_info['youtube']['active']:  # TV Shows
             LOG.info('TV Show Type Detected')
             request_info['tv']['title'] = show_details_type.groupdict()['showname']
-            request_info['tv']['details'] = show_details_type.groupdict()['episode']
-            """
-            (season (?P<season>\d{1,3}))(.+episode (?P<episode>\d{1,3}))
-            """
-            show_details = re.match(self.translate_regex('show.details'), str(request_info['tv']['details']))
-            if show_details:
-                request_info['tv']['season'] = int(show_details.groupdict()['season'])
-                request_info['tv']['episode'] = int(show_details.groupdict()['episode'])
-                request_info['tv']['active'] = True
-        """
-        play the tv show stargirl
-        (the |)(tv|)(show) (?P<showname>.+)     
-        """
-        show_type = re.match(self.translate_regex('show.type'), phrase)
-        if show_details_type and not request_info['youtube']['active']:  # TV Shows
-            LOG.info('Show Details Type Detected')
-            request_info['tv']['title'] = show_type.groupdict()['showname']
+            request_info['tv']['season'] = show_details_type.groupdict()['season']
+            request_info['tv']['episode'] = show_details_type.groupdict()['episode']
             request_info['tv']['active'] = True
-            # ToDo: get last episode played
+            request_info['tv']['type'] = "all"
+        else:
+            """
+            play the tv show stargirl
+            (the |)(tv|)(show) (?P<showname>.+)     
+            """
+            show_type = re.match(self.translate_regex('show.type'), phrase)
+            if show_details_type and not request_info['youtube']['active']:  # TV Shows
+                LOG.info('Show Details Type Detected')
+                request_info['tv']['title'] = show_type.groupdict()['showname']
+                request_info['tv']['active'] = True
+                request_info['tv']['type'] = "title"
         """
         specify with Kodi
         (the |some|)(?P<kodiItem>.+)(?=\s+(from|with|using|on) kodi)
@@ -352,6 +348,15 @@ class CPKodiSkill(CommonPlaySkill):
                         request_type = request_data['music']['type']
                         request_item = request_data['music'][request_type]
                         results = get_requested_music(self.kodi_path, request_item, request_type)
+                if request_data['tv']['active']:
+                    request_type = request_data['tv']['type']
+                    if "all" in request_type:
+                        results = get_tv_show(self.kodi_path,
+                                              request_data['tv']['title'],
+                                              request_data['tv']['season'],
+                                              request_data['tv']['episode'])
+                    if "title" in request_type:
+                        results = get_show(self.kodi_path,request_data['tv']['title'])
                 if request_data['youtube']['active'] and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
                     results = search_youtube(request_data['youtube']['item'])
                 if results:
