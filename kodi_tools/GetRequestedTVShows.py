@@ -12,7 +12,7 @@ def get_tv_show(kodi_path, show_title, season_number, episode_number):
     show_id = get_show(kodi_path, show_title)[0]['tvshowid']
     LOG.info('Found ShowID: ' + str(show_id))
     episode_details = get_episode(kodi_path, show_id, season_number, episode_number)
-    print('Found Episode Details: ' + str(episode_details))
+    LOG.info('Found Episode Details: ' + str(episode_details))
     return episode_details
 
 
@@ -66,12 +66,12 @@ def get_show(kodi_path, search_words):
                 clean_list.append(info)
             else:
                 if len(each_item['label']) == len(item_title):
-                    print('Removing Duplicate Entries')
+                    LOG.info('Removing Duplicate Entries')
                 else:
                     clean_list.append(info)
         return clean_list  # returns a dictionary of matched movies
     except Exception as e:
-        print(e)
+        LOG.info(e)
         return None
 
 
@@ -113,5 +113,5 @@ def get_episode(kodi_path, showID, seasonNum, episodeNum):
                 return each_item
         return None  # returns a dictionary of matched movies
     except Exception as e:
-        print(e)
+        LOG.info(e)
         return None
