@@ -267,7 +267,7 @@ class CPKodiSkill(CommonPlaySkill):
             request_info['music']['active'] = True
         """
         play the outer limits season 1 episode 2
-        (.*) (?P<showname>.*)(season (?P<season>\d{1,3}))(.+episode (?P<episode>\d{1,3}))
+        (.*?)(?P<showname>.*)(season (?P<season>\d{1,3}))(.+episode (?P<episode>\d{1,3}))
         """
         show_details_type = re.match(self.translate_regex('show.details'), phrase)
         if show_details_type and not request_info['youtube']['active']:  # TV Shows
