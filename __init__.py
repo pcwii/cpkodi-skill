@@ -39,6 +39,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.cast_ip = ""
         self.kodi_path = ""
         self.kodi_image_path = ""
+        self.kodi_filesystem_path = ""
         self._is_setup = False
         self.notifier_bool = False
         self.regexes = {}
@@ -75,7 +76,9 @@ class CPKodiSkill(CommonPlaySkill):
         kodi_pass = self.settings.get("kodi_pass", "")
         self.kodi_path = "http://" + kodi_user + ":" + kodi_pass + "@" + kodi_ip + ":" + str(kodi_port) + "/jsonrpc"
         LOG.info(self.kodi_path)
+        # Todo: Confirm these paths work with username and passwords
         self.kodi_image_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/image/"
+        self.kodi_filesystem_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/vfs/"
         self._is_setup = True
 
     def dLOG(self, log_message):
