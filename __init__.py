@@ -888,6 +888,7 @@ class CPKodiSkill(CommonPlaySkill):
             new_request = "play " + str(str_remainder) + ' with chromecast'
             self.send_message(new_request)
         else:
+            self.speak_dialog('no.chromecast', expect_response=False)
             return False  # if Chromecast is not enabled then fallback to another skill
 
 def create_skill():
