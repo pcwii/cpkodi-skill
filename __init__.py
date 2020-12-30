@@ -74,11 +74,12 @@ class CPKodiSkill(CommonPlaySkill):
         kodi_port = self.settings.get("kodi_port", "8080")
         kodi_user = self.settings.get("kodi_user", "")
         kodi_pass = self.settings.get("kodi_pass", "")
-        self.kodi_path = "http://" + kodi_user + ":" + kodi_pass + "@" + kodi_ip + ":" + str(kodi_port) + "/jsonrpc"
+        self.kodi_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
+                         str(kodi_port) + "/jsonrpc"
         LOG.info(self.kodi_path)
         # Todo: Confirm these paths work with username and passwords
-        self.kodi_image_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/image/"
-        self.kodi_filesystem_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/vfs/"
+        self.kodi_image_path = "http://" + str(kodi_ip) + ":" + str(kodi_port) + "/image/"
+        self.kodi_filesystem_path = "http://" + str(kodi_ip) + ":" + str(kodi_port) + "/vfs/"
         self._is_setup = True
 
     def dLOG(self, log_message):
