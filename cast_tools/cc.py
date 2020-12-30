@@ -1,20 +1,18 @@
 import pychromecast
-
 #myFile = "http://192.168.0.32:8080/vfs/%2Fhome%2Fosmc%2Fmnt%2FnfsMovies%2FMarvel%2FSpider-Man%2FSpider.Man.2.2004.1080p.mp4"
 
-
 def cc_get_names():
-    services, browser = pychromecast.discovery.discover_chromecasts()
-    pychromecast.discovery.stop_discovery(browser)
+    #services, browser = pychromecast.discovery.discover_chromecasts()
+    devices = pychromecast.discovery.discover_chromecasts()[0]
+    #pychromecast.discovery.stop_discovery(browser)
     deviceList = []
-    for each_device in services:
+    for each_device in devices:
         this_device = {}
         this_device['type'] = each_device[2]
         this_device['name'] = each_device[3]
         this_device['ip'] = each_device[4]
         this_device['port'] = each_device[5]
         deviceList.append(this_device)
-    pychromecast.discovery.stop_discovery(browser)
     return deviceList
 
 
