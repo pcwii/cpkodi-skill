@@ -78,8 +78,10 @@ class CPKodiSkill(CommonPlaySkill):
                          str(kodi_port) + "/jsonrpc"
         LOG.info(self.kodi_path)
         # Todo: Confirm these paths work with username and passwords
-        self.kodi_image_path = "http://" + str(kodi_ip) + ":" + str(kodi_port) + "/image/"
-        self.kodi_filesystem_path = "http://" + str(kodi_ip) + ":" + str(kodi_port) + "/vfs/"
+        self.kodi_image_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
+                               str(kodi_port) + "/image/"
+        self.kodi_filesystem_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
+                                    str(kodi_port) + "/vfs/"
         self._is_setup = True
 
     def dLOG(self, log_message):
