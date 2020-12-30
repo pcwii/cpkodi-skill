@@ -88,7 +88,7 @@ class CPKodiSkill(CommonPlaySkill):
 
     def dLOG(self, log_message):
         if self.debug_log:
-            self.dLOG(log_message)
+            LOG.info(str(log_message))
 
     def send_message(self, message):  # Sends the remote received commands to the messagebus
         self.dLOG("Sending a command to the message bus: " + message)
