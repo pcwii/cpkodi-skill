@@ -39,10 +39,10 @@
                         "value": "false"
                     },
                     {
-                        "name": "cast_ip",
+                        "name": "friendly_names",
                         "type": "text",
-                        "label": "IP Address of the Chromecast device",
-                        "value": "0.0.0.0"
+                        "label": "Friendly Name(s) of the Chromecast device",
+                        "value": ""
                     },
                     {
                         "name": "debug_log",

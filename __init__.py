@@ -8,8 +8,10 @@ import random
 
 from importlib import reload
 
+import .cast_tools import *
 from .kodi_tools import *
 from .youtube_searcher import *
+
 from websocket import create_connection
 
 from adapt.intent import IntentBuilder
@@ -26,7 +28,7 @@ _author__ = 'PCWii'
 # Release - '20201229 - Covid-19 Build'
 
 for each_module in sys.modules:
-    if ("kodi_tools" or "youtube_searcher") in each_module:
+    if ("kodi_tools" or "youtube_searcher" or "cast_tools") in each_module:
         LOG.info("Attempting to reload tools Modules: " + str(each_module))
         reload(sys.modules[each_module])
 
@@ -37,7 +39,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.skill_id = 'cpkodi-skill_pcwii'
         self.debug_log = False
         self.enable_chromecast = False
-        self.cast_ip = ""
+        self.friendly_names = ""
         self.kodi_path = ""
         self.kodi_image_path = ""
         self.kodi_filesystem_path = ""
@@ -67,8 +69,8 @@ class CPKodiSkill(CommonPlaySkill):
         if self.debug_log:
             LOG.info('Debug Logging now enabled!')
         self.enable_chromecast = self.settings.get("enable_chromecast", False)
-        self.cast_ip = self.settings.get("cast_ip", "")
-        if len(self.cast_ip) == 0:
+        self.friendly_names = self.settings.get("friendly_names", "")
+        if len(self.friendly_names) == 0:
             self.enable_chromecast = False
         kodi_ip = self.settings.get("kodi_ip", "192.168.0.32")
         kodi_port = self.settings.get("kodi_port", "8080")
