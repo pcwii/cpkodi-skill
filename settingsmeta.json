@@ -45,7 +45,7 @@
                         "value": "0.0.0.0"
                     },
                     {
-                        "name": "kodi_pass",
+                        "name": "debug_log",
                         "type": "checkbox",
                         "label": "Enable Extra Logging for debug",
                         "value": "false"
