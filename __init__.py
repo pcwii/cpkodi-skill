@@ -896,6 +896,7 @@ class CPKodiSkill(CommonPlaySkill):
             self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
         else:
             self.speak_dialog('no.chromecast', expect_response=False)
+            self.on_websettings_changed()
             return False  # if Chromecast is not enabled then fallback to another skill
 
 
