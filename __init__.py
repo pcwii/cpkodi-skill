@@ -73,20 +73,16 @@ class CPKodiSkill(CommonPlaySkill):
         kodi_port = self.settings.get("kodi_port", "8080")
         kodi_user = self.settings.get("kodi_user", "")
         kodi_pass = self.settings.get("kodi_pass", "")
-        try:
-            if kodi_ip and kodi_port:
-                kodi_ip = self.settings["kodi_ip"]
-                kodi_port = self.settings["kodi_port"]
-                kodi_user = self.settings["kodi_user"]
-                kodi_pass = self.settings["kodi_pass"]
-                self.kodi_path = "http://" + kodi_user + ":" + kodi_pass + "@" + kodi_ip + ":" + str(kodi_port) + \
-                                 "/jsonrpc"
-                LOG.info(self.kodi_path)
-                self.kodi_image_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/image/"
-                self._is_setup = True
-                # self.music_library = get_all_music(self.kodi_path)
-        except Exception as e:
-            LOG.error(e)
+        if kodi_ip and kodi_port:
+            kodi_ip = self.settings["kodi_ip"]
+            kodi_port = self.settings["kodi_port"]
+            kodi_user = self.settings["kodi_user"]
+            kodi_pass = self.settings["kodi_pass"]
+            self.kodi_path = "http://" + kodi_user + ":" + kodi_pass + "@" + kodi_ip + ":" + str(kodi_port) + \
+                             "/jsonrpc"
+            LOG.info(self.kodi_path)
+            self.kodi_image_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/image/"
+            self._is_setup = True
 
     def dLOG(self, log_message):
         if self.debug_log:
