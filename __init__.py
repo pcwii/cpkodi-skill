@@ -39,7 +39,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.skill_id = 'cpkodi-skill_pcwii'
         self.debug_log = False
         self.enable_chromecast = False
-        self.friendly_names = ""
+        #self.friendly_names = ""
         self.kodi_path = ""
         self.kodi_image_path = ""
         self.kodi_filesystem_path = ""
@@ -69,9 +69,9 @@ class CPKodiSkill(CommonPlaySkill):
         if self.debug_log:
             LOG.info('Debug Logging now enabled!')
         self.enable_chromecast = self.settings.get("enable_chromecast", False)
-        self.friendly_names = self.settings.get("friendly_names", "")
-        if len(self.friendly_names) == 0:
-            self.enable_chromecast = False
+        #self.friendly_names = self.settings.get("friendly_names", "")
+        #if len(self.friendly_names) == 0:
+            #self.enable_chromecast = False
         kodi_ip = self.settings.get("kodi_ip", "192.168.0.32")
         kodi_port = self.settings.get("kodi_port", "8080")
         kodi_user = self.settings.get("kodi_user", "")
@@ -889,6 +889,11 @@ class CPKodiSkill(CommonPlaySkill):
             self.dLOG('Request to CAST something: ' + str_remainder)
             new_request = "play " + str(str_remainder) + ' with chromecast'
             self.send_message(new_request)
+            cc_device_list = cc_get_names()
+            cc_devices = ""
+            for each_cc in cc_device_list:
+                cc_devices = cc_devices + ", " + each_cc['name']
+            self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
         else:
             self.speak_dialog('no.chromecast', expect_response=False)
             return False  # if Chromecast is not enabled then fallback to another skill

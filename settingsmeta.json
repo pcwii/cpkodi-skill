@@ -39,12 +39,6 @@
                         "value": "false"
                     },
                     {
-                        "name": "friendly_names",
-                        "type": "text",
-                        "label": "Friendly Name(s) of the Chromecast device",
-                        "value": ""
-                    },
-                    {
                         "name": "debug_log",
                         "type": "checkbox",
                         "label": "Enable Extra Logging for debug",
