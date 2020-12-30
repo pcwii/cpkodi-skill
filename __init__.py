@@ -884,12 +884,12 @@ class CPKodiSkill(CommonPlaySkill):
             common play system
             "cast something" will be re-formated to "play something with chromecast"
         """
-        if self.enable_chromecast:
+        cc_device_list = cc_get_names()
+        if self.enable_chromecast and cc_device_list:
             str_remainder = str(message.utterance_remainder())
             self.dLOG('Request to CAST something: ' + str_remainder)
             new_request = "play " + str(str_remainder) + ' with chromecast'
             self.send_message(new_request)
-            cc_device_list = cc_get_names()
             cc_devices = ""
             for each_cc in cc_device_list:
                 cc_devices = cc_devices + ", " + each_cc['name']
