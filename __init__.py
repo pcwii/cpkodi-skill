@@ -34,13 +34,13 @@ for each_module in sys.modules:
 class CPKodiSkill(CommonPlaySkill):
     def __init__(self):
         super(CPKodiSkill, self).__init__('CPKodiSkill')
+        self.skill_id = 'cpkodi-skill_pcwii'
         self.debug_log = False
         self.enable_chromecast = False
         self.cast_ip = ""
         self.kodi_path = ""
         self.kodi_image_path = ""
         self.kodi_filesystem_path = ""
-        self._is_setup = False
         self.notifier_bool = False
         self.regexes = {}
         self.active_library = None
@@ -48,8 +48,8 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_request = None
         self.kodi_specific_request = False
         self.artist_name = None
-        self.skill_id = 'cpkodi-skill_pcwii'
         self.movie_library = None
+        self._is_setup = False
         # self.settings_change_callback = self.on_websettings_changed
 
 
