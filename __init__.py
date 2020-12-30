@@ -51,10 +51,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.movie_library = None
         # self.settings_change_callback = self.on_websettings_changed
 
-    def dLOG(self, log_message):
-        if self.debug_log:
-            self.dLOG(log_message)
-            
+
     def initialize(self):
         self.load_data_files(dirname(__file__))
         self.on_websettings_changed()
@@ -64,8 +61,10 @@ class CPKodiSkill(CommonPlaySkill):
 
     def on_websettings_changed(self):  # called when updating mycroft home page
         # if not self._is_setup:
+        LOG.info('Websettings have changed! Updating path data')
         self.debug_log = self.settings.get("debug_log", False)
-        self.dLOG('Websettings have changed! Updating path data')
+        if self.debug_log:
+            LOG.info('Debug Logging now enabled!')
         self.enable_chromecast = self.settings.get("enable_chromecast", False)
         self.cast_ip = self.settings.get("cast_ip", "")
         if len(self.cast_ip) == 0:
@@ -82,12 +81,16 @@ class CPKodiSkill(CommonPlaySkill):
                 kodi_pass = self.settings["kodi_pass"]
                 self.kodi_path = "http://" + kodi_user + ":" + kodi_pass + "@" + kodi_ip + ":" + str(kodi_port) + \
                                  "/jsonrpc"
-                self.dLOG(self.kodi_path)
+                LOG.info(self.kodi_path)
                 self.kodi_image_path = "http://" + kodi_ip + ":" + str(kodi_port) + "/image/"
                 self._is_setup = True
                 # self.music_library = get_all_music(self.kodi_path)
         except Exception as e:
             LOG.error(e)
+
+    def dLOG(self, log_message):
+        if self.debug_log:
+            self.dLOG(log_message)
 
     def send_message(self, message):  # Sends the remote received commands to the messagebus
         self.dLOG("Sending a command to the message bus: " + message)
