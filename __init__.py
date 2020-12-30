@@ -8,7 +8,7 @@ import random
 
 from importlib import reload
 
-import .cast_tools import *
+from .cast_tools import *
 from .kodi_tools import *
 from .youtube_searcher import *
 
@@ -897,6 +897,7 @@ class CPKodiSkill(CommonPlaySkill):
         else:
             self.speak_dialog('no.chromecast', expect_response=False)
             return False  # if Chromecast is not enabled then fallback to another skill
+
 
 def create_skill():
     return CPKodiSkill()
