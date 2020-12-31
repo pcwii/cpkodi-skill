@@ -22,8 +22,9 @@ def get_movie_path(kodi_path, movieID):
     }
     try:
         kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
+        LOG.info("kodi responded with: " + str(kodi_response.text))
         movie_path = json.loads(kodi_response.text)["result"]["moviedetails"]["file"]
-        url_path = vfs_path + urllib.parse.quote(movie_path, safe='')
+        url_path = vfs_path + urllib.parse.quote(str(movie_path), safe='')
         LOG.info(url_path)
         return url_path
     except Exception as e:
