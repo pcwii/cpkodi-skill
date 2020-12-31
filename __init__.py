@@ -39,6 +39,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.skill_id = 'cpkodi-skill_pcwii'
         self.debug_log = False
         self.enable_chromecast = False
+        self.cc_device_list = ""
         #self.friendly_names = ""
         self.kodi_path = ""
         self.kodi_image_path = ""
@@ -197,6 +198,17 @@ class CPKodiSkill(CommonPlaySkill):
             request_info = json.load(resource_file)
         # self.dLOG(str(request_info))
         request_info['utterance'] = phrase
+        """
+        play the movie spiderman 2 with chromecast
+        *passed*
+        (the|some|)(?P<castItem>.+)(?=\s+(from|with|using|on) chromecast)
+        """
+        cast_type = re.match(self.translate_regex('cast.type'), phrase)
+        if cast_type:
+            self.dLOG('Chromecast Type Detected')
+            request_info['chromecast']['item'] = cast_type.groupdict()['castItem']
+            request_info['chromecast']['active'] = True
+            phrase = str(request_info['chromecast']['item'])
         """
         play third day from youtube
         *passed*
@@ -511,6 +523,13 @@ class CPKodiSkill(CommonPlaySkill):
             # print(full_list[int(each_id)])
             random_entry.append(full_list[int(each_id)])
         return random_entry
+
+    def cast_play(self, playlist_items, playlist_type):
+        cc_devices = ""
+        for each_cc in self.cc_device_list:
+            cc_devices = cc_devices + ", " + each_cc['name']
+        self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
+
 
     """
         All vocal intents appear here
@@ -884,16 +903,13 @@ class CPKodiSkill(CommonPlaySkill):
             common play system
             "cast something" will be re-formated to "play something with chromecast"
         """
-        cc_device_list = cc_get_names()
-        if self.enable_chromecast and cc_device_list:
+        self.cc_device_list = cc_get_names()
+        if self.enable_chromecast and self.cc_device_list:
             str_remainder = str(message.utterance_remainder())
             self.dLOG('Request to CAST something: ' + str_remainder)
             new_request = "play " + str(str_remainder) + ' with chromecast'
             self.send_message(new_request)
-            cc_devices = ""
-            for each_cc in cc_device_list:
-                cc_devices = cc_devices + ", " + each_cc['name']
-            self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
+
         else:
             self.speak_dialog('no.chromecast', expect_response=False)
             self.on_websettings_changed()

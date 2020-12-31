@@ -3,7 +3,6 @@ import pychromecast
 
 def cc_get_names():
     casts = pychromecast.get_chromecasts()
-    #pychromecast.discovery.stop_discovery(browser)
     deviceList = []
     if len(casts) == 0:
         return None
@@ -16,57 +15,47 @@ def cc_get_names():
 
 
 def cc_cast_file(deviceName, filename):
-    chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
-    # chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=["Hisense TV"])
+    chromecasts = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
     cast = chromecasts[0]
     cast.wait()
     mc = cast.media_controller
     mc.play_media(filename, 'video/mp4')
     mc.block_until_active()
-    pychromecast.discovery.stop_discovery(browser)
     return mc.status
 
 
 def cc_get_status(deviceName):
-    chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
-    # chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=["Hisense TV"])
+    chromecasts = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
     cast = chromecasts[0]
     cast.wait()
-    pychromecast.discovery.stop_discovery(browser)
     return cast.status
 
 
 def cc_pause(deviceName):
-    chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
-    # chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=["Hisense TV"])
+    chromecasts = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
     cast = chromecasts[0]
     cast.wait()
     mc = cast.media_controller
     mc.block_until_active()
     mc.pause()
-    pychromecast.discovery.stop_discovery(browser)
     return mc.status
 
 
 def cc_play(deviceName):
-    chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
-    # chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=["Hisense TV"])
+    chromecasts = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
     cast = chromecasts[0]
     cast.wait()
     mc = cast.media_controller
     mc.block_until_active()
     mc.play()
-    pychromecast.discovery.stop_discovery(browser)
     return mc.status
 
 
 def cc_stop(deviceName):
-    chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
-    # chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=["Hisense TV"])
+    chromecasts = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
     cast = chromecasts[0]
     cast.wait()
     mc = cast.media_controller
     mc.block_until_active()
     mc.stop()
-    pychromecast.discovery.stop_discovery(browser)
     return mc.status
