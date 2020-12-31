@@ -15,9 +15,8 @@ def cc_get_names():
 
 
 def cc_cast_file(deviceName, filename):
-    chromecasts = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
-
-    cast = chromecasts[0]
+    casts = pychromecast.get_chromecasts()
+    cast = next(cc for cc in casts if cc.device.friendly_name == "Hisense TV")
     cast.wait()
     mc = cast.media_controller
     mc.play_media(filename, 'video/mp4')
@@ -26,15 +25,15 @@ def cc_cast_file(deviceName, filename):
 
 
 def cc_get_status(deviceName):
-    chromecasts = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
-    cast = chromecasts[0]
+    casts = pychromecast.get_chromecasts()
+    cast = next(cc for cc in casts if cc.device.friendly_name == "Hisense TV")
     cast.wait()
     return cast.status
 
 
 def cc_pause(deviceName):
-    chromecasts = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
-    cast = chromecasts[0]
+    casts = pychromecast.get_chromecasts()
+    cast = next(cc for cc in casts if cc.device.friendly_name == "Hisense TV")
     cast.wait()
     mc = cast.media_controller
     mc.block_until_active()
@@ -43,8 +42,8 @@ def cc_pause(deviceName):
 
 
 def cc_play(deviceName):
-    chromecasts = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
-    cast = chromecasts[0]
+    casts = pychromecast.get_chromecasts()
+    cast = next(cc for cc in casts if cc.device.friendly_name == "Hisense TV")
     cast.wait()
     mc = cast.media_controller
     mc.block_until_active()
@@ -53,8 +52,8 @@ def cc_play(deviceName):
 
 
 def cc_stop(deviceName):
-    chromecasts = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
-    cast = chromecasts[0]
+    casts = pychromecast.get_chromecasts()
+    cast = next(cc for cc in casts if cc.device.friendly_name == "Hisense TV")
     cast.wait()
     mc = cast.media_controller
     mc.block_until_active()
