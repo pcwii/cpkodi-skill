@@ -7,6 +7,7 @@ import urllib.request
 
 
 def get_movie_path(kodi_path, movieID):
+    LOG.info("Searching path for MovieID: " + str(movieID))
     api_path = kodi_path + "/jsonrpc"
     vfs_path = kodi_path + "/vfs/"
     json_header = {'content-type': 'application/json'}
