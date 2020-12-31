@@ -449,9 +449,15 @@ class CPKodiSkill(CommonPlaySkill):
                 self.dLOG('Returned Library Length = ' + str(len(data["library"])))
                 if len(data["library"]) == 1:  # Only one item was returned so go ahead and play
                     movie_id = str(self.active_library[0]["movieid"])
-                    playlist_dict.append(movie_id)
                     # Todo: add the Cast Option here
-                    self.clear_queue_and_play(playlist_dict, 'movie')
+                    playlist_dict.append(movie_id)
+                    if request_data['chromecast']['active']:
+                        #pathURL = get_movie_path(self.kodi_path, movie_id)
+                        self.cast_play(playlist_dict, 'movie')
+                        #cc_cast_file("Hisense TV", pathURL)
+                    else:
+
+                        self.clear_queue_and_play(playlist_dict, 'movie')
                 elif len(data["library"]) > 1:  # confirm the library does not have a zero length or is None
                     # Todo: give the option to add all items to the playlist immediately
                     self.set_context('NavigateContextKeyword', 'NavigateContext')
@@ -524,12 +530,13 @@ class CPKodiSkill(CommonPlaySkill):
             random_entry.append(full_list[int(each_id)])
         return random_entry
 
-    def cast_play(self, playlist_items, playlist_type):
+    def cast_play(self, movie_id):
         cc_devices = ""
         for each_cc in self.cc_device_list:
             cc_devices = cc_devices + ", " + each_cc['name']
         self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
-
+        path_url = get_movie_path(self.kodi_path, movie_id)
+        cc_cast_file("Hisense TV", path_url)
 
     """
         All vocal intents appear here
