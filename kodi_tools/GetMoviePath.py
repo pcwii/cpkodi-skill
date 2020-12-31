@@ -5,6 +5,8 @@ import urllib.parse
 
 
 def get_movie_path(kodi_path, movieID):
+    api_path = kodi_path + "/jsonrpc"
+    vfs_path = kodi_path + "/vfs/"
     json_header = {'content-type': 'application/json'}
     method = "VideoLibrary.GetMovieDetails"
     kodi_payload = {
@@ -19,16 +21,11 @@ def get_movie_path(kodi_path, movieID):
         }
     }
     try:
-        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         movie_path = json.loads(kodi_response.text)["result"]["moviedetails"]["file"]
-        """
-        This must be handled by the return function
-        basePath = 'http://'+kodi_ip+':'+kodi_port+'/vfs/'
-        url_path = basePath + urllib.parse.quote(movie_path, safe='')
-        print(url_path)
-        """
-        LOG.info(str(movie_path))
-        return str(movie_path)
+        url_path = vfs_path + urllib.parse.quote(movie_path, safe='')
+        LOG.info(url_path)
+        return url_path
     except Exception as e:
         LOG.info(e)
         return None
