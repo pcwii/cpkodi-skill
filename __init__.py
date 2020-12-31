@@ -5,6 +5,7 @@ import splitter
 import time
 import json
 import random
+import urllib
 
 from importlib import reload
 
@@ -533,8 +534,10 @@ class CPKodiSkill(CommonPlaySkill):
         for each_cc in self.cc_device_list:
             cc_devices = cc_devices + ", " + each_cc['name']
         self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
-        path_url = get_movie_path(self.kodi_path, movie_id)
-        cc_cast_file("Hisense TV", path_url)
+        movie_path = get_movie_path(self.kodi_path, movie_id)
+        url_path = self.kodi_filesystem_path + urllib.parse.quote(movie_path, safe='')
+        self.dLOG("casting the file: " + url_path)
+        cc_cast_file("Hisense TV", url_path)
 
     """
         All vocal intents appear here

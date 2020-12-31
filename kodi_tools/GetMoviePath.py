@@ -28,6 +28,7 @@ def get_movie_path(kodi_path, movieID):
         print(url_path)
         """
         return movie_path
+
     except Exception as e:
         LOG.info(e)
         return None
