@@ -27,7 +27,7 @@ def get_movie_path(kodi_path, movieID):
         url_path = basePath + urllib.parse.quote(movie_path, safe='')
         print(url_path)
         """
-        return movie_path
+        return str(movie_path)
 
     except Exception as e:
         LOG.info(e)
