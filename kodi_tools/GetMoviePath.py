@@ -2,6 +2,8 @@ from mycroft.util.log import LOG
 import requests
 import json
 import urllib.parse
+import urllib.error
+import urllib.request
 
 
 def get_movie_path(kodi_path, movieID):
