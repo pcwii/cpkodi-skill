@@ -16,6 +16,7 @@ def cc_get_names():
 
 def cc_cast_file(deviceName, filename):
     chromecasts = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
+
     cast = chromecasts[0]
     cast.wait()
     mc = cast.media_controller

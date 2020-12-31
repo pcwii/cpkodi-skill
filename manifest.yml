@@ -3,7 +3,7 @@ dependencies:
     - requests
     - bs4
     - requests_cache
-    - pychromecast
+    - PyChromecast
     - pyenchant
     - compound-word-splitter
   system:
