@@ -17,7 +17,7 @@ def get_movie_path(kodi_path, movieID):
         "method": method,
         "id": 1,
         "params": {
-            "movieid": movieID,
+            "movieid": int(movieID),
             "properties": [
                 "file",
             ],
