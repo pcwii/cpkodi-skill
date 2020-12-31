@@ -452,11 +452,8 @@ class CPKodiSkill(CommonPlaySkill):
                     # Todo: add the Cast Option here
                     playlist_dict.append(movie_id)
                     if request_data['chromecast']['active']:
-                        #pathURL = get_movie_path(self.kodi_path, movie_id)
-                        self.cast_play(playlist_dict, 'movie')
-                        #cc_cast_file("Hisense TV", pathURL)
+                        self.cast_play(movie_id)
                     else:
-
                         self.clear_queue_and_play(playlist_dict, 'movie')
                 elif len(data["library"]) > 1:  # confirm the library does not have a zero length or is None
                     # Todo: give the option to add all items to the playlist immediately
@@ -531,6 +528,7 @@ class CPKodiSkill(CommonPlaySkill):
         return random_entry
 
     def cast_play(self, movie_id):
+        # Todo: provide dialog for multiple cast devices
         cc_devices = ""
         for each_cc in self.cc_device_list:
             cc_devices = cc_devices + ", " + each_cc['name']
