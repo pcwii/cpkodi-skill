@@ -4,6 +4,7 @@ import requests
 
 
 def get_active_player(kodi_path):
+    api_path = kodi_path + "/jsonrpc"
     json_header = {'content-type': 'application/json'}
     method = "Player.GetActivePlayers"
     kodi_payload = {
@@ -12,7 +13,7 @@ def get_active_player(kodi_path):
         "id": 1
     }
     try:
-        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         print(kodi_response.text)
         if json.loads(kodi_response.text)["result"]:
             active_player_id = json.loads(kodi_response.text)["result"][0]["playerid"]

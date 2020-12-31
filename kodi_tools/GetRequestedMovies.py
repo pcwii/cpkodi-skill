@@ -61,12 +61,12 @@ def get_requested_movies(kodi_path, search_words):
         will only return the movies that contain the words from the utterance
         It will exclude the numbers in the utterance initially
     """
+    api_path = kodi_path + "/jsonrpc"
     all_numbers = [int(s) for s in search_words if s.isdigit()]
     all_words = [str(s) for s in search_words if not s.isdigit()]
     LOG.info('Searching Movies for... ' + str(search_words))
     LOG.info('Movies keydigits... ' + str(all_numbers))
     LOG.info('Movies keywords... ' + str(all_words))
-
     filter_key = []
     for each_word in all_words:
         search_key = {
@@ -94,7 +94,7 @@ def get_requested_movies(kodi_path, search_words):
         }
     }
     try:
-        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         movie_list = json.loads(kodi_response.text)["result"]["movies"]
         clean_list = []  # this is a dict
         for each_movie in movie_list:

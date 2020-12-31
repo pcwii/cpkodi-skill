@@ -8,6 +8,7 @@ def get_requested_music(kodi_path, search_item, search_type):
         returns a music list based on the search item string and the search type
         search_type =  album, artist, label
     """
+    api_path = kodi_path + "/jsonrpc"
     json_header = {'content-type': 'application/json'}
     method = "AudioLibrary.GetSongs"
     if search_type == 'title_artist':
@@ -68,7 +69,7 @@ def get_requested_music(kodi_path, search_item, search_type):
             }
         }
     try:
-        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         song_list = json.loads(kodi_response.text)["result"]["songs"]
         # remove duplicates
         clean_list = []  # this is a dict

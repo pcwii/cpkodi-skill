@@ -29,7 +29,6 @@ def get_movie_path(kodi_path, movieID):
         """
         LOG.info(str(movie_path))
         return str(movie_path)
-
     except Exception as e:
         LOG.info(e)
         return None

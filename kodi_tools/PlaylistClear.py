@@ -3,6 +3,7 @@ import json
 
 
 def playlist_clear(kodi_path, media_type):
+    api_path = kodi_path + "/jsonrpc"
     if ("movie" in media_type) or ("video" in media_type):
         pl_id = 1
     if ("album" in media_type) or ("title" in media_type) or ("artist" in media_type) or ("audio" in media_type):
@@ -18,7 +19,7 @@ def playlist_clear(kodi_path, media_type):
         }
     }
     try:
-        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         return kodi_response
         #return json.loads(kodi_response.text)["result"]
     except Exception as e:

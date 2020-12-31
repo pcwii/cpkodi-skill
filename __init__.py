@@ -78,8 +78,10 @@ class CPKodiSkill(CommonPlaySkill):
         kodi_port = self.settings.get("kodi_port", "8080")
         kodi_user = self.settings.get("kodi_user", "")
         kodi_pass = self.settings.get("kodi_pass", "")
-        self.kodi_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
-                         str(kodi_port) + "/jsonrpc"
+        #self.kodi_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
+                         #str(kodi_port) + "/jsonrpc"
+        self.kodi_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + str(kodi_port)
+
         LOG.info(self.kodi_path)
         # Todo: Confirm these paths work with username and passwords
         self.kodi_image_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \

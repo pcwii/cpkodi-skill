@@ -6,6 +6,7 @@ import requests
 # check if the youtube addon exists
 def check_plugin_present(kodi_path, plugin_id):
     # "plugin.video.youtube"
+    api_path = kodi_path + "/jsonrpc"
     json_header = {'content-type': 'application/json'}
     method = "Addons.GetAddons"
     addon_video = "xbmc.addon.video"
@@ -18,7 +19,7 @@ def check_plugin_present(kodi_path, plugin_id):
         }
     }
     try:
-        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
     except Exception as e:
         LOG.info(e)
         return False

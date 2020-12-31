@@ -22,6 +22,7 @@ def get_show(kodi_path, search_words):
         2. Search for VideoLibrary.GetSeasons (uses Season number as integer)
         3. Search for VideoLibrary.GetEpisodes (uses episode number as integer)
     """
+    api_path = kodi_path + "/jsonrpc"
     filter_key = []
     for each_word in search_words:
         search_key = {
@@ -49,7 +50,7 @@ def get_show(kodi_path, search_words):
         }
     }
     try:
-        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         item_list = json.loads(kodi_response.text)["result"]['tvshows']
         # remove duplicates
         clean_list = []  # this is a dict
@@ -86,6 +87,7 @@ def get_episode(kodi_path, showID, seasonNum, episodeNum):
         "operator": "contains",
         "value": int(episodeNum)
     }
+    api_path = kodi_path + "/jsonrpc"
     json_header = {'content-type': 'application/json'}
     method = "VideoLibrary.GetEpisodes"
     kodi_payload = {
@@ -106,7 +108,7 @@ def get_episode(kodi_path, showID, seasonNum, episodeNum):
         }
     }
     try:
-        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         item_list = json.loads(kodi_response.text)["result"]["episodes"]
         for each_item in item_list:
             if each_item["episode"] == episodeNum:

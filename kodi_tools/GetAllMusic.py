@@ -4,6 +4,7 @@ import json
 
 
 def get_all_music(kodi_path):
+    api_path = kodi_path + "/jsonrpc"
     max_items = 50  # Limits response to the first 50 movies as it takes too long on large libraries
     json_header = {'content-type': 'application/json'}
     method = "AudioLibrary.GetSongs"
@@ -21,7 +22,7 @@ def get_all_music(kodi_path):
         }
     }
     try:
-        kodi_response = requests.post(kodi_path, data=json.dumps(kodi_payload), headers=json_header)
+        kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         music_list = json.loads(kodi_response.text)["result"]["songs"]
         return music_list
     except Exception as e:
