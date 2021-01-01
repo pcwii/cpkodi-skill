@@ -546,7 +546,10 @@ class CPKodiSkill(CommonPlaySkill):
         All vocal intents appear here
     """
     # stop kodi was requested in the utterance
-    @intent_handler(IntentBuilder("").require("StopKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
+    @intent_handler(IntentBuilder("").require("StopKeyword").one_of("ItemKeyword",
+                                                                    "KodiKeyword",
+                                                                    "YoutubeKeyword",
+                                                                    "ChromecastKeyword"))
     def handle_stop_intent(self, message):
         try:
             active_player_id, active_player_type = get_active_player(self.kodi_path)
