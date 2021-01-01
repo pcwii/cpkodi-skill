@@ -11,7 +11,7 @@ from importlib import reload
 
 from .cast_tools import *
 from .kodi_tools import *
-from .youtube_searcher import *
+from .youtube_tools import *
 
 from websocket import create_connection
 
@@ -29,7 +29,7 @@ _author__ = 'PCWii'
 # Release - '20201229 - Covid-19 Build'
 
 for each_module in sys.modules:
-    if ("kodi_tools" or "youtube_searcher" or "cast_tools") in each_module:
+    if "tools" in each_module:
         LOG.info("Attempting to reload tools Modules: " + str(each_module))
         reload(sys.modules[each_module])
 
