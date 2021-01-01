@@ -56,7 +56,6 @@ class CPKodiSkill(CommonPlaySkill):
         self._is_setup = False
         # self.settings_change_callback = self.on_websettings_changed
 
-
     def initialize(self):
         self.load_data_files(dirname(__file__))
         self.on_websettings_changed()
