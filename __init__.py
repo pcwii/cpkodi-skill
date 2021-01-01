@@ -538,7 +538,8 @@ class CPKodiSkill(CommonPlaySkill):
         self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
         url_path = get_movie_path(self.kodi_path, movie_id)
         self.dLOG("casting the file: " + url_path)
-        cc_cast_file("Hisense TV", url_path)
+        cc_status = cc_cast_file("Hisense TV", url_path)
+        self.dLOG(cc_status)
 
     """
         All vocal intents appear here
