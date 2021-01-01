@@ -1,6 +1,8 @@
+from mycroft.util.log import LOG
 import pychromecast
 import time
 #myFile = "http://192.168.0.32:8080/vfs/%2Fhome%2Fosmc%2Fmnt%2FnfsMovies%2FMarvel%2FSpider-Man%2FSpider.Man.2.2004.1080p.mp4"
+
 
 def cc_get_names():
     casts, browser = pychromecast.get_chromecasts()
@@ -8,7 +10,7 @@ def cc_get_names():
     deviceList = []
     if len(casts) == 0:
         return None
-    print("Found cast devices:")
+    LOG.info("Found cast devices:")
     for cast in casts:
         this_device = {}
         this_device['name'] = cast.name
