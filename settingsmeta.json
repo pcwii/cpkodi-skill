@@ -39,6 +39,12 @@
                         "value": "false"
                     },
                     {
+                        "name": "cast_device",
+                        "type": "text",
+                        "label": "The Friendly Name of your cast device",
+                        "value": ""
+                    },
+                    {
                         "name": "debug_log",
                         "type": "checkbox",
                         "label": "Enable Extra Logging for debug",

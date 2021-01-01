@@ -66,17 +66,20 @@ def cc_play(deviceName):
     return mc.status
 
 
-def cc_stop(deviceName):
+def cc_stop(deviceName, sessionID):
     chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=[deviceName])
     cast = chromecasts[0]
     cast.wait()
     mc = cast.media_controller
     time.sleep(1)
     if isinstance(mc.status.media_session_id, int):
-        mc.stop()
+        if mc.status.media_session_id == sessionID:
+            mc.stop()
+        else:
+            LOG.info('Chromecast: sessionID did not match!')
         time.sleep(1)
     else:
-        LOG.info('Nothing is Playing!')
+        LOG.info('Chromecast: Nothing is Playing!')
     device_status = {}
     device_status['player_state'] = mc.status.player_state
     device_status['media_session_id'] = mc.status.media_session_id

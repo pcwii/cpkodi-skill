@@ -40,7 +40,9 @@ class CPKodiSkill(CommonPlaySkill):
         self.skill_id = 'cpkodi-skill_pcwii'
         self.debug_log = False
         self.enable_chromecast = False
+        self.cast_device = ""
         self.cc_device_list = ""
+        self.cc_status = None
         #self.friendly_names = ""
         self.kodi_path = ""
         self.kodi_image_path = ""
@@ -70,9 +72,9 @@ class CPKodiSkill(CommonPlaySkill):
         if self.debug_log:
             LOG.info('Debug Logging now enabled!')
         self.enable_chromecast = self.settings.get("enable_chromecast", False)
-        #self.friendly_names = self.settings.get("friendly_names", "")
-        #if len(self.friendly_names) == 0:
-            #self.enable_chromecast = False
+        self.cast_device = self.settings.get("cast_device", "")
+        if len(self.cast_device) == 0:
+            self.enable_chromecast = False
         kodi_ip = self.settings.get("kodi_ip", "192.168.0.32")
         kodi_port = self.settings.get("kodi_port", "8080")
         kodi_user = self.settings.get("kodi_user", "")
@@ -426,8 +428,8 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_library = data["library"]  # a results playlist of what was found
         playlist_count = len(self.active_library)  # how many items were returned
         playlist_dict = []
-        # try:
-        if True:
+        try:
+        # if True:
             if request_data['youtube']['active']:
                 """
                     if Type is youtube then plugin and source has already been confirmed so go ahead and play
@@ -475,10 +477,10 @@ class CPKodiSkill(CommonPlaySkill):
                     playlist_dict.append(song_id)
                 # Todo: add the Cast Option here
                 self.clear_queue_and_play(playlist_dict, request_data['music']['type'])
-#        except Exception as e:
-#            self.dLOG('An error was detected in: CPS_match_query_phrase')
-#            LOG.error(e)
-#            self.on_websettings_changed()
+        except Exception as e:
+            self.dLOG('An error was detected in: CPS_match_query_phrase')
+            LOG.error(e)
+            self.on_websettings_changed()
 
     def clear_queue_and_play(self, playlist_items, playlist_type):
         result = None
@@ -486,8 +488,8 @@ class CPKodiSkill(CommonPlaySkill):
             playlist_label = str(self.active_library[0]["label"])
         else:
             playlist_label = ""
-        # try:
-        if True:  # Remove after testing
+        try:
+        # if True:  # Remove after testing
             result = playlist_clear(self.kodi_path, playlist_type)
             if "OK" in result.text:
                 result = None
@@ -505,10 +507,10 @@ class CPKodiSkill(CommonPlaySkill):
             if "OK" in result.text:
                 self.dLOG("Now Playing..." + str(result.text))
                 result = None
-        # except Exception as e:
-        #    self.dLOG('An error was detected in: clear_queue_and_play')
-        #    LOG.error(e)
-        #    self.on_websettings_changed()
+        except Exception as e:
+            self.dLOG('An error was detected in: clear_queue_and_play')
+            LOG.error(e)
+            self.on_websettings_changed()
 
     def random_movie_select(self):
         self.dLOG('Random Movie Selected')
@@ -534,11 +536,11 @@ class CPKodiSkill(CommonPlaySkill):
         cc_devices = ""
         for each_cc in self.cc_device_list:
             cc_devices = cc_devices + ", " + each_cc['name']
-        self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
+        #self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
         url_path = get_movie_path(self.kodi_path, movie_id)
         self.dLOG("casting the file: " + url_path)
-        cc_status = cc_cast_file("Hisense TV", url_path)
-        self.dLOG(cc_status)
+        self.cc_status = cc_cast_file(self.cast_device, url_path)
+        self.dLOG(self.cc_status)
 
     """
         All vocal intents appear here
@@ -556,6 +558,8 @@ class CPKodiSkill(CommonPlaySkill):
                     self.speak_dialog('stopped', expect_response=False)
             else:
                 self.dLOG('Kodi does not appear to be playing anything at the moment')
+                # Check Chromecast
+                self.cc_status = cc_stop(self.cast_device, self.cc_status["media_session_id"])
         except Exception as e:
             self.dLOG('An error was detected in: handle_stop_intent')
             LOG.error(e)
