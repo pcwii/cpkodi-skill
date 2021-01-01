@@ -25,7 +25,7 @@ def cc_cast_file(deviceName, filename):
     cast.wait()
     mc = cast.media_controller
     mc.play_media(filename, 'video/mp4')
-    time.sleep(2)
+    time.sleep(3)
     device_status = {}
     device_status['player_state'] = mc.status.player_state
     device_status['media_session_id'] = mc.status.media_session_id
@@ -71,7 +71,7 @@ def cc_stop(deviceName, sessionID):
     cast = chromecasts[0]
     cast.wait()
     mc = cast.media_controller
-    time.sleep(1)
+    time.sleep(2)
     if isinstance(mc.status.media_session_id, int):
         if mc.status.media_session_id == sessionID:
             mc.stop()
