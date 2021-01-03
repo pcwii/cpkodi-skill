@@ -23,6 +23,8 @@ from mycroft.util.parse import extract_number, match_one, fuzzy_match
 from mycroft.util.log import LOG
 from mycroft.audio import wait_while_speaking
 from mycroft.messagebus import Message
+# Todo: begin GUI
+from mycroft.enclosure.gui import SkillGUI
 
 
 _author__ = 'PCWii'
@@ -37,6 +39,7 @@ for each_module in sys.modules:
 class CPKodiSkill(CommonPlaySkill):
     def __init__(self):
         super(CPKodiSkill, self).__init__('CPKodiSkill')
+        self.gui = SkillGUI()
         self.skill_id = 'cpkodi-skill_pcwii'
         self.debug_log = False
         self.enable_chromecast = False
@@ -139,6 +142,11 @@ class CPKodiSkill(CommonPlaySkill):
             except Exception as e:
                 self.dLOG('An error was detected in: handle_speak, ' + str(e))
                 self.on_websettings_changed()
+
+    def display_image(self, image_path, caption=""):
+        # Todo: begin GUI integration
+        self.gui.show_image(image_path, override_idle=True,
+                            fill='PreserveAspectFit', caption=caption)
 
     def translate_regex(self, regex):
         """
