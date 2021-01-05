@@ -8,9 +8,18 @@ def get_requested_music(kodi_path, search_item, search_type):
         returns a music list based on the search item string and the search type
         search_type =  album, artist, label
     """
+    all_words = [str(s) for s in search_item if not s.isdigit()]
     api_path = kodi_path + "/jsonrpc"
     json_header = {'content-type': 'application/json'}
     method = "AudioLibrary.GetSongs"
+    title_filter = []
+    for each_word in all_words:  # Build a filter based on the words in the title
+        search_key = {
+            "field": "title",
+            "operator": "contains",
+            "value": each_word.strip()
+        }
+        title_filter.append(search_key)
     if search_type == 'title_artist':
         kodi_payload = {
             "jsonrpc": "2.0",
@@ -25,11 +34,7 @@ def get_requested_music(kodi_path, search_item, search_type):
                 ],
                 "filter": {
                     "and": [
-                        {
-                            "field": "title",
-                            "operator": "contains",
-                            "value": search_item[0]
-                        },
+                        title_filter,
                         {
                             "field": "artist",
                             "operator": "contains",
@@ -57,9 +62,7 @@ def get_requested_music(kodi_path, search_item, search_type):
                     "track"
                 ],
                 "filter": {
-                    "field": search_type,
-                    "operator": "contains",
-                    "value": search_item
+                    "and": title_filter
                 },
                 "sort": {
                     "order": "ascending",
