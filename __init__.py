@@ -39,7 +39,7 @@ for each_module in sys.modules:
 class CPKodiSkill(CommonPlaySkill):
     def __init__(self):
         super(CPKodiSkill, self).__init__('CPKodiSkill')
-        self.gui = SkillGUI()
+        # self.gui = SkillGUI()
         self.skill_id = 'cpkodi-skill_pcwii'
         self.debug_log = False
         self.enable_chromecast = False
@@ -145,8 +145,8 @@ class CPKodiSkill(CommonPlaySkill):
 
     def display_image(self, image_path, caption=""):
         # Todo: begin GUI integration
-        self.gui.show_image(image_path, override_idle=True,
-                            fill='PreserveAspectFit', caption=caption)
+        #self.gui.show_image(image_path, override_idle=True,
+        #                    fill='PreserveAspectFit', caption=caption)
 
     def translate_regex(self, regex):
         """
