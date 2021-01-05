@@ -145,6 +145,7 @@ class CPKodiSkill(CommonPlaySkill):
 
     def display_image(self, image_path, caption=""):
         # Todo: begin GUI integration
+        self.dLOG('GUI Integration not active')
         #self.gui.show_image(image_path, override_idle=True,
         #                    fill='PreserveAspectFit', caption=caption)
 
