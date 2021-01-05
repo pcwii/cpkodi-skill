@@ -1,3 +1,4 @@
+**Be aware that this repo is currently undergoing development and Testing. As a result breaking changes may be introduced occassionally during testing**
 # <img src='https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/tv.svg' card_color='#40DBB0' width='50' height='50' style='vertical-align:bottom'/> CP Kodi Control
 Control KODI open source media center with Mycroft.ai using the Common Play architecture
 
@@ -83,7 +84,6 @@ CP Kodi skill is capable of "casting" any of your personal library files to a ch
 *[ ] "cast the movie guardians of the galaxy"
 ## Credits 
 * PCWii
-* Youtube Scraping Elements borrowed from 
 ## Category
 **Media**
 ## Tags
@@ -97,7 +97,7 @@ Tested on platform_picroft (others untested)
     - requests
     - bs4
     - requests_cache
-    - pychromecast
+    - PyChromecast>=7.0.1
     - pyenchant
     - compound-word-splitter
 * system:

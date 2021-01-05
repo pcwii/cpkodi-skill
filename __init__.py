@@ -506,6 +506,7 @@ class CPKodiSkill(CommonPlaySkill):
             if "OK" in result.text:
                 result = None
                 self.dLOG("Add Playlist Successful: " + str(playlist_items))
+                self.display_image(str(self.active_library[0]["fanart"]),str(self.active_library[0]["label"]))
                 wait_while_speaking()
                 self.speak_dialog("now.playing", data={"result_type": str(playlist_type),
                                                        "result_label": str(playlist_label)},
