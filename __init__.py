@@ -24,7 +24,8 @@ from mycroft.util.log import LOG
 from mycroft.audio import wait_while_speaking
 from mycroft.messagebus import Message
 # Todo: begin GUI
-from mycroft.enclosure.gui import SkillGUI
+# from mycroft.enclosure.gui import SkillGUI
+from mycroft.skills.core import resting_screen_handler
 
 
 _author__ = 'PCWii'
@@ -507,7 +508,12 @@ class CPKodiSkill(CommonPlaySkill):
             if "OK" in result.text:
                 result = None
                 self.dLOG("Add Playlist Successful: " + str(playlist_items))
-                # self.display_image(str(self.active_library[0]["fanart"]),str(self.active_library[0]["label"]))
+                # Todo: This displays a random image
+                self.gui.clear()
+                self.enclosure.display_manager.remove_active()
+                self.gui.show_image("https://source.unsplash.com/1920x1080/?+random",
+                                    "Example Long Caption That Needs Wrapping Very Long Long Text Text Example That Is",
+                                    "Example Title")
                 wait_while_speaking()
                 self.speak_dialog("now.playing", data={"result_type": str(playlist_type),
                                                        "result_label": str(playlist_label)},
