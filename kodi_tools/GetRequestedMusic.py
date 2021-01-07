@@ -9,34 +9,33 @@ def get_requested_music(kodi_path, search_item, search_type):
         search_type =  album, artist, label
     """
     api_path = kodi_path + "/jsonrpc"
-    json_header = {'content-type': 'application/json'}
     method = "AudioLibrary.GetSongs"
-    title_filter = []
-    if "title" in search_type:
-        if search_type == 'title_artist':
-            title_words = [str(s) for s in search_item[0] if not s.isdigit()]
-        else:
-            title_words = [str(s) for s in search_item if not s.isdigit()]
-        for each_word in title_words:  # Build a filter based on the words in the title
-            search_key = {
-                "field": "title",
-                "operator": "contains",
-                "value": each_word.strip()
-            }
-            title_filter.append(search_key)
-    artist_filter = []
+    search_filter = []
     if "artist" in search_type:
-        if search_type == 'title_artist':
-            artist_words = [str(s) for s in search_item[1] if not s.isdigit()]
+        if "title" in search_type:
+            artist_words = ''.join((item for item in search_item[0] if not item.isdigit())).split()
         else:
-            artist_words = [str(s) for s in search_item if not s.isdigit()]
+            artist_words = ''.join((item for item in search_item if not item.isdigit())).split()
         for each_word in artist_words:  # Build a filter based on the words in the title
             search_key = {
                 "field": "artist",
                 "operator": "contains",
                 "value": each_word.strip()
             }
-            artist_filter.append(search_key)
+            search_filter.append(search_key)
+    if "title" in search_type:
+        if "artist" in search_type:
+            title_words = ''.join((item for item in search_item[1] if not item.isdigit())).split()
+        else:
+            title_words = ''.join((item for item in search_item if not item.isdigit())).split()
+        for each_word in title_words:  # Build a filter based on the search words
+            search_key = {
+                "field": "title",
+                "operator": "contains",
+                "value": each_word.strip()
+            }
+            search_filter.append(search_key)
+    LOG.info(str(search_filter))
     kodi_payload = {
         "jsonrpc": "2.0",
         "method": method,
@@ -49,10 +48,7 @@ def get_requested_music(kodi_path, search_item, search_type):
                 "track"
             ],
             "filter": {
-                "and": [
-                    title_filter,
-                    artist_filter
-                ]
+                "and": search_filter
             },
             "sort": {
                 "order": "ascending",
@@ -62,7 +58,7 @@ def get_requested_music(kodi_path, search_item, search_type):
         }
     }
     try:
-        LOG.info("payload: "+ str(kodi_payload))
+        LOG.info("payload: " + str(kodi_payload))
         kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         song_list = json.loads(kodi_response.text)["result"]["songs"]
         # remove duplicates
