@@ -13,7 +13,7 @@ def get_requested_music(kodi_path, search_item, search_type):
     method = "AudioLibrary.GetSongs"
     title_filter = []
     if "title" in search_type:
-        if search_type == 'title_artist'
+        if search_type == 'title_artist':
             title_words = [str(s) for s in search_item[0] if not s.isdigit()]
         else:
             title_words = [str(s) for s in search_item if not s.isdigit()]
@@ -26,7 +26,7 @@ def get_requested_music(kodi_path, search_item, search_type):
             title_filter.append(search_key)
     artist_filter = []
     if "artist" in search_type:
-        if search_type == 'title_artist'
+        if search_type == 'title_artist':
             artist_words = [str(s) for s in search_item[1] if not s.isdigit()]
         else:
             artist_words = [str(s) for s in search_item if not s.isdigit()]
