@@ -49,8 +49,8 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 ## Examples -Miscellaneous-
 *[ ] "pause kodi"
 *[ ] "re-start kodi"
-*[ ] "stop kodi"
-*[ ] "clear the kodi playlist"
+*[x] "stop kodi"
+*[x] "clear the kodi playlist"
 *[ ] "set kodi volume to 100"
 *[ ] "set kodi volume to 25"
 *[ ] "turn kodi notifications on"
