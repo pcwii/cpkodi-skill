@@ -384,11 +384,11 @@ class CPKodiSkill(CommonPlaySkill):
                         word_list = self.split_compound(request_data['movies']['title'])
                         results = get_requested_movies(self.kodi_path, word_list)
                 if request_data['music']['active']:
+                    # Extend the CPS timeout while we search the whole library
+                    self.bus.emit(Message('play:query.response', {"phrase": phrase,
+                                                                  "skill_id": self.skill_id,
+                                                                  "searching": True}))
                     if request_data['random']:
-                        # Extend the CPS timeout while we search the whole library
-                        self.bus.emit(Message('play:query.response', {"phrase": phrase,
-                                                                      "skill_id": self.skill_id,
-                                                                      "searching": True}))
                         self.dLOG('Searching for Random music')
                         results = self.random_music_select()
                     else:
