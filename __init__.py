@@ -248,8 +248,8 @@ class CPKodiSkill(CommonPlaySkill):
         if match_song_artist_type and not request_info['youtube']['active']:
             self.dLOG('Song and Artist Type Detected')
             request_info['music']['type'] = 'title_artist'
-            request_info['music']['title_artist'] = match_song_artist_type.groupdict()['title'], \
-                                                    match_song_artist_type.groupdict()['artist']
+            request_info['music']['title_artist'] = [match_song_artist_type.groupdict()['title'],
+                                                     match_song_artist_type.groupdict()['artist']]
             request_info['music']['active'] = True
         else:
             self.dLOG('Checking other song types')
