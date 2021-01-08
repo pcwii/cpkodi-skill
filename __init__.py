@@ -395,6 +395,7 @@ class CPKodiSkill(CommonPlaySkill):
                         request_type = request_data['music']['type']
                         request_item = request_data['music'][request_type]
                         results = get_requested_music(self.kodi_path, request_item, request_type)
+                        self.dLOG("Found: " + str(results))
                 if request_data['tv']['active']:
                     request_type = request_data['tv']['type']
                     if "all" in request_type:
