@@ -9,6 +9,7 @@ def get_requested_music(kodi_path, search_item, search_type):
         search_type =  album, artist, label
     """
     api_path = kodi_path + "/jsonrpc"
+    json_header = {'content-type': 'application/json'}
     method = "AudioLibrary.GetSongs"
     search_filter = []
     if "artist" in search_type:
@@ -35,7 +36,7 @@ def get_requested_music(kodi_path, search_item, search_type):
                 "value": each_word.strip()
             }
             search_filter.append(search_key)
-    LOG.info(str(search_filter))
+    # LOG.info(str(search_filter))
     kodi_payload = {
         "jsonrpc": "2.0",
         "method": method,
@@ -58,7 +59,7 @@ def get_requested_music(kodi_path, search_item, search_type):
         }
     }
     try:
-        LOG.info("payload: " + str(kodi_payload))
+        # LOG.info("payload: " + str(kodi_payload))
         kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         song_list = json.loads(kodi_response.text)["result"]["songs"]
         # remove duplicates
@@ -79,5 +80,5 @@ def get_requested_music(kodi_path, search_item, search_type):
                     clean_list.append(info)
         return clean_list  # returns a dictionary of matched movies
     except Exception as e:
-        print(e)
+        LOG.info(e)
         return None
