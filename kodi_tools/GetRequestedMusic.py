@@ -58,7 +58,8 @@ def get_requested_music(kodi_path, search_item, search_type):
             }
         }
     }
-    try:
+    if True:
+    #try:
         # LOG.info("payload: " + str(kodi_payload))
         kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         song_list = json.loads(kodi_response.text)["result"]["songs"]
@@ -79,6 +80,6 @@ def get_requested_music(kodi_path, search_item, search_type):
                 else:
                     clean_list.append(info)
         return clean_list  # returns a dictionary of matched movies
-    except Exception as e:
-        LOG.info(e)
-        return None
+#    except Exception as e:
+#        LOG.info(e)
+#        return None
