@@ -15,7 +15,9 @@ def get_requested_music(kodi_path, search_data):
     search_filter = []
     # Todo: could iterate through the datatype for keys
     for data_key in search_data:
-        if search_data[data_key] != "None":
+        if search_data[data_key] == "None" or search_data[data_key] == bool:
+            LOG.info("invalid data_key type, skipping!")
+        else:
             key_words = ''.join((item for item in search_data[data_key] if not item.isdigit())).split()
             for each_word in key_words:  # Build a filter based on the words in the title
                 filter_item = {
