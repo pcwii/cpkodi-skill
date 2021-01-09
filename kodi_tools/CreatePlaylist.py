@@ -6,10 +6,10 @@ import json
 # add the songid to the active playlist songid is an integer
 def create_playlist(kodi_path, id_dict, media_type):
     api_path = kodi_path + "/jsonrpc"
-    if "movie" in media_type:
+    if ("movie" in media_type) or ("video" in media_type):
         pl_id = 1
         id_type = "movieid"
-    if ("album" in media_type) or ("title" in media_type) or ("artist" in media_type):
+    else:
         pl_id = 0
         id_type = "songid"
     json_header = {'content-type': 'application/json'}
