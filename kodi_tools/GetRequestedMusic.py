@@ -19,32 +19,32 @@ def get_requested_music(kodi_path, search_data):
     if search_data[search_key] != "None":
         key_words = ''.join((item for item in search_data[search_key] if not item.isdigit())).split()
         for each_word in key_words:  # Build a filter based on the words in the title
-            search_key = {
+            filter_item = {
                 "field": search_key,
                 "operator": "contains",
                 "value": each_word.strip()
             }
-            search_filter.append(search_key)
+            search_filter.append(filter_item)
     search_key = 'title'
     if search_data[search_key] != "None":
         key_words = ''.join((item for item in search_data[search_key] if not item.isdigit())).split()
         for each_word in key_words:  # Build a filter based on the words in the title
-            search_key = {
+            filter_item = {
                 "field": search_key,
                 "operator": "contains",
                 "value": each_word.strip()
             }
-            search_filter.append(search_key)
+            search_filter.append(filter_item)
     search_key = 'artist'
     if search_data[search_key] != "None":
         key_words = ''.join((item for item in search_data[search_key] if not item.isdigit())).split()
         for each_word in key_words:  # Build a filter based on the words in the title
-            search_key = {
+            filter_item = {
                 "field": search_key,
                 "operator": "contains",
                 "value": each_word.strip()
             }
-            search_filter.append(search_key)
+            search_filter.append(filter_item)
     kodi_payload = {
         "jsonrpc": "2.0",
         "method": method,
