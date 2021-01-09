@@ -1,0 +1,1 @@
+(.*) (album|disc|lp|cd) (?P<album>.+)(.*) (((by|from)) (?P<artist>.*))

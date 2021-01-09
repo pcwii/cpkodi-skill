@@ -233,18 +233,17 @@ class CPKodiSkill(CommonPlaySkill):
             self.dLOG('Youtube Type Detected')
             request_info['youtube']['item'] = youtube_type.groupdict()['ytItem']
             request_info['youtube']['active'] = True
-        """
-        play the album eye on it
-        *passed*
-        (the |)(album|disc|lp|cd) (?P<album>.+)
-        """
-        album_type = re.match(self.translate_regex('album.type'), phrase)
-        if album_type and not request_info['youtube']['active']:
-            self.dLOG('Album Type Detected')
-            request_info['music']['album'] = album_type.groupdict()['album']
-            request_info['music']['active'] = True
+        match_album_artist_type = re.match(self.translate_regex('album.artist.type'), phrase)
         match_song_artist_type = re.match(self.translate_regex('song.artist.type'), phrase)
-        if match_song_artist_type and not request_info['youtube']['active']:
+        album_type = re.match(self.translate_regex('album.type'), phrase)
+        song_type = re.match(self.translate_regex('song.type'), phrase)
+        artist_type = re.match(self.translate_regex('artist.type'), phrase)
+        if match_album_artist_type and not request_info['youtube']['active']:
+            self.dLOG('album and Artist Type Detected')
+            request_info['music']['album'] = match_album_artist_type.groupdict()['album']
+            request_info['music']['artist'] = match_album_artist_type.groupdict()['artist']
+            request_info['music']['active'] = True
+        elif match_song_artist_type and not request_info['youtube']['active']:
             self.dLOG('Song and Artist Type Detected')
             request_info['music']['title'] = match_song_artist_type.groupdict()['title']
             request_info['music']['artist'] = match_song_artist_type.groupdict()['artist']
@@ -256,7 +255,6 @@ class CPKodiSkill(CommonPlaySkill):
             *passed*
             (the |)(song|single) (?P<title>.+)
             """
-            song_type = re.match(self.translate_regex('song.type'), phrase)
             if song_type and not request_info['youtube']['active']:
                 self.dLOG('Song Type Detected')
                 request_info['music']['title'] = song_type.groupdict()['title']
@@ -265,10 +263,18 @@ class CPKodiSkill(CommonPlaySkill):
             play the artist toby mac
             (the |)(artist|group|band|(something|anything|stuff|music|songs) (by|from)|(some|by)) (?P<artist>.+)
             """
-            artist_type = re.match(self.translate_regex('artist.type'), phrase)
             if artist_type and not request_info['youtube']['active']:
                 self.dLOG('Artist Type Detected')
                 request_info['music']['artist'] = artist_type.groupdict()['artist']
+                request_info['music']['active'] = True
+            """
+            play the album eye on it
+            *passed*
+            (the |)(album|disc|lp|cd) (?P<album>.+)
+            """
+            if album_type and not request_info['youtube']['active']:
+                self.dLOG('Album Type Detected')
+                request_info['music']['album'] = album_type.groupdict()['album']
                 request_info['music']['active'] = True
         """
         play the movie spiderman homecoming
