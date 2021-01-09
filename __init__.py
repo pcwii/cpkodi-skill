@@ -241,17 +241,13 @@ class CPKodiSkill(CommonPlaySkill):
         album_type = re.match(self.translate_regex('album.type'), phrase)
         if album_type and not request_info['youtube']['active']:
             self.dLOG('Album Type Detected')
-            request_info['music']['type'] = 'album'
             request_info['music']['album'] = album_type.groupdict()['album']
             request_info['music']['active'] = True
         match_song_artist_type = re.match(self.translate_regex('song.artist.type'), phrase)
         if match_song_artist_type and not request_info['youtube']['active']:
             self.dLOG('Song and Artist Type Detected')
-            request_info['music']['type'] = 'title_artist'
             request_info['music']['title'] = match_song_artist_type.groupdict()['title']
             request_info['music']['artist'] = match_song_artist_type.groupdict()['artist']
-            request_info['music']['title_artist'] = [match_song_artist_type.groupdict()['title'],
-                                                     match_song_artist_type.groupdict()['artist']]
             request_info['music']['active'] = True
         else:
             self.dLOG('Checking other song types')
@@ -263,7 +259,6 @@ class CPKodiSkill(CommonPlaySkill):
             song_type = re.match(self.translate_regex('song.type'), phrase)
             if song_type and not request_info['youtube']['active']:
                 self.dLOG('Song Type Detected')
-                request_info['music']['type'] = 'title'
                 request_info['music']['title'] = song_type.groupdict()['title']
                 request_info['music']['active'] = True
             """
@@ -273,7 +268,6 @@ class CPKodiSkill(CommonPlaySkill):
             artist_type = re.match(self.translate_regex('artist.type'), phrase)
             if artist_type and not request_info['youtube']['active']:
                 self.dLOG('Artist Type Detected')
-                request_info['music']['type'] = 'artist'
                 request_info['music']['artist'] = artist_type.groupdict()['artist']
                 request_info['music']['active'] = True
         """

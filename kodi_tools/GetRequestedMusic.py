@@ -6,7 +6,7 @@ import json
 def get_requested_music(kodi_path, search_data):
     """
         returns a music list based on the search item string and the search type
-        search_type =  album, artist, label
+        search_data =  baseDataStructure.json['music']
         may consider passing the music json data item as this will provide all the data required to filter
     """
     api_path = kodi_path + "/jsonrpc"
