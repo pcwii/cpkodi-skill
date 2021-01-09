@@ -573,7 +573,7 @@ class CPKodiSkill(CommonPlaySkill):
             else:
                 self.dLOG('Kodi does not appear to be playing anything at the moment')
                 # Check Chromecast
-                self.cc_status = cc_stop(self.cast_device, self.cc_status["media_session_id"])
+                #self.cc_status = cc_stop(self.cast_device, self.cc_status["media_session_id"])
         except Exception as e:
             self.dLOG('An error was detected in: handle_stop_intent')
             LOG.error(e)
