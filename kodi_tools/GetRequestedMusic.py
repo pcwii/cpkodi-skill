@@ -13,38 +13,37 @@ def get_requested_music(kodi_path, search_data):
     json_header = {'content-type': 'application/json'}
     method = "AudioLibrary.GetSongs"
     search_filter = []
-    # Check each music key
     # Todo: could iterate through the datatype for keys
-    data_key = 'album'
-    if search_data[data_key] != "None":
-        key_words = ''.join((item for item in search_data[data_key] if not item.isdigit())).split()
-        for each_word in key_words:  # Build a filter based on the words in the title
-            filter_item = {
-                "field": data_key,
-                "operator": "contains",
-                "value": each_word.strip()
-            }
-            search_filter.append(filter_item)
-    data_key = 'title'
-    if search_data[data_key] != "None":
-        key_words = ''.join((item for item in search_data[data_key] if not item.isdigit())).split()
-        for each_word in key_words:  # Build a filter based on the words in the title
-            filter_item = {
-                "field": data_key,
-                "operator": "contains",
-                "value": each_word.strip()
-            }
-            search_filter.append(filter_item)
-    data_key = 'artist'
-    if search_data[data_key] != "None":
-        key_words = ''.join((item for item in search_data[data_key] if not item.isdigit())).split()
-        for each_word in key_words:  # Build a filter based on the words in the title
-            filter_item = {
-                "field": data_key,
-                "operator": "contains",
-                "value": each_word.strip()
-            }
-            search_filter.append(filter_item)
+    for data_key in search_data:
+        if search_data[data_key] != "None":
+            key_words = ''.join((item for item in search_data[data_key] if not item.isdigit())).split()
+            for each_word in key_words:  # Build a filter based on the words in the title
+                filter_item = {
+                    "field": data_key,
+                    "operator": "contains",
+                    "value": each_word.strip()
+                }
+                search_filter.append(filter_item)
+    # data_key = 'title'
+    # if search_data[data_key] != "None":
+    #     key_words = ''.join((item for item in search_data[data_key] if not item.isdigit())).split()
+    #     for each_word in key_words:  # Build a filter based on the words in the title
+    #         filter_item = {
+    #             "field": data_key,
+    #             "operator": "contains",
+    #             "value": each_word.strip()
+    #         }
+    #         search_filter.append(filter_item)
+    # data_key = 'artist'
+    # if search_data[data_key] != "None":
+    #     key_words = ''.join((item for item in search_data[data_key] if not item.isdigit())).split()
+    #     for each_word in key_words:  # Build a filter based on the words in the title
+    #         filter_item = {
+    #             "field": data_key,
+    #             "operator": "contains",
+    #             "value": each_word.strip()
+    #         }
+    #         search_filter.append(filter_item)
     kodi_payload = {
         "jsonrpc": "2.0",
         "method": method,
