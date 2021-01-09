@@ -38,8 +38,8 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 *[x] "the album Cinematic by Owl City"
 *[x] "play some music" --will play a random selection
 *[x] "clear the music playlist"
-*[ ] "pause the music"
-*[ ] "resume the music"
+*[x] "pause the music"
+*[x] "resume the music"
 ## Examples -Youtube- **Requires Youtube Kodi Plugin**
 *[ ] "play the captain marvel official trailer from youtube”
 *[ ] "play helix from youtube”
