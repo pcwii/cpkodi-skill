@@ -14,7 +14,7 @@ def get_requested_music(kodi_path, search_item, search_type):
     search_filter = []
     if "artist" in search_type:
         if "title" in search_type:
-            artist_words = ''.join((item for item in search_item[0] if not item.isdigit())).split()
+            artist_words = ''.join((item for item in search_item[1] if not item.isdigit())).split()
         else:
             artist_words = ''.join((item for item in search_item if not item.isdigit())).split()
         for each_word in artist_words:  # Build a filter based on the words in the title
@@ -26,7 +26,7 @@ def get_requested_music(kodi_path, search_item, search_type):
             search_filter.append(search_key)
     if "title" in search_type:
         if "artist" in search_type:
-            title_words = ''.join((item for item in search_item[1] if not item.isdigit())).split()
+            title_words = ''.join((item for item in search_item[0] if not item.isdigit())).split()
         else:
             title_words = ''.join((item for item in search_item if not item.isdigit())).split()
         for each_word in title_words:  # Build a filter based on the search words
