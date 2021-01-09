@@ -68,7 +68,7 @@ def get_requested_music(kodi_path, search_data):
     }
     if True:
     #try:
-        # LOG.info("payload: " + str(kodi_payload))
+        LOG.info("payload: " + str(kodi_payload))
         kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         LOG.info("Music json" + kodi_response.text)
         item_count = int(json.loads(kodi_response.text)['result']['limits']['total'])
