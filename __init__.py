@@ -481,7 +481,7 @@ class CPKodiSkill(CommonPlaySkill):
                     song_id = str(each_item["songid"])
                     playlist_dict.append(song_id)
                 # Todo: add the Cast Option here
-                self.clear_queue_and_play(playlist_dict, request_data['music']['type'])
+                self.clear_queue_and_play(playlist_dict, 'audio') # Pass the entire Music Structure
         except Exception as e:
             self.dLOG('An error was detected in: CPS_match_query_phrase')
             LOG.error(e)
