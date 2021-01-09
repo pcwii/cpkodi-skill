@@ -15,32 +15,32 @@ def get_requested_music(kodi_path, search_data):
     search_filter = []
     # Check each music key
     # Todo: could iterate through the datatype for keys
-    search_key = 'album'
-    if search_data[search_key] != "None":
-        key_words = ''.join((item for item in search_data[search_key] if not item.isdigit())).split()
+    data_key = 'album'
+    if search_data[data_key] != "None":
+        key_words = ''.join((item for item in search_data[data_key] if not item.isdigit())).split()
         for each_word in key_words:  # Build a filter based on the words in the title
             filter_item = {
-                "field": search_key,
+                "field": data_key,
                 "operator": "contains",
                 "value": each_word.strip()
             }
             search_filter.append(filter_item)
-    search_key = 'title'
-    if search_data[search_key] != "None":
-        key_words = ''.join((item for item in search_data[search_key] if not item.isdigit())).split()
+    data_key = 'title'
+    if search_data[data_key] != "None":
+        key_words = ''.join((item for item in search_data[data_key] if not item.isdigit())).split()
         for each_word in key_words:  # Build a filter based on the words in the title
             filter_item = {
-                "field": search_key,
+                "field": data_key,
                 "operator": "contains",
                 "value": each_word.strip()
             }
             search_filter.append(filter_item)
-    search_key = 'artist'
-    if search_data[search_key] != "None":
-        key_words = ''.join((item for item in search_data[search_key] if not item.isdigit())).split()
+    data_key = 'artist'
+    if search_data[data_key] != "None":
+        key_words = ''.join((item for item in search_data[data_key] if not item.isdigit())).split()
         for each_word in key_words:  # Build a filter based on the words in the title
             filter_item = {
-                "field": search_key,
+                "field": data_key,
                 "operator": "contains",
                 "value": each_word.strip()
             }
