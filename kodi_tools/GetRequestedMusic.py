@@ -62,7 +62,7 @@ def get_requested_music(kodi_path, search_item, search_type):
     #try:
         # LOG.info("payload: " + str(kodi_payload))
         kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
-        LOG.info("Music json" + json.loads(kodi_response.text))
+        LOG.info("Music json" + kodi_response.text)
         song_list = json.loads(kodi_response.text)['result']['songs']
         # remove duplicates
         clean_list = []  # this is a dict
