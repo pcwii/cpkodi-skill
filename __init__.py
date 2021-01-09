@@ -563,7 +563,8 @@ class CPKodiSkill(CommonPlaySkill):
         All vocal intents appear here
     """
     # stop kodi was requested in the utterance
-    @intent_handler(IntentBuilder("").require("StopKeyword").one_of("ItemKeyword",
+    @intent_handler(IntentBuilder("").require("StopKeyword").one_of("AudioItemKeyword",
+                                                                    "FilmItemKeyword",
                                                                     "KodiKeyword",
                                                                     "YoutubeKeyword",
                                                                     "ChromecastKeyword"))
@@ -586,7 +587,10 @@ class CPKodiSkill(CommonPlaySkill):
             self.on_websettings_changed()
 
     # request to Pause a playing kodi instance
-    @intent_handler(IntentBuilder("").require("PauseKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
+    @intent_handler(IntentBuilder("").require("PauseKeyword").one_of("AudioItemKeyword",
+                                                                     "FilmItemKeyword",
+                                                                     "KodiKeyword",
+                                                                     "YoutubeKeyword"))
     def handle_pause_intent(self, message):
         try:
             active_player_id, active_player_type = get_active_player(self.kodi_path)
@@ -603,7 +607,10 @@ class CPKodiSkill(CommonPlaySkill):
             self.on_websettings_changed()
 
     # request to resume a paused kodi instance
-    @intent_handler(IntentBuilder('').require("ResumeKeyword").one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
+    @intent_handler(IntentBuilder('').require("ResumeKeyword").one_of("AudioItemKeyword",
+                                                                      "FilmItemKeyword",
+                                                                      "KodiKeyword",
+                                                                      "YoutubeKeyword"))
     def handle_resume_intent(self, message):
         try:
             active_player_id, active_player_type = get_active_player(self.kodi_path)
@@ -621,7 +628,10 @@ class CPKodiSkill(CommonPlaySkill):
 
     # clear Playlists
     @intent_handler(IntentBuilder('').require("ClearKeyword").require("PlaylistKeyword").
-                    one_of("ItemKeyword", "KodiKeyword", "YoutubeKeyword"))
+                    one_of("AudioItemKeyword",
+                           "FilmItemKeyword",
+                           "KodiKeyword",
+                           "YoutubeKeyword"))
     def handle_clear_playlist_intent(self, message):
         try:
             if "audio" in message.data:

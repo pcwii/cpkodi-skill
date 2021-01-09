@@ -29,7 +29,7 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 *[ ] "clear the movie playlist"
 * **Movie titles containing Roman Numerals will automatically be searched**
 **eg.** 
-*[ ] "play the movie star wars 3" - will locate *star wars III* 
+*[x] "play the movie star wars 3" - will locate *star wars III* 
 ## Examples -Music-
 *[x] "play the artist elvis presley”
 *[x] "play the song blue suede shoes"
@@ -40,15 +40,15 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 *[x] "clear the music playlist"
 *[x] "pause the music"
 *[x] "resume the music"
-## Examples -Youtube- **Requires Youtube Kodi Plugin**
+## Examples -Youtube- **Requires Youtube Kodi Plugin - could have issues**
 *[ ] "play the captain marvel official trailer from youtube”
 *[ ] "play helix from youtube”
 *[ ] "play some Elton John from youtube"
 ## Examples -TV Shows-
 *[ ] "play the outer limits season 1 episode 2”
 ## Examples -Miscellaneous-
-*[ ] "pause kodi"
-*[ ] "re-start kodi"
+*[x] "pause kodi"
+*[x] "re-start kodi"
 *[x] "stop kodi"
 *[x] "clear the kodi playlist"
 *[ ] "set kodi volume to 100"
