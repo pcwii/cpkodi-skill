@@ -31,13 +31,13 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 **eg.** 
 *[ ] "play the movie star wars 3" - will locate *star wars III* 
 ## Examples -Music-
-*[ ] "play the artist elvis presley”
-*[ ] "play all shook up”
-*[ ] "play the song blue suede shoes"
-*[ ] "play the album appeal to reason”
-*[ ] "the song blue christmas by elvis presley"
-*[ ] "play some music" --will play a random selection
-*[ ] "clear the music playlist"
+*[x] "play the artist elvis presley”
+*[x] "play the song blue suede shoes"
+*[x] "play the album appeal to reason”
+*[x] "the song Cinematic by Owl City"
+*[x] "the album Cinematic by Owl City"
+*[x] "play some music" --will play a random selection
+*[x] "clear the music playlist"
 *[ ] "pause the music"
 *[ ] "resume the music"
 ## Examples -Youtube- **Requires Youtube Kodi Plugin**

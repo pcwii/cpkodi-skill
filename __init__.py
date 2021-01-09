@@ -590,7 +590,7 @@ class CPKodiSkill(CommonPlaySkill):
     def handle_pause_intent(self, message):
         try:
             active_player_id, active_player_type = get_active_player(self.kodi_path)
-            if active_player_id:
+            if active_player_id is not None:
                 result = pause_all(self.kodi_path, active_player_id)
                 if "OK" in result.text:
                     self.dLOG("paused")
