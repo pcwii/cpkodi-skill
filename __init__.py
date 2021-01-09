@@ -565,7 +565,7 @@ class CPKodiSkill(CommonPlaySkill):
         try:
             active_player_id, active_player_type = get_active_player(self.kodi_path)
             self.dLOG(str(active_player_id) + ', ' + str(active_player_type))
-            if active_player_type:
+            if active_player_type is not None:
                 result = stop_kodi(self.kodi_path, active_player_id)
                 if "OK" in result.text:
                     self.dLOG("Stopped")
