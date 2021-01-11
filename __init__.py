@@ -938,6 +938,11 @@ class CPKodiSkill(CommonPlaySkill):
         update_kw = message.data.get("ScanKeyword")
         self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
 
+    @intent_handler(IntentBuilder('').require("MuteKeyword").require('KodiKeyword'))
+    def handle_mute_toggle_intent(self, message):
+        mute_state = mute_kodi(self.kodi_path)
+        # self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
+
     # user has requested to cast something
     @intent_handler(IntentBuilder('').require("CastKeyword"))
     def handle_cast_movies_intent(self, message):
