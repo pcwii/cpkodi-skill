@@ -634,13 +634,13 @@ class CPKodiSkill(CommonPlaySkill):
                            "YoutubeKeyword"))
     def handle_clear_playlist_intent(self, message):
         try:
-            if "audio" in message.data:
+            if "AudioItemKeyword" in message.data:
                 result = None
                 result = playlist_clear(self.kodi_path, "audio")
                 if "OK" in result.text:
                     result = None
                     self.dLOG("Clear Audio Playlist Successful")
-            elif "video" in message.data:
+            elif "FilmItemKeyword" in message.data:
                 result = None
                 result = playlist_clear(self.kodi_path, "video")
                 if "OK" in result.text:
