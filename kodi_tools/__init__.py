@@ -17,7 +17,7 @@ from .PlayNormal import play_normal
 from .PlayYT import play_yt
 from .PostNotification import post_notification
 from .ResumePlayer import resume_play
-from .SetVolume import set_volume
+from .SetVolume import set_volume, mute_kodi
 from .ShowMovieInfo import show_movie_info
 from .ShowRoot import show_root
 from .ShowSubtitles import show_subtitles

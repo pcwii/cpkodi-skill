@@ -22,3 +22,22 @@ def set_volume(kodi_path, level):
         return json.loads(kodi_response.text)["result"]
     except Exception as e:
         return None
+
+def mute_kodi(kodi_path):
+    api_path = kodi_path + "/jsonrpc"
+    json_header = {'content-type': 'application/json'}
+    method = "Application.SetMute"
+    kodi_payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": method,
+        "params": {
+            "mute": "toggle"
+        }
+    }
+    try:
+        kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
+        mute_state = json.loads(kodi_response.text)["result"]
+        return mute_state
+    except Exception as e:
+        return None

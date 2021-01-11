@@ -51,8 +51,8 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 *[x] "re-start kodi"
 *[x] "stop kodi"
 *[x] "clear the kodi playlist"
-*[ ] "set kodi volume to 100"
-*[ ] "set kodi volume to 25"
+*[x] "set kodi volume to 100"
+*[x] "set kodi volume to 25"
 *[ ] "turn kodi notifications on"
 *[ ] "turn kodi notifications off"
 *[ ] "move the kodi cursor up / down / left / right / back / select / cancel"
@@ -114,10 +114,10 @@ Tested on platform_picroft (others untested)
 ## Todo
 - ~~Added movies search with roman numerals based on numbers in the utterance~~ (Completed 20201214)
 - ~~Make repeat words language agnostic "MultiplicativeList.json"~~ (Completed 2021214)
-- Add the ability to search music by album and artist (Todo 20201214)
+- ~~Add the ability to search music by album and artist~~ (Completed 20210110)
 - ~~Correct the random music request "play some music"~~ (Completed 20201228) 
 - ~~Confirm TV Show request by season and episode "play the outer limits season 1 episode 2"~~ (Completed 20201229)
-- Confirm music request by artist "play the artist Elvis" (Todo 20201214)
+- ~~Confirm music request by artist "play the artist Elvis"~~ (Completed 20210110)
 - Confirm TV Show request by Title with dialog "play the tv show stargirl" (Todo 20201214)
 - ~~Correct index out of range when iterating through a list of found movies~~ (Complete 20201223)
 - ~~Todo Add new dialog response when we reach the end of the list~~ (Completed 20201224)
