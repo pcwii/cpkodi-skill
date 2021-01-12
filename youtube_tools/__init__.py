@@ -109,51 +109,52 @@ def search_youtube(query, location_code="US",
                 # most recent from channel {title_from_step_above}
                 # related to your search
 
-                category = entries["title"]["simpleText"]
+
                 # TODO category localization
                 # this comes in lang from your ip address
                 # not good to use as dict keys, can assumptions be made about
                 # ordering and num of results? last item always seems to be
                 # related artists and first (if any) featured channel
                 ch = featured_channel.get("title", "")
+                if ("content" in entries) and ("verticalListRenderer" in entries) and ("items" in entries):
+                    category = entries["title"]["simpleText"]
+                    for vid in entries["content"]["verticalListRenderer"]['items']:
+                        vid = vid['videoRenderer']
+                        thumb = vid["thumbnail"]['thumbnails']
+                        d = [r["text"] for r in vid['title']["runs"]]
+                        title = " ".join(d)
 
-                for vid in entries["content"]["verticalListRenderer"]['items']:
-                    vid = vid['videoRenderer']
-                    thumb = vid["thumbnail"]['thumbnails']
-                    d = [r["text"] for r in vid['title']["runs"]]
-                    title = " ".join(d)
+                        length_caption = \
+                            vid.get("lengthText", {}).get('accessibility', {}).get("accessibilityData", {}).get("label")
 
-                    length_caption = \
-                        vid.get("lengthText", {}).get('accessibility', {}).get("accessibilityData", {}).get("label")
+                        length_txt = vid.get("lengthText", {}).get('simpleText')
+                        videoId = vid['videoId']
+                        url = vid['navigationEndpoint']['commandMetadata'][
+                            'webCommandMetadata']['url']
 
-                    length_txt = vid.get("lengthText", {}).get('simpleText')
-                    videoId = vid['videoId']
-                    url = vid['navigationEndpoint']['commandMetadata'][
-                        'webCommandMetadata']['url']
-
-                    if ch and category.endswith(ch):
-                        featured_channel["videos"].append(
-                            {
-                                "url": base_url + url,
-                                "title": title,
-                                "length": length_txt,
-                                "length_human": length_caption,
-                                "videoId": videoId,
-                                "thumbnails": thumb
-                            }
-                        )
-                    else:
-                        related_to_search.append(
-                            {
-                                "url": base_url + url,
-                                "title": title,
-                                "length": length_txt,
-                                "length_human": length_caption,
-                                "videoId": videoId,
-                                "thumbnails": thumb,
-                                "reason": category
-                            }
-                        )
+                        if ch and category.endswith(ch):
+                            featured_channel["videos"].append(
+                                {
+                                    "url": base_url + url,
+                                    "title": title,
+                                    "length": length_txt,
+                                    "length_human": length_caption,
+                                    "videoId": videoId,
+                                    "thumbnails": thumb
+                                }
+                            )
+                        else:
+                            related_to_search.append(
+                                {
+                                    "url": base_url + url,
+                                    "title": title,
+                                    "length": length_txt,
+                                    "length_human": length_caption,
+                                    "videoId": videoId,
+                                    "thumbnails": thumb,
+                                    "reason": category
+                                }
+                            )
             elif 'playlistRenderer' in vid:
                 # playlist
                 vid = vid['playlistRenderer']
