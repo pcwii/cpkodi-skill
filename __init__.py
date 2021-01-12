@@ -701,6 +701,7 @@ class CPKodiSkill(CommonPlaySkill):
             direction_kw = "Back"  # these english words are required by the kodi api
         # repeat_count = self.get_repeat_words(message.data.get('utterance'))
         repeat_count = self.convert_multiplicative(message.data.get('utterance'))
+        self.dLOG(str(direction_kw))
         if direction_kw:
             for each_count in range(0, int(repeat_count)):
                 response = move_cursor(self.kodi_path, direction_kw)

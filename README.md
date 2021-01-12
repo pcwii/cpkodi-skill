@@ -59,7 +59,7 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 *[x] "turn kodi notifications off"
 *[ ] "move the kodi cursor up / down / left / right / back / select / cancel"
   - After the first cursor command just say the direction "up / down / left / right / back / select / cancel"
-*[ ] "move the kodi cursor right 3 times"
+*[x] "move the kodi cursor right 3 times"
 *[x] "move the kodi cursor down twice"
 *[ ] "update the kodi library"
 *[ ] "clean the kodi library"
