@@ -40,7 +40,9 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 *[x] "clear the music playlist"
 *[x] "pause the music"
 *[x] "resume the music"
-## Examples -Youtube- **Requires Youtube Kodi Plugin - could have issues**
+## Examples -Youtube- 
+- Requires Youtube Kodi [Plugin](https://github.com/anxdpanic/plugin.video.youtube/releases)
+- Requires Youtube Kodi [API](https://github.com/anxdpanic/plugin.video.youtube/wiki/Personal-API-Keys)
 *[ ] "play the captain marvel official trailer from youtube”
 *[ ] "play helix from youtube”
 *[ ] "play some Elton John from youtube"

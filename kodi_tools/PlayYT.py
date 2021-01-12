@@ -6,8 +6,7 @@ import json
 def play_yt(kodi_path, video_id):
     api_path = kodi_path + "/jsonrpc"
     LOG.info('play youtube ID: ' + str(video_id))
-    yt_link = "plugin://plugin.video.youtube/play/" + video_id
-    #yt_link = "plugin://plugin.video.youtube/?action=play_video&videoid="+ video_id
+    yt_link = "plugin://plugin.video.youtube/play/?video_id=" + video_id
     json_header = {'content-type': 'application/json'}
     method = "Player.Open"
     kodi_payload = {
