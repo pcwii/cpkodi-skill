@@ -43,9 +43,9 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 ## Examples -Youtube- 
 - Requires Youtube Kodi [Plugin](https://github.com/anxdpanic/plugin.video.youtube/releases)
 - Requires Youtube Kodi [API](https://github.com/anxdpanic/plugin.video.youtube/wiki/Personal-API-Keys)
-*[ ] "play the captain marvel official trailer from youtube”
-*[ ] "play helix from youtube”
-*[ ] "play some Elton John from youtube"
+*[x] "play the captain marvel official trailer from youtube”
+*[x] "play helix with youtube”
+*[ ] "play some Elton John using youtube"
 ## Examples -TV Shows-
 *[ ] "play the outer limits season 1 episode 2”
 ## Examples -Miscellaneous-
