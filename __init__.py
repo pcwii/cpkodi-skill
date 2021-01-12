@@ -188,6 +188,7 @@ class CPKodiSkill(CommonPlaySkill):
                 if each_item in message:
                     repeat_value = data[each_item]
                     self.dLOG("Multiplicative returning the value, " + str(repeat_value))
+                    break
         return int(repeat_value)
 
     def split_compound(self, sentence):
