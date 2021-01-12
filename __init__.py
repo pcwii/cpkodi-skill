@@ -174,12 +174,12 @@ class CPKodiSkill(CommonPlaySkill):
             Since it uses a file we can ensure it is language agnostic
             This routine replaces the get_repeat_words routine
         """
-        value = extract_number(message)
+        value = re.findall(r'\d+', message)
         path = self.find_resource("MultiplicativeList.json")
         if value:
             repeat_value = value[0]
             self.dLOG("Multiplicative returning the value, " + str(repeat_value))
-            return repeat_value
+            return int(repeat_value)
         else:
             with open(path) as f:
                 data = json.load(f)
@@ -188,7 +188,7 @@ class CPKodiSkill(CommonPlaySkill):
                 if each_item in message:
                     repeat_value = data[each_item]
                     self.dLOG("Multiplicative returning the value, " + str(repeat_value))
-                    return repeat_value
+                    return int(repeat_value)
 
     def split_compound(self, sentence):
         """

@@ -40,12 +40,12 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 *[x] "clear the music playlist"
 *[x] "pause the music"
 *[x] "resume the music"
-## Examples -Youtube- 
+## Examples -Youtube-
 - Requires Youtube Kodi [Plugin](https://github.com/anxdpanic/plugin.video.youtube/releases)
 - Requires Youtube Kodi [API](https://github.com/anxdpanic/plugin.video.youtube/wiki/Personal-API-Keys)
 *[x] "play the captain marvel official trailer from youtube”
 *[x] "play helix with youtube”
-*[ ] "play some Elton John using youtube"
+*[x] "play some Elton John using youtube"
 ## Examples -TV Shows-
 *[ ] "play the outer limits season 1 episode 2”
 ## Examples -Miscellaneous-
@@ -55,12 +55,12 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 *[x] "clear the kodi playlist"
 *[x] "set kodi volume to 100"
 *[x] "set kodi volume to 25"
-*[ ] "turn kodi notifications on"
-*[ ] "turn kodi notifications off"
+*[x] "turn kodi notifications on"
+*[x] "turn kodi notifications off"
 *[ ] "move the kodi cursor up / down / left / right / back / select / cancel"
   - After the first cursor command just say the direction "up / down / left / right / back / select / cancel"
 *[ ] "move the kodi cursor right 3 times"
-*[ ] "move the kodi cursor down twice"
+*[x] "move the kodi cursor down twice"
 *[ ] "update the kodi library"
 *[ ] "clean the kodi library"
 ## Conversational Context
