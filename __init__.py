@@ -400,10 +400,7 @@ class CPKodiSkill(CommonPlaySkill):
                 if request_data['tv']['active']:
                     request_type = request_data['tv']['type']
                     if "all" in request_type:
-                        results = get_tv_show(self.kodi_path,
-                                              request_data['tv']['title'],
-                                              request_data['tv']['season'],
-                                              request_data['tv']['episode'])
+                        results = get_tv_show(self.kodi_path, request_data['tv'])
                     if "title" in request_type:
                         results = get_show(self.kodi_path, request_data['tv']['title'])
                 if request_data['youtube']['active'] and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
