@@ -12,7 +12,7 @@ def get_tv_show(kodi_path, show_data):
     api_path = kodi_path + "/jsonrpc"
     show_id = get_show(api_path, show_data["title"])[0]["tvshowid"]
     LOG.info('Found ShowID: ' + str(show_id))
-    episode_details = get_episode(api_path, show_id, show_data["season"], show_data["season"])
+    episode_details = get_episode(api_path, show_id, show_data["season"], show_data["episode"])
     LOG.info('Found Episode Details: ' + str(episode_details))
     return episode_details
 
@@ -78,7 +78,7 @@ def get_show(api_path, search_data):
     return clean_list  # returns a dictionary of matched movies
 
 
-def get_episode(api_path, showID, seasonNum, episodeNum):
+def get_episode(api_path, showID, show_data):
     """
         1. need to confirm the TVShow (returns tvshowID)
         2. Search for VideoLibrary.GetSeasons (uses Season number as integer)
@@ -87,7 +87,7 @@ def get_episode(api_path, showID, seasonNum, episodeNum):
     search_key = {
         "field": "episode",
         "operator": "contains",
-        "value": int(episodeNum)
+        "value": int(showID)
     }
     json_header = {'content-type': 'application/json'}
     method = "VideoLibrary.GetEpisodes"
@@ -96,8 +96,8 @@ def get_episode(api_path, showID, seasonNum, episodeNum):
         "id": 1,
         "method": method,
         "params": {
-            "tvshowid": showID,
-            "season": seasonNum,
+            "tvshowid": show_data['episode'],
+            "season": show_data['season'],
             "properties": [
                 "season",
                 "episode",
@@ -112,7 +112,7 @@ def get_episode(api_path, showID, seasonNum, episodeNum):
         kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
         item_list = json.loads(kodi_response.text)["result"]["episodes"]
         for each_item in item_list:
-            if each_item["episode"] == episodeNum:
+            if each_item["episode"] == show_data['episode']:
                 return each_item
         return None  # returns a dictionary of matched movies
     except Exception as e:
