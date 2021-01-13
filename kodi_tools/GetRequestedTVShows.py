@@ -10,9 +10,9 @@ def get_tv_show(kodi_path, show_data):
         2. return the episode details
     """
     api_path = kodi_path + "/jsonrpc"
-    show_id = get_show(kodi_path, show_data["title"])[0]["tvshowid"]
+    show_id = get_show(api_path, show_data["title"])[0]["tvshowid"]
     LOG.info('Found ShowID: ' + str(show_id))
-    episode_details = get_episode(show_id, show_data["season"], show_data["season"])
+    episode_details = get_episode(api_path, show_id, show_data["season"], show_data["season"])
     LOG.info('Found Episode Details: ' + str(episode_details))
     return episode_details
 
