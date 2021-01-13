@@ -109,5 +109,14 @@ def get_episode(api_path, show_id, show_data):
     clean_list = []  # this is a dict
     for each_item in item_list:
         if int(each_item["episode"]) == int(show_data['episode']):
-            clean_list.append(each_item)
+            info = {
+                "label": each_item['label'],
+                "episodeid": each_item['episodeid'],
+                "fanart": each_item['fanart'],
+                "thumbnail": each_item['thumbnail'],
+                "filename": each_item['file'],
+                "season": each_item['season'],
+                "episode": each_item['episode']
+            }
+            clean_list.append(info)
     return clean_list  # Returns an array of Dict.
