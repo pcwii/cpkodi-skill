@@ -490,15 +490,22 @@ class CPKodiSkill(CommonPlaySkill):
                     If type is TV Episode if one then add to playlist and play
                 """
                 self.dLOG('Preparing to Play TV Show' + str(self.active_library))
-                self.dLOG('Returned Library Length = ' + str(len(data["library"])))
                 if len(data["library"]) == 1:  # Only one item was returned so go ahead and play
                     episode_id = str(self.active_library[0]["episodeid"])
-                    # Todo: add the Cast Option here
                     playlist_dict.append(episode_id)
                     if request_data['chromecast']['active']:
                         self.cast_play(episode_id)
                     else:
                         self.clear_queue_and_play(playlist_dict, 'tv')
+                elif len(data["library"]) > 1:  # confirm the library does not have a zero length or is None
+                    # Todo: give the option to add all items to the playlist immediately
+                    self.set_context('NavigateContextKeyword', 'NavigateContext')
+                    wait_while_speaking()
+                    self.speak_dialog('multiple.results', data={"result": str(playlist_count)}, expect_response=True)
+                else:  # no items were found in the library
+                    wait_while_speaking()
+                    self.speak_dialog('no.results', data={"result": str(data["request"])}, expect_response=False)
+
 
     def clear_queue_and_play(self, playlist_items, playlist_type):
         result = None
