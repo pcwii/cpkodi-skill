@@ -7,10 +7,10 @@ Utilize the kodi API and Python library for controlling the KODI open source med
 The Kodi Skill uses conversational dialog to help you to control your KODI instance more naturally. 
 
 ## Examples -Movies-
--[x] "play the movie guardians of the galaxy"
--[x] "play the film planet of the apes"
--[x] "play a random movie"
--[ ] "turn kodi subtitles on"
+- [x] "play the movie guardians of the galaxy"
+- [x] "play the film planet of the apes"
+- [x] "play a random movie"
+- [ ] "turn kodi subtitles on"
 -[ ] "turn kodi subtitles off"
 -[ ] "skip kodi forward"
 -[ ] "skip kodi backward"
