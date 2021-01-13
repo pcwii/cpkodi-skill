@@ -87,7 +87,7 @@ def get_episode(api_path, show_id, show_data):
     search_key = {
         "field": "episode",
         "operator": "contains",
-        "value": int(show_id)
+        "value": int(show_data['episode'])
     }
     json_header = {'content-type': 'application/json'}
     method = "VideoLibrary.GetEpisodes"
@@ -96,7 +96,7 @@ def get_episode(api_path, show_id, show_data):
         "id": 1,
         "method": method,
         "params": {
-            "tvshowid": show_data['episode'],
+            "tvshowid": int(show_id),
             "season": show_data['season'],
             "properties": [
                 "season",
@@ -106,6 +106,9 @@ def get_episode(api_path, show_id, show_data):
                 "thumbnail",
                 "playcount"
             ],
+            "filter": {
+                "and": search_key
+            },
         }
     }
     try:
