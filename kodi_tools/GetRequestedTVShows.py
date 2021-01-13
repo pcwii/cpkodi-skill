@@ -106,9 +106,6 @@ def get_episode(api_path, show_id, show_data):
                 "thumbnail",
                 "playcount"
             ],
-            "filter": {
-                "and": search_key
-            },
         }
     }
     try:
