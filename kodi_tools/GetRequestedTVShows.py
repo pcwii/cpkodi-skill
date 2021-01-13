@@ -98,6 +98,7 @@ def get_episode(api_path, show_id, show_data):
         "params": {
             "tvshowid": int(show_id),
             "season": int(show_data['season']),
+            "episode": int(show_data['episode']),
             "properties": [
                 "season",
                 "episode",
@@ -109,8 +110,8 @@ def get_episode(api_path, show_id, show_data):
         }
     }
     kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
-    LOG.info(json.loads(kodi_response.text))
     item_list = json.loads(kodi_response.text)["result"]["episodes"]
+    LOG.info(item_list)
     for each_item in item_list:
         if each_item["episode"] == show_data['episode']:
             return each_item
