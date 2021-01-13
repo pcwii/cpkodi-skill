@@ -7,9 +7,9 @@ Utilize the kodi API and Python library for controlling the KODI open source med
 The Kodi Skill uses conversational dialog to help you to control your KODI instance more naturally. 
 
 ## Examples -Movies-
-*[ ] "play the movie guardians of the galaxy"
-*[ ] "play the film planet of the apes"
-*[ ] "play a random movie"
+*[x] "play the movie guardians of the galaxy"
+*[x] "play the film planet of the apes"
+*[x] "play a random movie"
 *[ ] "turn kodi subtitles on"
 *[ ] "turn kodi subtitles off"
 *[ ] "skip kodi forward"
@@ -19,14 +19,14 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 *[ ] "stop the movie"
 *[ ] "show kodi movie information"
 *[ ] "hide kodi movie information"
-*[ ] "list recently added movies"
-*[ ] "list the movies by genre"
-*[ ] "list the movies by studio"
-*[ ] "list movie sets"
-*[ ] "list movies by title"
-*[ ] "list movies by actor"
-*[ ] "list all movies"
-*[ ] "clear the movie playlist"
+*[x] "list recently added movies"
+*[x] "list the movies by genre"
+*[x] "list the movies by studio"
+*[x] "list movie sets"
+*[x] "list movies by title"
+*[x] "list movies by actor"
+*[x] "list all movies"
+*[x] "clear the movie playlist"
 * **Movie titles containing Roman Numerals will automatically be searched**
 **eg.** 
 *[x] "play the movie star wars 3" - will locate *star wars III* 
@@ -47,7 +47,7 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 *[x] "play helix with youtube”
 *[x] "play some Elton John using youtube"
 ## Examples -TV Shows-
-*[ ] "play the outer limits season 1 episode 2”
+*[x] "play the outer limits season 1 episode 2”
 ## Examples -Miscellaneous-
 *[x] "pause kodi"
 *[x] "re-start kodi"
