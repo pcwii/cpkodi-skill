@@ -71,10 +71,10 @@ using conversational context.
 * Response: "I have located 3 movies with the name Iron Man, 
 * Response: "Would you like me to list them?"
 * Request: "yes"
-* Response: "Iron Man, to add to Playlist say Add, to Skip, say Next, say play, to play, or Cancel, to stop"
+* Response: "Iron Man, To Add this selection to the playlist say, Add, To Skip, say Next, Say start, to play, or Stop, to stop"
 * Request: "next"
 * Response: "Iron Man 2"
-* Request: "play" / "select"
+* Request: "start" / "select"
 * Response: "o-k, attempting to play, Iron Man 2"
 ## Cinemavision Addon
 - [ ] If mycroft.ai locates the addon CinemaVision it will prompt the user if this addon should be used during the 
