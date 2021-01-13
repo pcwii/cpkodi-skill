@@ -437,8 +437,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.active_library = data["library"]  # a results playlist of what was found
         playlist_count = len(self.active_library)  # how many items were returned
         playlist_dict = []
-        try:
-        # if True:
+        if True:
             if request_data['youtube']['active']:
                 """
                     if Type is youtube then plugin and source has already been confirmed so go ahead and play
@@ -486,10 +485,20 @@ class CPKodiSkill(CommonPlaySkill):
                     playlist_dict.append(song_id)
                 # Todo: add the Cast Option here
                 self.clear_queue_and_play(playlist_dict, 'audio') # Pass the entire Music Structure
-        except Exception as e:
-            self.dLOG('An error was detected in: CPS_match_query_phrase')
-            LOG.error(e)
-            self.on_websettings_changed()
+            if request_data['tv']['active']:
+                """
+                    If type is TV Episode if one then add to playlist and play
+                """
+                self.dLOG('Preparing to Play TV Show' + str(self.active_library))
+                self.dLOG('Returned Library Length = ' + str(len(data["library"])))
+                if len(data["library"]) == 1:  # Only one item was returned so go ahead and play
+                    episode_id = str(self.active_library[0]["episodeid"])
+                    # Todo: add the Cast Option here
+                    playlist_dict.append(episode_id)
+                    if request_data['chromecast']['active']:
+                        self.cast_play(episode_id)
+                    else:
+                        self.clear_queue_and_play(playlist_dict, 'tv')
 
     def clear_queue_and_play(self, playlist_items, playlist_type):
         result = None
@@ -518,7 +527,7 @@ class CPKodiSkill(CommonPlaySkill):
                                                        "result_label": str(playlist_label)},
                                   expect_response=False)
                 time.sleep(2)  # wait for playlist before playback
-                result = play_normal(self.kodi_path, playlist_type)
+                result = play_pl(self.kodi_path, playlist_type)
             if "OK" in result.text:
                 self.dLOG("Now Playing..." + str(result.text))
                 result = None

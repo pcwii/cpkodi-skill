@@ -9,6 +9,9 @@ def create_playlist(kodi_path, id_dict, media_type):
     if ("movie" in media_type) or ("video" in media_type):
         pl_id = 1
         id_type = "movieid"
+    elif "tv" in media_type:
+        pl_id = 1
+        id_type = "episodeid"
     else:
         pl_id = 0
         id_type = "songid"

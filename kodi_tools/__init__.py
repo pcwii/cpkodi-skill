@@ -13,7 +13,7 @@ from .HideSubtitles import hide_subtitles
 from .MoveCursor import move_cursor
 from .PausePlayer import pause_all
 from .PlaylistClear import playlist_clear
-from .PlayNormal import play_normal
+from .Playback import play_pl
 from .PlayYT import play_yt
 from .PostNotification import post_notification
 from .ResumePlayer import resume_play
