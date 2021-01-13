@@ -108,13 +108,9 @@ def get_episode(api_path, show_id, show_data):
             ],
         }
     }
-    try:
-        kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
-        item_list = json.loads(kodi_response.text)["result"]["episodes"]
-        for each_item in item_list:
-            if each_item["episode"] == show_data['episode']:
-                return each_item
-        return None  # returns a dictionary of matched movies
-    except Exception as e:
-        LOG.info(e)
-        return None
+    kodi_response = requests.post(api_path, data=json.dumps(kodi_payload), headers=json_header)
+    item_list = json.loads(kodi_response.text)["result"]["episodes"]
+    for each_item in item_list:
+        if each_item["episode"] == show_data['episode']:
+            return each_item
+    return None  # returns a dictionary of matched movies
