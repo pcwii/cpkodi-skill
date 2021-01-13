@@ -12,7 +12,7 @@ def get_tv_show(kodi_path, show_data):
     api_path = kodi_path + "/jsonrpc"
     show_id = get_show(api_path, show_data["title"])[0]["tvshowid"]
     LOG.info('Found ShowID: ' + str(show_id))
-    episode_details = get_episode(api_path, show_id, show_data["season"], show_data["episode"])
+    episode_details = get_episode(api_path, show_id, show_data)
     LOG.info('Found Episode Details: ' + str(episode_details))
     return episode_details
 
@@ -78,16 +78,16 @@ def get_show(api_path, search_data):
     return clean_list  # returns a dictionary of matched movies
 
 
-def get_episode(api_path, showID, show_data):
+def get_episode(api_path, show_id, show_data):
     """
-        1. need to confirm the TVShow (returns tvshowID)
+        1. need to confirm the TVShow (returns tvshow_id)
         2. Search for VideoLibrary.GetSeasons (uses Season number as integer)
         3. Search for VideoLibrary.GetEpisodes (uses episode number as integer)
     """
     search_key = {
         "field": "episode",
         "operator": "contains",
-        "value": int(showID)
+        "value": int(show_id)
     }
     json_header = {'content-type': 'application/json'}
     method = "VideoLibrary.GetEpisodes"
