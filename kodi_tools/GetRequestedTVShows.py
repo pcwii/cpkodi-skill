@@ -97,7 +97,7 @@ def get_episode(api_path, show_id, show_data):
         "method": method,
         "params": {
             "tvshowid": int(show_id),
-            "season": show_data['season'],
+            "season": int(show_data['season']),
             "properties": [
                 "season",
                 "episode",
