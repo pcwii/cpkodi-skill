@@ -84,11 +84,6 @@ def get_episode(api_path, show_id, show_data):
         2. Search for VideoLibrary.GetSeasons (uses Season number as integer)
         3. Search for VideoLibrary.GetEpisodes (uses episode number as integer)
     """
-    search_key = {
-        "field": "episode",
-        "operator": "contains",
-        "value": int(show_data['episode'])
-    }
     json_header = {'content-type': 'application/json'}
     method = "VideoLibrary.GetEpisodes"
     kodi_payload = {
@@ -98,7 +93,6 @@ def get_episode(api_path, show_id, show_data):
         "params": {
             "tvshowid": int(show_id),
             "season": int(show_data['season']),
-            "episode": int(show_data['episode']),
             "properties": [
                 "season",
                 "episode",
@@ -113,6 +107,6 @@ def get_episode(api_path, show_id, show_data):
     item_list = json.loads(kodi_response.text)
     LOG.info(item_list)
     for each_item in item_list:
-        if each_item["episode"] == show_data['episode']:
+        if int(each_item["episode"]) == int(show_data['episode']):
             return each_item
     return None  # returns a dictionary of matched movies
