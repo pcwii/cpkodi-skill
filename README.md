@@ -7,64 +7,64 @@ Utilize the kodi API and Python library for controlling the KODI open source med
 The Kodi Skill uses conversational dialog to help you to control your KODI instance more naturally. 
 
 ## Examples -Movies-
-*[x] "play the movie guardians of the galaxy"
-*[x] "play the film planet of the apes"
-*[x] "play a random movie"
-*[ ] "turn kodi subtitles on"
-*[ ] "turn kodi subtitles off"
-*[ ] "skip kodi forward"
-*[ ] "skip kodi backward"
-*[ ] "pause the film"
-*[ ] "re-start the film"
-*[ ] "stop the movie"
-*[ ] "show kodi movie information"
-*[ ] "hide kodi movie information"
-*[x] "list recently added movies"
-*[x] "list the movies by genre"
-*[x] "list the movies by studio"
-*[x] "list movie sets"
-*[x] "list movies by title"
-*[x] "list movies by actor"
-*[x] "list all movies"
-*[x] "clear the movie playlist"
+-[x] "play the movie guardians of the galaxy"
+-[x] "play the film planet of the apes"
+-[x] "play a random movie"
+-[ ] "turn kodi subtitles on"
+-[ ] "turn kodi subtitles off"
+-[ ] "skip kodi forward"
+-[ ] "skip kodi backward"
+-[ ] "pause the film"
+-[ ] "re-start the film"
+-[ ] "stop the movie"
+-[ ] "show kodi movie information"
+-[ ] "hide kodi movie information"
+-[x] "list recently added movies"
+-[x] "list the movies by genre"
+-[x] "list the movies by studio"
+-[x] "list movie sets"
+-[x] "list movies by title"
+-[x] "list movies by actor"
+-[x] "list all movies"
+-[x] "clear the movie playlist"
 * **Movie titles containing Roman Numerals will automatically be searched**
 **eg.** 
-*[x] "play the movie star wars 3" - will locate *star wars III* 
+-[x] "play the movie star wars 3" - will locate *star wars III* 
 ## Examples -Music-
-*[x] "play the artist elvis presley”
-*[x] "play the song blue suede shoes"
-*[x] "play the album appeal to reason”
-*[x] "the song Cinematic by Owl City"
-*[x] "the album Cinematic by Owl City"
-*[x] "play some music" --will play a random selection
-*[x] "clear the music playlist"
-*[x] "pause the music"
-*[x] "resume the music"
+-[x] "play the artist elvis presley”
+-[x] "play the song blue suede shoes"
+-[x] "play the album appeal to reason”
+-[x] "the song Cinematic by Owl City"
+-[x] "the album Cinematic by Owl City"
+-[x] "play some music" --will play a random selection
+-[x] "clear the music playlist"
+-[x] "pause the music"
+-[x] "resume the music"
 ## Examples -Youtube-
 - Requires Youtube Kodi [Plugin](https://github.com/anxdpanic/plugin.video.youtube/releases)
 - Requires Youtube Kodi [API](https://github.com/anxdpanic/plugin.video.youtube/wiki/Personal-API-Keys)
-*[x] "play the captain marvel official trailer from youtube”
-*[x] "play helix with youtube”
-*[x] "play some Elton John using youtube"
+-[x] "play the captain marvel official trailer from youtube”
+-[x] "play helix with youtube”
+-[x] "play some Elton John using youtube"
 ## Examples -TV Shows-
-*[x] "play the outer limits season 1 episode 2”
+-[x] "play the outer limits season 1 episode 2”
 ## Examples -Miscellaneous-
-*[x] "pause kodi"
-*[x] "re-start kodi"
-*[x] "stop kodi"
-*[x] "clear the kodi playlist"
-*[x] "set kodi volume to 100"
-*[x] "set kodi volume to 25"
-*[x] "turn kodi notifications on"
-*[x] "turn kodi notifications off"
-*[ ] "move the kodi cursor up / down / left / right / back / select / cancel"
+-[x] "pause kodi"
+-[x] "re-start kodi"
+-[x] "stop kodi"
+-[x] "clear the kodi playlist"
+-[x] "set kodi volume to 100"
+-[x] "set kodi volume to 25"
+-[x] "turn kodi notifications on"
+-[x] "turn kodi notifications off"
+-[ ] "move the kodi cursor up / down / left / right / back / select / cancel"
   - After the first cursor command just say the direction "up / down / left / right / back / select / cancel"
-*[x] "move the kodi cursor right 3 times"
-*[x] "move the kodi cursor down twice"
-*[ ] "update the kodi library"
-*[ ] "clean the kodi library"
+-[x] "move the kodi cursor right 3 times"
+-[x] "move the kodi cursor down twice"
+-[ ] "update the kodi library"
+-[ ] "clean the kodi library"
 ## Conversational Context
-*[ ] If mycroft.ai locates more than one movie that matches your request it will permit you to itterate through your requests
+-[ ] If mycroft.ai locates more than one movie that matches your request it will permit you to itterate through your requests
 using conversational context.
 * eg. "hey mycroft:"
 * Request: "play the move Iron Man"
@@ -77,13 +77,13 @@ using conversational context.
 * Request: "play" / "select"
 * Response: "o-k, attempting to play, Iron Man 2"
 ## Cinemavision Addon
-*[ ] If mycroft.ai locates the addon CinemaVision it will prompt the user if this addon should be used during the 
+-[ ] If mycroft.ai locates the addon CinemaVision it will prompt the user if this addon should be used during the 
 playback of the movie that was selected.
 * Response: "Would you like to play the movie using cinemavision?"
 * Request: "yes / no"
 ## Chromecast Support
 CP Kodi skill is capable of "casting" any of your personal library files to a chromecast enabled device
-*[ ] "cast the movie guardians of the galaxy"
+-[ ] "cast the movie guardians of the galaxy"
 ## Credits 
 * PCWii
 ## Category
