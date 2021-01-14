@@ -27,7 +27,7 @@ def search_youtube(query, location_code="US",
     params = {"search_query": query,
               "gl": location_code}
 
-    # TODO dont cache if no results found
+    # TODO don't cache if no results found
     html = session.get(base_url + "/results",
                        headers=headers, params=params).text
 

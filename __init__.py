@@ -23,10 +23,9 @@ from mycroft.util.parse import extract_number, match_one, fuzzy_match
 from mycroft.util.log import LOG
 from mycroft.audio import wait_while_speaking
 from mycroft.messagebus import Message
-# Todo: begin GUI
+# Todo: begin GUI implementation
 # from mycroft.enclosure.gui import SkillGUI
 from mycroft.skills.core import resting_screen_handler
-
 
 _author__ = 'PCWii'
 # Release - '20201229 - Covid-19 Build'
@@ -47,7 +46,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.cast_device = ""
         self.cc_device_list = ""
         self.cc_status = None
-        #self.friendly_names = ""
+        # self.friendly_names = ""
         self.kodi_path = ""
         self.kodi_image_path = ""
         self.kodi_filesystem_path = ""
@@ -83,8 +82,6 @@ class CPKodiSkill(CommonPlaySkill):
         kodi_port = self.settings.get("kodi_port", "8080")
         kodi_user = self.settings.get("kodi_user", "")
         kodi_pass = self.settings.get("kodi_pass", "")
-        #self.kodi_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
-                         #str(kodi_port) + "/jsonrpc"
         self.kodi_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + str(kodi_port)
 
         LOG.info(self.kodi_path)
@@ -144,12 +141,6 @@ class CPKodiSkill(CommonPlaySkill):
                 self.dLOG('An error was detected in: handle_speak, ' + str(e))
                 self.on_websettings_changed()
 
-    def display_image(self, image_path, caption=""):
-        # Todo: begin GUI integration
-        self.dLOG('GUI Integration not active')
-        #self.gui.show_image(image_path, override_idle=True,
-        #                    fill='PreserveAspectFit', caption=caption)
-
     def translate_regex(self, regex):
         """
             All requests types are added here and return the requested items
@@ -194,7 +185,8 @@ class CPKodiSkill(CommonPlaySkill):
     def split_compound(self, sentence):
         """
             Used to split compound words that are found in the utterance
-            This will make it easier to confirm that all words are found in the search
+            This will make it easier to confirm that all words are found in the search if we filter each part of
+            the compound word
         """
         search_words = re.split(r'\W+', str(sentence))
         separator = " "
@@ -395,7 +387,7 @@ class CPKodiSkill(CommonPlaySkill):
                         self.dLOG('Searching for Random music')
                         results = self.random_music_select()
                     else:
-                        results = get_requested_music(self.kodi_path, request_data['music']) # Type is not required
+                        results = get_requested_music(self.kodi_path, request_data['music'])  # Type is not required
                         self.dLOG("Found: " + str(results))
                 if request_data['tv']['active']:
                     request_type = request_data['tv']['type']
@@ -484,7 +476,7 @@ class CPKodiSkill(CommonPlaySkill):
                     song_id = str(each_item["songid"])
                     playlist_dict.append(song_id)
                 # Todo: add the Cast Option here
-                self.clear_queue_and_play(playlist_dict, 'audio') # Pass the entire Music Structure
+                self.clear_queue_and_play(playlist_dict, 'audio')  # Pass the entire Music Structure
             if request_data['tv']['active']:
                 """
                     If type is TV Episode if one then add to playlist and play
@@ -506,7 +498,6 @@ class CPKodiSkill(CommonPlaySkill):
                     wait_while_speaking()
                     self.speak_dialog('no.results', data={"result": str(data["request"])}, expect_response=False)
 
-
     def clear_queue_and_play(self, playlist_items, playlist_type):
         result = None
         if playlist_type == "movie":
@@ -514,7 +505,7 @@ class CPKodiSkill(CommonPlaySkill):
         else:
             playlist_label = ""
         try:
-        # if True:  # Remove after testing
+            # if True:  # Remove after testing
             result = playlist_clear(self.kodi_path, playlist_type)
             if "OK" in result.text:
                 result = None
@@ -523,7 +514,7 @@ class CPKodiSkill(CommonPlaySkill):
             if "OK" in result.text:
                 result = None
                 self.dLOG("Add Playlist Successful: " + str(playlist_items))
-                # Todo: This displays a random image
+                # Todo: This displays a random image Update with proper thumbnails
                 self.gui.clear()
                 self.enclosure.display_manager.remove_active()
                 self.gui.show_image("https://source.unsplash.com/1920x1080/?+random",
@@ -547,8 +538,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.dLOG('Random Movie Selected')
         full_list = get_all_movies(self.kodi_path)
         random_id = random.randint(1, len(full_list))
-        random_entry = []
-        random_entry.append(full_list[random_id])
+        random_entry = [full_list[random_id]]
         return random_entry
 
     def random_music_select(self):
@@ -567,7 +557,7 @@ class CPKodiSkill(CommonPlaySkill):
         cc_devices = ""
         for each_cc in self.cc_device_list:
             cc_devices = cc_devices + ", " + each_cc['name']
-        #self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
+        # self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
         url_path = get_movie_path(self.kodi_path, movie_id)
         self.dLOG("casting the file: " + url_path)
         self.cc_status = cc_cast_file(self.cast_device, url_path)
@@ -576,6 +566,7 @@ class CPKodiSkill(CommonPlaySkill):
     """
         All vocal intents appear here
     """
+
     # stop kodi was requested in the utterance
     @intent_handler(IntentBuilder("").require("StopKeyword").one_of("AudioItemKeyword",
                                                                     "FilmItemKeyword",
@@ -594,7 +585,7 @@ class CPKodiSkill(CommonPlaySkill):
             else:
                 self.dLOG('Kodi does not appear to be playing anything at the moment')
                 # Check Chromecast
-                #self.cc_status = cc_stop(self.cast_device, self.cc_status["media_session_id"])
+                # self.cc_status = cc_stop(self.cast_device, self.cc_status["media_session_id"])
         except Exception as e:
             self.dLOG('An error was detected in: handle_stop_intent')
             LOG.error(e)
@@ -749,15 +740,15 @@ class CPKodiSkill(CommonPlaySkill):
             This will walk you through each movie in the found list
         """
         last_index = len(self.active_library) - 1
-        self.dLOG("list length is: " + str(len(self.active_library)) + ", Processing item: " + str(self.active_index+1))
+        self.dLOG(
+            "list length is: " + str(len(self.active_library)) + ", Processing item: " + str(self.active_index + 1))
         if "AddKeyword" in message.data:
             """
                 User requested to add this item to the playlist
                 Context does not change
             """
             self.dLOG('User responded with...' + message.data.get('AddKeyword'))
-            playlist_dict = []
-            playlist_dict.append(self.active_library[self.active_index]['movieid'])
+            playlist_dict = [self.active_library[self.active_index]['movieid']]
             create_playlist(self.kodi_path, playlist_dict, "movie")
             """
                 Next we must read back the next item in the list and ask what to do
@@ -792,8 +783,7 @@ class CPKodiSkill(CommonPlaySkill):
             """
             self.dLOG('User responded with...' + message.data.get('StartKeyword'))
             self.set_context('ListContextKeyword', '')
-            playlist_dict = []
-            playlist_dict.append(self.active_library[self.active_index]['movieid'])
+            playlist_dict = [self.active_library[self.active_index]['movieid']]
             self.active_index = 0
             self.clear_queue_and_play(playlist_dict, "movie")
         elif "StopKeyword" in message.data:
@@ -964,7 +954,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
             This intent will re-format the request and send it to the messagebus to be handled by the
             common play system
-            "cast something" will be re-formated to "play something with chromecast"
+            "cast something" will be re-formatted to "play something with chromecast"
         """
         self.cc_device_list = cc_get_names()
         if self.enable_chromecast and self.cc_device_list:

@@ -63,8 +63,6 @@ def get_requested_movies(kodi_path, search_words):
     """
     api_path = kodi_path + "/jsonrpc"
     all_numbers = [int(s) for s in search_words if s.isdigit()]
-    # Todo: The following does not work for words
-    # all_words = ''.join((item for item in search_words if not item.isdigit())).split()
     all_words = [item for item in search_words if not (item.isdigit() or item[0] == '-' and item[1:].isdigit())]
     LOG.info('Searching Movies for... ' + str(search_words))
     LOG.info('Movies keydigits... ' + str(all_numbers))
