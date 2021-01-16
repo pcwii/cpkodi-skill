@@ -1,4 +1,5 @@
-from os.path import dirname
+#from os.path import dirname, join
+import os
 import re
 import sys
 import splitter
@@ -62,7 +63,7 @@ class CPKodiSkill(CommonPlaySkill):
         # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
-        self.load_data_files(dirname(__file__))
+        self.load_data_files(os.path.dirname(__file__))
         self.on_websettings_changed()
         self.add_event('recognizer_loop:wakeword', self.handle_listen)
         self.add_event('recognizer_loop:utterance', self.handle_utterance)
@@ -148,7 +149,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         self.regexes = {}
         if regex not in self.regexes:
-            path = self.find_resource(regex + '.regex')
+            path = self.find_resource(regex + '.rx')
             if path:
                 with open(path) as f:
                     string = f.read().strip()
@@ -167,13 +168,11 @@ class CPKodiSkill(CommonPlaySkill):
         """
         repeat_value = 0
         value = re.findall(r'\d+', message)
-        path = self.find_resource("MultiplicativeList.json")
         if value:
             repeat_value = value[0]
             self.dLOG("Multiplicative returning the value, " + str(repeat_value))
         else:
-            with open(path) as f:
-                data = json.load(f)
+            data = self.load_object_file("MultiplicativeList.json")
             self.dLOG(str(data))
             for each_item in data:
                 if each_item in message:
@@ -194,15 +193,20 @@ class CPKodiSkill(CommonPlaySkill):
         words_list = [list_item.strip() for list_item in raw_list]
         return words_list
 
+    def load_object_file(self, filename):  # loads the workout file json
+        location = os.path.dirname(os.path.realpath(__file__))
+        object_file = location + '/./json_objects/' + filename  # get the current skill parent directory path
+        with open(object_file) as json_file:
+            data = json.load(json_file)
+            return data
+
     def get_request_info(self, phrase):
         """
         Retrieve the base data structure form the json file
         parse the phrase with regex to determine what is being requested
         populate the dataStructure accordingly
         """
-        resource_path = self.find_resource("baseDataStructure.json")
-        with open(resource_path) as resource_file:
-            request_info = json.load(resource_file)
+        request_info = self.load_object_file("baseDataStructure.json")
         # self.dLOG(str(request_info))
         request_info['utterance'] = phrase
         """
