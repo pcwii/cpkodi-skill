@@ -1,4 +1,3 @@
-#from os.path import dirname, join
 import os
 import re
 import sys
