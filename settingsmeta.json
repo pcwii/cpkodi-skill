@@ -6,7 +6,7 @@
                 "fields": [
                     {
                         "type": "label",
-                        "label": "Complete the data for the following settings. If you have no password leave it blank."
+                        "label": "Dev- Complete the data for the following settings. If you have no password leave it blank."
                     },
                     {
                         "name": "kodi_ip",
