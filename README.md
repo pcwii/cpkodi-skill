@@ -109,7 +109,6 @@ Tested on platform_picroft (others untested)
 - [CinemaVision](https://kodi.wiki/view/Add-on:CinemaVision)
 ## Installation Notes
 - SSH to your device and run: `msm install https://github.com/pcwii/cpkodi-skill.git`
-- **DEV** `msm install https://github.com/pcwii/cpkodi-skill.git`
 - Configure Kodi to “allow remote control via HTTP”, under the Kodi settings:services
 - Configure Kodi to “allow remote control from applications on other systems”, under the Kodi settings:services
 - Under Kodi settings:services note the port number (8080)
