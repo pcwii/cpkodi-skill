@@ -147,8 +147,11 @@ class CPKodiSkill(CommonPlaySkill):
             A <item>.type.regex should exist in the local/en-us
         """
         self.regexes = {}
+        self.dLOG("Using Regex: " + regex)
         if regex not in self.regexes:
-            path = self.find_resource(regex + '.rx')
+            filename = regex + '.rx'
+            location = os.path.dirname(os.path.realpath(__file__))
+            path = location + '/./json_objects/' + filename
             if path:
                 with open(path) as f:
                     string = f.read().strip()
