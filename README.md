@@ -1,4 +1,4 @@
-![](images/cpkodi.png) <!-- .element height="50px" width="50px" -->
+![](images/cpkodi.png width=50px)
  #CP Kodi Control
 
 Control KODI open source media center with Mycroft.ai using the Common Play architecture
