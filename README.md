@@ -1,5 +1,4 @@
-**Be aware that this repo is currently undergoing development and Testing. As a result breaking changes may be introduced occassionally during testing**
-# <img src='https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/tv.svg' card_color='#40DBB0' width='50' height='50' style='vertical-align:bottom'/> CP Kodi Control
+# <img src='./images/usbmusic.png' card_color='#40DBB0' width='50' height='50' style='vertical-align:bottom'/> CP Kodi Control
 Control KODI open source media center with Mycroft.ai using the Common Play architecture
 
 ## About 
