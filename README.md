@@ -1,4 +1,6 @@
-# <img src='./images/usbmusic.png' card_color='#40DBB0' width='50' height='50' style='vertical-align:bottom'/> CP Kodi Control
+![](images/cpkodi.png) <!-- .element height="50px" width="50px" -->
+ #CP Kodi Control
+
 Control KODI open source media center with Mycroft.ai using the Common Play architecture
 
 ## About 
