@@ -21,7 +21,7 @@ from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.skills.core import intent_handler, intent_file_handler
 from mycroft.util.parse import extract_number, match_one, fuzzy_match
 from mycroft.util.log import LOG
-from mycroft.audio import wait_while_speaking
+# from mycroft.audio import wait_while_speaking
 from mycroft.messagebus import Message
 # Todo: begin GUI implementation
 # from mycroft.enclosure.gui import SkillGUI
@@ -83,9 +83,7 @@ class CPKodiSkill(CommonPlaySkill):
         kodi_user = self.settings.get("kodi_user", "")
         kodi_pass = self.settings.get("kodi_pass", "")
         self.kodi_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + str(kodi_port)
-
         LOG.info(self.kodi_path)
-        # Todo: Confirm these paths work with username and passwords
         self.kodi_image_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
                                str(kodi_port) + "/image/"
         self.kodi_filesystem_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
@@ -428,10 +426,10 @@ class CPKodiSkill(CommonPlaySkill):
             data contains the following json data
             {
                 "library": results,  # Contains the playlist items
-                "details": request_data  # Contains the json object for the request
+                "details": request_data  # Contains the json object for the request "baseDataStructure.json"
             }
         """
-        request_data = data["details"]  # the original data
+        request_data = data["details"]  # the original request data
         self.active_library = data["library"]  # a results playlist of what was found
         playlist_count = len(self.active_library)  # how many items were returned
         playlist_dict = []
@@ -447,8 +445,10 @@ class CPKodiSkill(CommonPlaySkill):
                 else:  # Youtube Requests does not contain a playlist item
                     yt_id = self.active_library['videos'][0]['videoId']
                     yt_title = self.active_library['videos'][0]['title']
-                wait_while_speaking()
-                self.speak_dialog('play.youtube', data={"result": str(yt_title)}, expect_response=False)
+                self.speak_dialog('play.youtube',
+                                  data={"result": str(yt_title)},
+                                  expect_response=False,
+                                  wait=True)
                 self.dLOG('Attempting to Play youtube items: ' + str(yt_title))
                 play_yt(self.kodi_path, yt_id)
             if request_data['movies']['active']:
@@ -459,7 +459,6 @@ class CPKodiSkill(CommonPlaySkill):
                 self.dLOG('Returned Library Length = ' + str(len(data["library"])))
                 if len(data["library"]) == 1:  # Only one item was returned so go ahead and play
                     movie_id = str(self.active_library[0]["movieid"])
-                    # Todo: add the Cast Option here
                     playlist_dict.append(movie_id)
                     if request_data['chromecast']['active']:
                         self.cast_play(movie_id)
@@ -468,11 +467,15 @@ class CPKodiSkill(CommonPlaySkill):
                 elif len(data["library"]) > 1:  # confirm the library does not have a zero length or is None
                     # Todo: give the option to add all items to the playlist immediately
                     self.set_context('NavigateContextKeyword', 'NavigateContext')
-                    wait_while_speaking()
-                    self.speak_dialog('multiple.results', data={"result": str(playlist_count)}, expect_response=True)
+                    self.speak_dialog('multiple.results',
+                                      data={"result": str(playlist_count)},
+                                      expect_response=True,
+                                      wait=True)
                 else:  # no items were found in the library
-                    wait_while_speaking()
-                    self.speak_dialog('no.results', data={"result": str(data["request"])}, expect_response=False)
+                    self.speak_dialog('no.results',
+                                      data={"result": str(data["request"])},
+                                      expect_response=False,
+                                      wait=True)
             if request_data['music']['active']:
                 """
                     If type is music then add all to playlist and play
@@ -498,11 +501,15 @@ class CPKodiSkill(CommonPlaySkill):
                 elif len(data["library"]) > 1:  # confirm the library does not have a zero length or is None
                     # Todo: give the option to add all items to the playlist immediately
                     self.set_context('NavigateContextKeyword', 'NavigateContext')
-                    wait_while_speaking()
-                    self.speak_dialog('multiple.results', data={"result": str(playlist_count)}, expect_response=True)
+                    self.speak_dialog('multiple.results',
+                                      data={"result": str(playlist_count)},
+                                      expect_response=True,
+                                      wait=True)
                 else:  # no items were found in the library
-                    wait_while_speaking()
-                    self.speak_dialog('no.results', data={"result": str(data["request"])}, expect_response=False)
+                    self.speak_dialog('no.results',
+                                      data={"result": str(data["request"])},
+                                      expect_response=False,
+                                      wait=True)
 
     def clear_queue_and_play(self, playlist_items, playlist_type):
         result = None
@@ -526,10 +533,10 @@ class CPKodiSkill(CommonPlaySkill):
                 self.gui.show_image("https://source.unsplash.com/1920x1080/?+random",
                                     "Example Long Caption That Needs Wrapping Very Long Long Text Text Example That Is",
                                     "Example Title")
-                wait_while_speaking()
-                self.speak_dialog("now.playing", data={"result_type": str(playlist_type),
-                                                       "result_label": str(playlist_label)},
-                                  expect_response=False)
+                self.speak_dialog("now.playing",
+                                  data={"result_type": str(playlist_type), "result_label": str(playlist_label)},
+                                  expect_response=False,
+                                  wait=True)
                 time.sleep(2)  # wait for playlist before playback
                 result = play_pl(self.kodi_path, playlist_type)
             if "OK" in result.text:
@@ -558,20 +565,48 @@ class CPKodiSkill(CommonPlaySkill):
             random_entry.append(full_list[int(each_id)])
         return random_entry
 
-    def cast_play(self, movie_id):
+    def cast_play(self, item_id):
         # Todo: provide dialog for multiple cast devices
         cc_devices = ""
-        for each_cc in self.cc_device_list:
-            cc_devices = cc_devices + ", " + each_cc['name']
-        # self.speak_dialog('list.chromecast', data={"result": str(cc_devices)}, expect_response=False)
-        url_path = get_movie_path(self.kodi_path, movie_id)
-        self.dLOG("casting the file: " + url_path)
-        self.cc_status = cc_cast_file(self.cast_device, url_path)
-        self.dLOG(self.cc_status)
+        if len(self.cc_device_list) > 1:  # Found more than 1 CC device on network
+            # Begin Context Dialog for choosing Chromecast
+            self.set_context('CastContextKeyword', 'CastContext')
+            self.set_context('ListCCContextKeyword', '')
+            self.speak_dialog('multiple.cc.results',
+                              data={"result": str(len(self.cc_device_list))},
+                              expect_response=True,
+                              wait=True)
+        else:
+            # Go ahead and cast the item since only one was CC found
+            self.set_context('CastContextKeyword', '')
+            self.set_context('ListCCContextKeyword', '')
+            url_path = get_movie_path(self.kodi_path, item_id)
+            self.dLOG("casting the file: " + url_path)
+            self.cc_status = cc_cast_file(self.cast_device, url_path)
+            self.dLOG(self.cc_status)
 
     """
         All vocal intents appear here
     """
+    @intent_handler(IntentBuilder('').require('CastContextKeyword').one_of('YesKeyword', 'NoKeyword'))
+    def handle_cc_decision_intent(self, message):
+        """
+            The user answered Yes/No to the question Would you like me to list the CC devices
+        """
+        self.set_context('CastContextKeyword', '')  # Clear the context
+        if "YesKeyword" in message.data:
+            """
+                If yes was spoken the read the first item and request next steps
+            """
+            self.dLOG('User responded with...' + message.data.get('YesKeyword'))
+            self.set_context('ListCCContextKeyword', 'ListCCContext')
+            # msg_payload = str(self.active_library[self.active_index]['label'])
+            # self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
+        else:  # No was spoken to navigate the list, reading the first item
+            self.dLOG('User responded with...' + message.data.get('NoKeyword'))
+            self.speak_dialog('cancel',
+                              expect_response=False,
+                              wait=True)
 
     # stop kodi was requested in the utterance
     @intent_handler(IntentBuilder("").require("StopKeyword").one_of("AudioItemKeyword",
@@ -587,7 +622,9 @@ class CPKodiSkill(CommonPlaySkill):
                 result = stop_kodi(self.kodi_path, active_player_id)
                 if "OK" in result.text:
                     self.dLOG("Stopped")
-                    self.speak_dialog('stopped', expect_response=False)
+                    self.speak_dialog('stopped',
+                                      expect_response=False,
+                                      wait=True)
             else:
                 self.dLOG('Kodi does not appear to be playing anything at the moment')
                 # Check Chromecast
@@ -609,7 +646,9 @@ class CPKodiSkill(CommonPlaySkill):
                 result = pause_all(self.kodi_path, active_player_id)
                 if "OK" in result.text:
                     self.dLOG("paused")
-                    self.speak_dialog('paused', expect_response=False)
+                    self.speak_dialog('paused',
+                                      expect_response=False,
+                                      wait=True)
             else:
                 self.dLOG('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
@@ -629,7 +668,9 @@ class CPKodiSkill(CommonPlaySkill):
                 result = resume_play(self.kodi_path, active_player_id)
                 if "OK" in result.text:
                     self.dLOG("Resumed")
-                    self.speak_dialog('resumed', expect_response=False)
+                    self.speak_dialog('resumed',
+                                      expect_response=False,
+                                      wait=True)
             else:
                 self.dLOG('Kodi does not appear to be playing anything at the moment')
         except Exception as e:
@@ -676,13 +717,17 @@ class CPKodiSkill(CommonPlaySkill):
     @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OnKeyword").require("KodiKeyword"))
     def handle_notification_on_intent(self, message):
         self.notifier_bool = True
-        self.speak_dialog("notification.on")
+        self.speak_dialog("notification.on",
+                          expect_response=False,
+                          wait=True)
 
     # turn notifications off requested in the utterance
     @intent_handler(IntentBuilder('').require("NotificationKeyword").require("OffKeyword").require("KodiKeyword"))
     def handle_notification_off_intent(self, message):
         self.notifier_bool = False
-        self.speak_dialog("notification.off")
+        self.speak_dialog("notification.off",
+                          expect_response=False,
+                          wait=True)
 
     # move cursor utterance
     @intent_handler(IntentBuilder('').require('MoveKeyword').require('CursorKeyword').
@@ -717,8 +762,10 @@ class CPKodiSkill(CommonPlaySkill):
             for each_count in range(0, int(repeat_count)):
                 response = move_cursor(self.kodi_path, direction_kw)
                 if "OK" in response.text:
-                    wait_while_speaking()
-                    self.speak_dialog("direction", data={"result": direction_kw}, expect_response=True)
+                    self.speak_dialog("direction",
+                                      data={"result": direction_kw},
+                                      expect_response=True,
+                                      wait=True)
 
     @intent_handler(IntentBuilder('').require('NavigateContextKeyword').one_of('YesKeyword', 'NoKeyword'))
     def handle_navigate_decision_intent(self, message):
@@ -733,10 +780,15 @@ class CPKodiSkill(CommonPlaySkill):
             self.dLOG('User responded with...' + message.data.get('YesKeyword'))
             self.set_context('ListContextKeyword', 'ListContext')
             msg_payload = str(self.active_library[self.active_index]['label'])
-            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
+            self.speak_dialog('navigate',
+                              data={"result": msg_payload},
+                              expect_response=True,
+                              wait=True)
         else:  # No was spoken to navigate the list, reading the first item
             self.dLOG('User responded with...' + message.data.get('NoKeyword'))
-            self.speak_dialog('cancel', expect_response=False)
+            self.speak_dialog('cancel',
+                              expect_response=False,
+                              wait=True)
 
     @intent_handler(IntentBuilder('').require('ListContextKeyword').
                     one_of('AddKeyword', 'NextKeyword', 'StartKeyword', 'StopKeyword'))
@@ -761,8 +813,10 @@ class CPKodiSkill(CommonPlaySkill):
             """
             self.active_index += 1
             msg_payload = str(self.active_library[self.active_index]['label'])
-            wait_while_speaking()
-            self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
+            self.speak_dialog('navigate',
+                              data={"result": msg_payload},
+                              expect_response=True,
+                              wait=True)
         elif "NextKeyword" in message.data:
             """
                 User requested the next item in the list therefore we need to read back
@@ -773,13 +827,17 @@ class CPKodiSkill(CommonPlaySkill):
             self.active_index += 1
             if self.active_index < last_index:  # We have not reached the end of the list
                 msg_payload = str(self.active_library[self.active_index]['label'])
-                wait_while_speaking()
-                self.speak_dialog('navigate', data={"result": msg_payload}, expect_response=True)
+                self.speak_dialog('navigate',
+                                  data={"result": msg_payload},
+                                  expect_response=True,
+                                  wait=True)
             else:
                 self.dLOG('We have reached the last item in the list')
                 msg_payload = str(self.active_library[self.active_index]['label'])
-                wait_while_speaking()
-                self.speak_dialog('last.result', data={"result": msg_payload}, expect_response=True)
+                self.speak_dialog('last.result',
+                                  data={"result": msg_payload},
+                                  expect_response=True,
+                                  wait=True)
                 self.active_index = 0
         elif "StartKeyword" in message.data:
             """
@@ -799,8 +857,9 @@ class CPKodiSkill(CommonPlaySkill):
         else:
             self.set_context('ListContextKeyword', '')
             self.active_index = 0
-            wait_while_speaking()
-            self.speak_dialog('cancel', expect_response=False)
+            self.speak_dialog('cancel',
+                              expect_response=False,
+                              wait=True)
 
     # Adjust the volume in kodi
     @intent_handler(IntentBuilder('').require('SetsKeyword').require('KodiKeyword').require('VolumeKeyword'))
@@ -811,9 +870,15 @@ class CPKodiSkill(CommonPlaySkill):
             if int(volume_level[0]) < 101:
                 new_volume = set_volume(self.kodi_path, int(volume_level[0]))
                 self.dLOG("Kodi Volume Now: " + str(new_volume))
-                self.speak_dialog('volume.set', data={'result': str(new_volume)}, expect_response=False)
+                self.speak_dialog('volume.set',
+                                  data={'result': str(new_volume)},
+                                  expect_response=False,
+                                  wait=True)
             else:
-                self.speak_dialog('volume.error', data={'result': str(int(volume_level[0]))}, expect_response=False)
+                self.speak_dialog('volume.error',
+                                  data={'result': str(int(volume_level[0]))},
+                                  expect_response=False,
+                                  wait=True)
 
     # the user requested to skip the movie timeline forward or backward
     @intent_handler(IntentBuilder('').require("SkipKeyword").optionally('KodiKeyword').optionally('FilmKeyword').
@@ -873,7 +938,10 @@ class CPKodiSkill(CommonPlaySkill):
         result = show_window(self.kodi_path, window_path)
         self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("RecentKeyword")
-        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+        self.speak_dialog('sorted.by',
+                          data={"result": sort_kw},
+                          expect_response=False,
+                          wait=True)
 
     # user has requested to show the movies listed by genres
     @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('GenreKeyword'))
@@ -882,7 +950,10 @@ class CPKodiSkill(CommonPlaySkill):
         result = show_window(self.kodi_path, window_path)
         self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("GenreKeyword")
-        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+        self.speak_dialog('sorted.by',
+                          data={"result": sort_kw},
+                          expect_response=False,
+                          wait=True)
 
     # user has requested to show the movies listed by actor
     @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('ActorKeyword'))
@@ -891,7 +962,10 @@ class CPKodiSkill(CommonPlaySkill):
         result = show_window(self.kodi_path, window_path)
         self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("ActorKeyword")
-        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+        self.speak_dialog('sorted.by',
+                          data={"result": sort_kw},
+                          expect_response=False,
+                          wait=True)
 
     # user has requested to show the movies listed by studio
     @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('StudioKeyword'))
@@ -900,7 +974,10 @@ class CPKodiSkill(CommonPlaySkill):
         result = show_window(self.kodi_path, window_path)
         self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("StudioKeyword")
-        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+        self.speak_dialog('sorted.by',
+                          data={"result": sort_kw},
+                          expect_response=False,
+                          wait=True)
 
     # user has requested to show the movies listed by title
     @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('TitleKeyword'))
@@ -909,7 +986,10 @@ class CPKodiSkill(CommonPlaySkill):
         result = show_window(self.kodi_path, window_path)
         self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("TitleKeyword")
-        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+        self.speak_dialog('sorted.by',
+                          data={"result": sort_kw},
+                          expect_response=False,
+                          wait=True)
 
     # user has requested to show the movies listed by movie sets
     @intent_handler(IntentBuilder('').require("ListKeyword").require('FilmKeyword').require('SetsKeyword'))
@@ -918,7 +998,10 @@ class CPKodiSkill(CommonPlaySkill):
         result = show_window(self.kodi_path, window_path)
         self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("SetsKeyword")
-        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+        self.speak_dialog('sorted.by',
+                          data={"result": sort_kw},
+                          expect_response=False,
+                          wait=True)
 
     # user has requested to show the movies listed all movies
     @intent_handler(IntentBuilder('').require("ListKeyword").require('AllKeyword').require('FilmKeyword'))
@@ -927,7 +1010,10 @@ class CPKodiSkill(CommonPlaySkill):
         result = show_window(self.kodi_path, window_path)
         self.dLOG('Kodi Show Window Result: ' + str(result))
         sort_kw = message.data.get("AllKeyword")
-        self.speak_dialog('sorted.by', data={"result": sort_kw}, expect_response=False)
+        self.speak_dialog('sorted.by',
+                          data={"result": sort_kw},
+                          expect_response=False,
+                          wait=True)
 
     # user has requested to refresh the movie library database
     @intent_handler(IntentBuilder('').require("CleanKeyword").require('KodiKeyword').require('LibraryKeyword'))
@@ -937,7 +1023,10 @@ class CPKodiSkill(CommonPlaySkill):
         self.dLOG('Kodi Update Library Result: ' + str(result))
         # self.music_library = get_all_music(self.kodi_path)
         update_kw = message.data.get("CleanKeyword")
-        self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
+        self.speak_dialog('update.library',
+                          data={"result": update_kw},
+                          expect_response=False,
+                          wait=True)
 
     # user has requested to update the movie database
     @intent_handler(IntentBuilder('').require("ScanKeyword").require('KodiKeyword').require('LibraryKeyword'))
@@ -947,7 +1036,10 @@ class CPKodiSkill(CommonPlaySkill):
         self.dLOG('Kodi Update Library Result: ' + str(result))
         # self.music_library = get_all_music(self.kodi_path
         update_kw = message.data.get("ScanKeyword")
-        self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
+        self.speak_dialog('update.library',
+                          data={"result": update_kw},
+                          expect_response=False,
+                          wait=True)
 
     @intent_handler(IntentBuilder('').require("MuteKeyword").require('KodiKeyword'))
     def handle_mute_toggle_intent(self, message):
@@ -966,13 +1058,17 @@ class CPKodiSkill(CommonPlaySkill):
         if self.enable_chromecast and self.cc_device_list:
             str_remainder = str(message.utterance_remainder())
             self.dLOG('Request to CAST something: ' + str_remainder)
+            # Todo: This is not likely language agnostic
             new_request = "play " + str(str_remainder) + ' with chromecast'
             self.send_message(new_request)
-
         else:
-            self.speak_dialog('no.chromecast', expect_response=False)
+            self.speak_dialog('no.chromecast',
+                              expect_response=False,
+                              wait=True)
             self.on_websettings_changed()
             return False  # if Chromecast is not enabled then fallback to another skill
+
+
 
 
 def create_skill():
