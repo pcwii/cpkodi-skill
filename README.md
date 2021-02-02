@@ -63,6 +63,7 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 - [x] "move the kodi cursor down twice"
 - [ ] "update the kodi library"
 - [ ] "clean the kodi library"
+- [ ] "load kodi settings / configuration"
 ## Conversational Context
 - [x] If mycroft.ai locates more than one movie that matches your request it will permit you to itterate through your requests
 using conversational context.
@@ -76,7 +77,9 @@ using conversational context.
 * Response: "Iron Man 2"
 * Request: "start" / "select"
 * Response: "o-k, attempting to play, Iron Man 2"
-## Cinemavision Addon
+## Cinemavision Addon 
+## This kodi addon is not expected to work in the next kodi release
+## Support for this addon will likely be removed
 - [ ] If mycroft.ai locates the addon CinemaVision it will prompt the user if this addon should be used during the 
 playback of the movie that was selected.
 * Response: "Would you like to play the movie using cinemavision?"

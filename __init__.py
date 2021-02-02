@@ -78,7 +78,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.cast_device = self.settings.get("cast_device", "")
         if len(self.cast_device) == 0:
             self.enable_chromecast = False
-        kodi_ip = self.settings.get("kodi_ip", "192.168.0.32")
+        kodi_ip = self.settings.get("kodi_ip", "0.0.0.0")
         kodi_port = self.settings.get("kodi_port", "8080")
         kodi_user = self.settings.get("kodi_user", "")
         kodi_pass = self.settings.get("kodi_pass", "")
@@ -358,6 +358,7 @@ class CPKodiSkill(CommonPlaySkill):
             We imediatly check for the kodi specific request and strip this from the phase
         """
         # Todo: Handle Cinemavision options
+        # Todo: Cinemavision is not expected to function in the next Kodi Release
         self.dLOG('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
             self.dLOG('CPKodi Skill must be setup at the home.mycroft.ai')
@@ -629,6 +630,7 @@ class CPKodiSkill(CommonPlaySkill):
                 self.dLOG('Kodi does not appear to be playing anything at the moment')
                 # Check Chromecast
                 # self.cc_status = cc_stop(self.cast_device, self.cc_status["media_session_id"])
+            self.on_websettings_changed()
         except Exception as e:
             self.dLOG('An error was detected in: handle_stop_intent')
             LOG.error(e)
@@ -708,6 +710,7 @@ class CPKodiSkill(CommonPlaySkill):
                     if "OK" in result.text:
                         result = None
                         self.dLOG("Clear Video Playlist Successful")
+            self.on_websettings_changed()
         except Exception as e:
             self.dLOG('An error was detected in: handle_clear_playlist_intent')
             LOG.error(e)
@@ -1046,6 +1049,14 @@ class CPKodiSkill(CommonPlaySkill):
         mute_state = mute_kodi(self.kodi_path)
         # self.speak_dialog('update.library', data={"result": update_kw}, expect_response=False)
 
+    @intent_handler(IntentBuilder('').require("LoadKeyword").require('KodiKeyword').require('SettingsKeyword'))
+    def handle_mute_toggle_intent(self, message):
+        self.on_websettings_changed()
+        self.speak_dialog('update.settings',
+                          expect_response=False,
+                          wait=True)
+
+
     # user has requested to cast something
     @intent_handler(IntentBuilder('').require("CastKeyword"))
     def handle_cast_movies_intent(self, message):
@@ -1067,8 +1078,6 @@ class CPKodiSkill(CommonPlaySkill):
                               wait=True)
             self.on_websettings_changed()
             return False  # if Chromecast is not enabled then fallback to another skill
-
-
 
 
 def create_skill():
