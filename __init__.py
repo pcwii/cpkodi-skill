@@ -58,8 +58,8 @@ class CPKodiSkill(CommonPlaySkill):
         self.kodi_specific_request = False
         self.artist_name = None
         self.movie_library = None
+        self.settings_change_callback = self.on_settings_changed
         self._is_setup = False
-        # self.settings_change_callback = self.on_websettings_changed
 
     def initialize(self):
         self.load_data_files(os.path.dirname(__file__))
@@ -1055,7 +1055,6 @@ class CPKodiSkill(CommonPlaySkill):
         self.speak_dialog('update.settings',
                           expect_response=False,
                           wait=True)
-
 
     # user has requested to cast something
     @intent_handler(IntentBuilder('').require("CastKeyword"))
