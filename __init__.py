@@ -148,8 +148,9 @@ class CPKodiSkill(CommonPlaySkill):
         self.dLOG("Using Regex: " + regex)
         if regex not in self.regexes:
             filename = regex + '.rx'
-            location = os.path.dirname(os.path.realpath(__file__))
-            path = location + '/./json_objects/' + filename
+            # location = os.path.dirname(os.path.realpath(__file__))
+            # path = location + '/./json_objects/' + filename #<---This is the wrong path should be ./regex/en-us/
+            path = self.find_resource(filename)
             if path:
                 with open(path) as f:
                     string = f.read().strip()
