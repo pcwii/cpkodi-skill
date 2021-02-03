@@ -63,7 +63,7 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 - [x] "move the kodi cursor down twice"
 - [ ] "update the kodi library"
 - [ ] "clean the kodi library"
-- [ ] "load kodi settings / configuration"
+- [x] "load kodi settings / configuration"
 ## Conversational Context
 - [x] If mycroft.ai locates more than one movie that matches your request it will permit you to itterate through your requests
 using conversational context.
