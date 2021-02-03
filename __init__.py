@@ -532,7 +532,7 @@ class CPKodiSkill(CommonPlaySkill):
                 self.gui.clear()
                 self.enclosure.display_manager.remove_active()
                 self.gui.show_image("https://source.unsplash.com/1920x1080/?+random",
-                                    "Example Long Caption That Needs Wrapping Very Long Long Text Text Example That Is",
+                                    "Example Long Caption That Needs Wrapping Very Long Text Example That Is",
                                     "Example Title")
                 self.speak_dialog("now.playing",
                                   data={"result_type": str(playlist_type), "result_label": str(playlist_label)},
