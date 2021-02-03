@@ -4,7 +4,7 @@ import json
 
 def playlist_clear(kodi_path, media_type):
     api_path = kodi_path + "/jsonrpc"
-    if ("movie" in media_type) or ("video" in media_type):
+    if ("movie" in media_type) or ("video" in media_type) or ("tv" in media_type):
         pl_id = 1
     else:
         pl_id = 0
