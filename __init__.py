@@ -58,7 +58,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.kodi_specific_request = False
         self.artist_name = None
         self.movie_library = None
-        self.settings_change_callback = self.on_settings_changed
+        self.settings_change_callback = self.on_websettings_changed
         self._is_setup = False
 
     def initialize(self):
