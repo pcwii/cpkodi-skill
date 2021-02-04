@@ -6,7 +6,11 @@
                 "fields": [
                     {
                         "type": "label",
-                        "label": "Dev- Complete the data for the following settings. If you have no password leave it blank."
+                        "label": "Rel:20210204"
+                    },
+                    {
+                        "type": "label",
+                        "label": " Complete the data for the following settings. If you have no password leave it blank."
                     },
                     {
                         "name": "kodi_ip",
