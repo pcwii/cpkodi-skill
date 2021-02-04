@@ -402,6 +402,7 @@ class CPKodiSkill(CommonPlaySkill):
                         results = get_tv_show(self.kodi_path, request_data['tv'])
                     if "title" in request_type:
                         results = get_show(self.kodi_path, request_data['tv']['title'])
+                        #Todo: Write tvshow file here
                 if request_data['youtube']['active'] and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
                     results = search_youtube(request_data['youtube']['item'])
                 if results:
@@ -514,6 +515,11 @@ class CPKodiSkill(CommonPlaySkill):
                                       expect_response=False,
                                       wait=True)
 
+    def store_tv_show_data(self):
+        self.dLOG("Saving File..." + str(self.active_library[0]))
+        with self.file_system.open("episode_details", "w") as f:
+            f.write(str(self.active_library[0]))
+
     def clear_queue_and_play(self, playlist_items, playlist_type):
         result = None
         if playlist_type == "movie":
@@ -541,14 +547,18 @@ class CPKodiSkill(CommonPlaySkill):
                                   expect_response=False,
                                   wait=True)
                 time.sleep(2)  # wait for playlist before playback
+                if "tv" in str(playlist_type):
+                    self.store_tv_show_data()
                 result = play_pl(self.kodi_path, playlist_type)
             if "OK" in result.text:
                 self.dLOG("Now Playing..." + str(result.text))
                 result = None
+
         except Exception as e:
             self.dLOG('An error was detected in: clear_queue_and_play')
             LOG.error(e)
             self.on_websettings_changed()
+
 
     def random_movie_select(self):
         self.dLOG('Random Movie Selected')
