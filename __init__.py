@@ -149,7 +149,7 @@ class CPKodiSkill(CommonPlaySkill):
         if regex not in self.regexes:
             filename = regex + '.rx'
             location = os.path.dirname(os.path.realpath(__file__))
-            path = location + '/./regex/en-us/' + filename
+            path = location + '/./regex/en-us/' + filename  # Todo: This is not language agnostic
             # path = self.find_resource(filename)
             self.dLOG("Regex Path: " + path)
             if path:
