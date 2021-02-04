@@ -151,6 +151,7 @@ class CPKodiSkill(CommonPlaySkill):
             # location = os.path.dirname(os.path.realpath(__file__))
             # path = location + '/./json_objects/' + filename #<---This is the wrong path should be ./regex/en-us/
             path = self.find_resource(filename)
+            self.dLOG("Regex Path: " + path)
             if path:
                 with open(path) as f:
                     string = f.read().strip()
