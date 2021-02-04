@@ -518,7 +518,7 @@ class CPKodiSkill(CommonPlaySkill):
     def store_tv_show_data(self):
         self.dLOG("Saving File..." + str(self.active_library[0]))
         # File stored in ~/.mycroft/skills/CPKodiSkill/
-        with self.file_system.open("episode_details", "w") as f:
+        with self.file_system.open("episode_details.json", "w") as f:
             f.write(str(self.active_library[0]))
 
     def clear_queue_and_play(self, playlist_items, playlist_type):
