@@ -517,6 +517,7 @@ class CPKodiSkill(CommonPlaySkill):
 
     def store_tv_show_data(self):
         self.dLOG("Saving File..." + str(self.active_library[0]))
+        # File stored in ~/.mycroft/skills/CPKodiSkill/
         with self.file_system.open("episode_details", "w") as f:
             f.write(str(self.active_library[0]))
 
