@@ -1,4 +1,4 @@
- tail -f /var/log/mycroft/skills.log | grep cpkodi
+tail -f /var/log/mycroft/skills.log | grep cpkodi
 
 play third day from youtube - correctly evaluated
 play the album eye on it - correctly evaluated

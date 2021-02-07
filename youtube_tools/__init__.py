@@ -227,15 +227,18 @@ def search_youtube(query, location_code="US",
                     entry = entry['promotedVideoRenderer']
                     desc = entry["description"]['simpleText']
                     title = entry['longBylineText']['runs'][0]["text"]
-                    try:
-                        url = base_url + entry['longBylineText']['runs'][0][
-                            'navigationEndpoint']['browseEndpoint']['canonicalBaseUrl']
-                        promoted.append(
-                            {"title": title,
-                             "description": desc,
-                             "url": url})
-                    except Exception as e:
-                        LOG.error('youtube_tools Exception Error: ' + e)
+                    """
+                        The following is generating errors
+                    """
+                    # try:
+                    #     url = base_url + entry['longBylineText']['runs'][0][
+                    #         'navigationEndpoint']['browseEndpoint']['canonicalBaseUrl']
+                    #     promoted.append(
+                    #         {"title": title,
+                    #          "description": desc,
+                    #          "url": url})
+                    # except Exception as e:
+                    #     LOG.error('youtube_tools Exception Error: ' + str(e))
             elif 'itemSectionRenderer' in vid:
                 vid = vid['content']
                 thumb = vid["thumbnail"]['thumbnails']

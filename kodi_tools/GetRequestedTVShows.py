@@ -110,6 +110,7 @@ def get_episode(api_path, show_id, show_data):
     for each_item in item_list:
         if int(each_item["episode"]) == int(show_data['episode']):
             info = {
+                "showid": int(show_id),
                 "label": each_item['label'],
                 "episodeid": each_item['episodeid'],
                 "fanart": each_item['fanart'],
