@@ -235,7 +235,7 @@ def search_youtube(query, location_code="US",
                              "description": desc,
                              "url": url})
                     except Exception as e:
-                        LOG.error('youtube_tools Exception Error: ' + e)
+                        LOG.error('youtube_tools Exception Error: ' + str(e))
             elif 'itemSectionRenderer' in vid:
                 vid = vid['content']
                 thumb = vid["thumbnail"]['thumbnails']
