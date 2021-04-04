@@ -84,6 +84,7 @@ class CPKodiSkill(CommonPlaySkill):
         kodi_pass = self.settings.get("kodi_pass", "")
         self.kodi_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + str(kodi_port)
         LOG.info(self.kodi_path)
+
         self.kodi_image_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
                                str(kodi_port) + "/image/"
         self.kodi_filesystem_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
