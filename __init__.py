@@ -405,8 +405,11 @@ class CPKodiSkill(CommonPlaySkill):
                     if "title" in request_type:
                         results = get_show(self.kodi_path, request_data['tv']['title'])
                         #Todo: Write tvshow file here
-                if request_data['youtube']['active'] and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
-                    results = search_youtube(request_data['youtube']['item'])
+                if request_data['youtube']['active']:
+                    if check_plugin_present(self.kodi_path, "plugin.video.youtube")
+                        results = search_youtube(request_data['youtube']['item'])
+                    else:
+                        self.dLOG('Warning...Youtube Plugin Not found!, while processing youtube request!')
                 if results:
                     if len(results) > 0:
                         if request_data['kodi']['active']:
