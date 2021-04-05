@@ -362,6 +362,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         # Todo: Handle Cinemavision options
         # Todo: Cinemavision is not expected to function in the next Kodi Release
+        results = None
         self.dLOG('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
             self.dLOG('CPKodi Skill must be setup at the home.mycroft.ai')
