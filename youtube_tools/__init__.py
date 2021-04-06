@@ -12,6 +12,7 @@ def _get_json(soup_blob):
                     'module={}')]
     json_data = re.split(r"\};", json_data)[0]
     results = json.loads(json_data + "}")
+    LOG.info(str(results))
     return results
 
 

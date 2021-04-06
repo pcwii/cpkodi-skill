@@ -84,6 +84,7 @@ class CPKodiSkill(CommonPlaySkill):
         kodi_pass = self.settings.get("kodi_pass", "")
         self.kodi_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + str(kodi_port)
         LOG.info(self.kodi_path)
+
         self.kodi_image_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
                                str(kodi_port) + "/image/"
         self.kodi_filesystem_path = "http://" + str(kodi_user) + ":" + str(kodi_pass) + "@" + str(kodi_ip) + ":" + \
@@ -361,6 +362,7 @@ class CPKodiSkill(CommonPlaySkill):
         """
         # Todo: Handle Cinemavision options
         # Todo: Cinemavision is not expected to function in the next Kodi Release
+        results = None
         self.dLOG('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
             self.dLOG('CPKodi Skill must be setup at the home.mycroft.ai')
@@ -403,8 +405,11 @@ class CPKodiSkill(CommonPlaySkill):
                     if "title" in request_type:
                         results = get_show(self.kodi_path, request_data['tv']['title'])
                         #Todo: Write tvshow file here
-                if request_data['youtube']['active'] and check_plugin_present(self.kodi_path, "plugin.video.youtube"):
-                    results = search_youtube(request_data['youtube']['item'])
+                if request_data['youtube']['active']:
+                    if check_plugin_present(self.kodi_path, "plugin.video.youtube"):
+                        results = search_youtube(request_data['youtube']['item'])
+                    else:
+                        self.dLOG('Warning...Youtube Plugin Not found!, while processing youtube request!')
                 if results:
                     if len(results) > 0:
                         if request_data['kodi']['active']:
