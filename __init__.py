@@ -30,7 +30,7 @@ from mycroft.skills.core import resting_screen_handler
 _author__ = 'PCWii'
 # Release - '20201229 - Covid-19 Build'
 
-for each_module in sys.modules:
+for each_module in list(sys.modules):
     if "tools" in each_module:
         LOG.info("Attempting to reload tools Modules: " + str(each_module))
         reload(sys.modules[each_module])
@@ -169,7 +169,7 @@ class CPKodiSkill(CommonPlaySkill):
             Since it uses a file we can ensure it is language agnostic
             This routine replaces the get_repeat_words routine
         """
-        repeat_value = 0
+        repeat_value = 1
         value = re.findall(r'\d+', message)
         if value:
             repeat_value = value[0]
