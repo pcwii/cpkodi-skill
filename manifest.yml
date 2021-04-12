@@ -6,5 +6,6 @@ dependencies:
     - PyChromecast>=7.0.1
     - pyenchant
     - compound-word-splitter
+    - youtube_searcher
   system:
     apt-get: libenchant1c2a

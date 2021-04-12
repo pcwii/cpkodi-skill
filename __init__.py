@@ -11,7 +11,7 @@ from importlib import reload
 
 from .cast_tools import *
 from .kodi_tools import *
-from .youtube_tools import *
+from youtube_searcher import search_youtube
 
 from websocket import create_connection
 
@@ -28,7 +28,7 @@ from mycroft.messagebus import Message
 from mycroft.skills.core import resting_screen_handler
 
 _author__ = 'PCWii'
-# Release - '20201229 - Covid-19 Build'
+# Release - '20210411 - Added https://github.com/HelloChatterbox/youtube_searcher'
 
 for each_module in list(sys.modules):
     if "tools" in each_module:
@@ -449,11 +449,13 @@ class CPKodiSkill(CommonPlaySkill):
                     we only currently extract the first item in the results
                 """
                 if self.active_library['playlists']:  # Youtube Requests contains a playlist item
-                    yt_id = self.active_library['playlists'][0]['playlistId']
-                    yt_title = self.active_library['playlists'][0]['title']
+                    random_id = random.randint(0, len(self.active_library['playlists'])-1)
+                    yt_id = self.active_library['playlists'][random_id]['playlistId']
+                    yt_title = self.active_library['playlists'][random_id]['title']
                 else:  # Youtube Requests does not contain a playlist item
-                    yt_id = self.active_library['videos'][0]['videoId']
-                    yt_title = self.active_library['videos'][0]['title']
+                    random_id = random.randint(0, len(self.active_library['videos'])-1)
+                    yt_id = self.active_library['videos'][random_id]['videoId']
+                    yt_title = self.active_library['videos'][random_id]['title']
                 self.speak_dialog('play.youtube',
                                   data={"result": str(yt_title)},
                                   expect_response=False,
