@@ -373,7 +373,7 @@ class CPKodiSkill(CommonPlaySkill):
         if True:
             if self.voc_match(phrase, "FavouritesKeyword"):
                 favourite_check = self._check_favourites("open " + phrase)
-                 if favourite_check is not None:
+                if favourite_check is not None:
                     return favourite_check
 
             request_data = self.get_request_info(phrase)  # Parse the utterance (phrase)
@@ -1141,7 +1141,10 @@ class CPKodiSkill(CommonPlaySkill):
         matching_favourites = get_requested_favourites(self.kodi_path, favourite_query)
         for favourite in matching_favourites:
             if favourite['type'] == 'script':
-                self.speak(favourite['title'] + " is a script. I don't know how to open that.")
+                self.speak_dialog('no.scripts',
+                                  data={"title": favourite['title']},
+                                  expect_response=False,
+                                  wait=False)
                 continue
             elif favourite['type'] == 'window':
                 any_window(self.kodi_path, favourite['window'], favourite['windowparameter'])
