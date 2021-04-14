@@ -1,0 +1,3 @@
+(open|watch) (the |)(?P<FavouriteTitle>.*) (from|in) (my |)(kodi |)(favorites|favourites|starred items)
+(open|watch) (my |)(favorite|starred item|favourite) (?P<FavouriteTitle>.*) (from|in) kodi
+(open|watch) (my |)(kodi |)(favorite|starred item|favourite) (?P<FavouriteTitle>.*)
