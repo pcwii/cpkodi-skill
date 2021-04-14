@@ -353,7 +353,6 @@ class CPKodiSkill(CommonPlaySkill):
                                       request_info['movies']['active'])
         return request_info
 
-
     def CPS_match_query_phrase(self, phrase):
         """
             The method is invoked by the PlayBackControlSkill.
@@ -1153,7 +1152,6 @@ class CPKodiSkill(CommonPlaySkill):
                 play_path(self.kodi_path, favourite['path'])
                 return
         return False # we never found a matching media or window
-
 
 
 def create_skill():
