@@ -16,7 +16,6 @@ from youtube_searcher import search_youtube
 from websocket import create_connection
 
 from adapt.intent import IntentBuilder
-from adapt.engine import IntentDeterminationEngine
 
 from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.skills.core import intent_handler, intent_file_handler
