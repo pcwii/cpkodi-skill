@@ -16,6 +16,7 @@ from youtube_searcher import search_youtube
 from websocket import create_connection
 
 from adapt.intent import IntentBuilder
+from adapt.engine import IntentDeterminationEngine
 
 from mycroft.skills.common_play_skill import CommonPlaySkill, CPSMatchLevel
 from mycroft.skills.core import intent_handler, intent_file_handler
@@ -67,6 +68,28 @@ class CPKodiSkill(CommonPlaySkill):
         self.add_event('recognizer_loop:wakeword', self.handle_listen)
         self.add_event('recognizer_loop:utterance', self.handle_utterance)
         self.add_event('speak', self.handle_speak)
+        self.dLOG(str(dir(self)))
+        self.own_engine = IntentDeterminationEngine()
+        favourite_intent = IntentBuilder("FavouriteIntent")\
+            .require("FavouritesKeyword").require("FavouriteTitle").build()
+
+        vocpath = os.path.join(os.path.dirname(__file__), "vocab", self.lang)
+        vocdir = os.listdir(vocpath)
+        for vocfile in vocdir:
+            if vocfile[-4:] == ".voc":
+                with open(os.path.join(vocpath, vocfile)) as f:
+                    words = f.readlines()
+                    for word in words:
+                        self.own_engine.register_entity(word.strip(), vocfile[:-4])
+        rxpath = os.path.join(os.path.dirname(__file__), "regex", self.lang)
+        rxdir = os.listdir(rxpath)
+        for rxfile in rxdir:
+            if rxfile[-3:] == ".rx":
+                with open(os.path.join(rxpath, rxfile)) as f:
+                    regexes = f.readlines()
+                    for regex in regexes:
+                        self.own_engine.register_regex_entity(regex.strip())
+        self.own_engine.register_intent_parser(favourite_intent)
 
     def on_websettings_changed(self):  # called when updating mycroft home page
         # if not self._is_setup:
@@ -362,6 +385,12 @@ class CPKodiSkill(CommonPlaySkill):
         """
         # Todo: Handle Cinemavision options
         # Todo: Cinemavision is not expected to function in the next Kodi Release
+        own_keywords = self.own_engine.determine_intent(phrase)
+        self.dLOG(str(dir(self.own_engine)))
+        self.dLOG(str(self.own_engine.intent_parsers))
+        for keyword in own_keywords:
+            self.dLOG("Next keyword:")
+            self.dLOG(json.dumps(keyword, indent=4))
         results = None
         self.dLOG('CPKodiSkill received the following phrase: ' + phrase)
         if not self._is_setup:
@@ -1099,14 +1128,9 @@ class CPKodiSkill(CommonPlaySkill):
             return False  # if Chromecast is not enabled then fallback to another skill
 
     # user wants to open something from their favourites
-    @intent_handler(IntentBuilder('').require("FavouritesKeyword"))
+    @intent_handler(IntentBuilder('KodiFavouritesIntent').require("FavouritesKeyword").require("FavouriteTitle").build())
     def handle_open_favourites_intent(self, message):
-        favourite_match = re.match(self.translate_regex("favourite.title"),message.data['utterance'])
-        if bool(favourite_match) == False:
-            self.dLOG("Could not match!  Utterance:")
-            self.dLOG(message.data['utterance'])
-            return False
-        favourite_query = favourite_match['FavouriteTitle']
+        favourite_query = message.data['FavouriteTitle']
 
         matching_favourites = get_requested_favourites(self.kodi_path, favourite_query)
         for favourite in matching_favourites:
