@@ -1,0 +1,1 @@
+(open|play|watch) (the |)(?P<FavouriteTitle>.+) (from|in) (my |)(kodi |)(favorites|favourites|starred items)

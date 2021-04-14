@@ -25,5 +25,7 @@ from .ShowWindow import show_window
 from .SkipPlay import skip_play
 from .StopKodi import stop_kodi
 from .UpdateLibrary import update_library
-
+from .AnyWindow import any_window
+from .PlayPath import play_path
+from .GetRequestedFavourites import get_requested_favourites
 

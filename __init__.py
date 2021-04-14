@@ -1098,6 +1098,30 @@ class CPKodiSkill(CommonPlaySkill):
             self.on_websettings_changed()
             return False  # if Chromecast is not enabled then fallback to another skill
 
+    # user wants to open something from their favourites
+    @intent_handler(IntentBuilder('').require("FavouritesKeyword"))
+    def handle_open_favourites_intent(self, message):
+        favourite_match = re.match(self.translate_regex("favourite.title"),message.data['utterance'])
+        if bool(favourite_match) == False:
+            self.dLOG("Could not match!  Utterance:")
+            self.dLOG(message.data['utterance'])
+            return False
+        favourite_query = favourite_match['FavouriteTitle']
+
+        matching_favourites = get_requested_favourites(self.kodi_path, favourite_query)
+        for favourite in matching_favourites:
+            if favourite['type'] == 'script':
+                self.speak(favourite['title'] + " is a script. I don't know how to open that.")
+                continue
+            elif favourite['type'] == 'window':
+                any_window(self.kodi_path, favourite['window'], favourite['windowparameter'])
+                return
+            elif favourite['type'] == 'media':
+                play_path(self.kodi_path, favourite['path'])
+                return
+        return False # we never found a matching media or window
+
+
 
 def create_skill():
     return CPKodiSkill()
