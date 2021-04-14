@@ -354,6 +354,7 @@ class CPKodiSkill(CommonPlaySkill):
                                       request_info['movies']['active'])
         return request_info
 
+
     def CPS_match_query_phrase(self, phrase):
         """
             The method is invoked by the PlayBackControlSkill.
@@ -371,11 +372,16 @@ class CPKodiSkill(CommonPlaySkill):
             return None
         # try:
         if True:
+            if self.voc_match(phrase, "FavouritesKeyword"):
+                favourite_check = self._check_favourites("open " + phrase)
+                 if favourite_check is not None:
+                    return favourite_check
+
             request_data = self.get_request_info(phrase)  # Parse the utterance (phrase)
             self.dLOG('Phrase was parsed with the following request... ' + str(request_data))
             if not request_data['activeItem']:
                 self.dLOG('GetRequest returned None, no regex matches were found')
-                return False
+                return None
             else:  # Active regex data was parsed
                 if request_data['movies']['active']:
                     if request_data['random']:
@@ -439,6 +445,8 @@ class CPKodiSkill(CommonPlaySkill):
                 "details": request_data  # Contains the json object for the request "baseDataStructure.json"
             }
         """
+        if 'type' in data:
+            return self._run_favourite(data)
         request_data = data["details"]  # the original request data
         self.active_library = data["library"]  # a results playlist of what was found
         playlist_count = len(self.active_library)  # how many items were returned
@@ -1098,6 +1106,33 @@ class CPKodiSkill(CommonPlaySkill):
                               wait=True)
             self.on_websettings_changed()
             return False  # if Chromecast is not enabled then fallback to another skill
+
+    def _match_adapt_regex(self, string, rxfile):
+        with open(os.path.join(os.path.dirname(__file__), "regex", self.lang, rxfile + ".rx")) as f:
+            self.dLOG("Matching " + string)
+            for line in f.readlines():
+                self.dLOG(line.strip())
+                match = re.match(line.strip(), string)
+                if match is not None:
+                    return match[rxfile]
+            return None
+
+    def _check_favourites(self, phrase):
+        match = self._match_adapt_regex(phrase, "FavouriteTitle")
+        if match is None:
+            return None
+        matching_favourites = get_requested_favourites(self.kodi_path, match)
+        for favourite in matching_favourites:
+            if favourite['type'] == 'window' or favourite['type'] == 'media':
+                return (phrase, CPSMatchLevel.EXACT, favourite)
+
+    def _run_favourite(self, data):
+        if data['type'] == 'window':
+            any_window(self.kodi_path, data['window'], data['windowparameter'])
+            return
+        if data['type'] == 'media':
+            play_path(self.kodi_path, data['path'])
+
 
     # user wants to open something from their favourites
     @intent_handler(IntentBuilder('OpenFavorite').require("FavouritesKeyword").require("FavouriteTitle").build())
