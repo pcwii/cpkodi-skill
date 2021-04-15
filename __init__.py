@@ -371,7 +371,7 @@ class CPKodiSkill(CommonPlaySkill):
         # try:
         if True:
             if self.voc_match(phrase, "FavouritesKeyword"):
-                favourite_check = self._check_favourites("open " + phrase)
+                favourite_check = self._check_favourites(self.translate("open.keyword") + " " + phrase)
                 if favourite_check is not None:
                     return favourite_check
 
