@@ -375,6 +375,16 @@ class CPKodiSkill(CommonPlaySkill):
                 if favourite_check is not None:
                     return favourite_check
 
+            if self.voc_match(phrase, "PVRKeyword"):
+                if channel_no := self._match_adapt_regex(phrase, "ChannelNumber") is not None:
+                    if check_channel_number(self.kodi_path, channel_no) is not None:
+                        return (phrase, CPSMatchLevel.EXACT, {'channel': channel_no})
+                # there's no great way to ask for a remainder from voc_match
+                query = " ".join([word for word in phrase.split(" ") if not self.voc_match(word, "PVRKeyword")])
+                channel_list = find_channel(self.kodi_path, query)
+                if channel_list is not None and len(channel_list) > 0:
+                    return (phrase, CPSMatchLevel.EXACT, {'channel': channel_list[0]['channelid']})
+                
             request_data = self.get_request_info(phrase)  # Parse the utterance (phrase)
             self.dLOG('Phrase was parsed with the following request... ' + str(request_data))
             if not request_data['activeItem']:
@@ -443,6 +453,9 @@ class CPKodiSkill(CommonPlaySkill):
                 "details": request_data  # Contains the json object for the request "baseDataStructure.json"
             }
         """
+        if 'channel' in data:
+            play_channel_number(self.kodi_path, int(data['channel']))
+            return
         if 'type' in data:
             return self._run_favourite(data)
         request_data = data["details"]  # the original request data
@@ -1131,6 +1144,24 @@ class CPKodiSkill(CommonPlaySkill):
         if data['type'] == 'media':
             play_path(self.kodi_path, data['path'])
 
+    @intent_handler(IntentBuilder('WatchPVRChannelNumber').require("WatchKeyword")
+                    .require("PVRKeyword").optionally("ChannelNumber").build())
+    def handle_channel(self, message):
+        if 'ChannelNumber' in message.data:
+            play_channel_number(self.kodi_path, int(message.data['ChannelNumber']))
+            return
+        self.dLOG(str(dir(message)))
+        self.dLOG(str(message.data.keys()))
+        self.dLOG(str(message.data))
+        channel_query = message.utterance_remainder()
+        channels = find_channel(self.kodi_path, channel_query)
+        self.dLOG(str(channels))
+        if len(channels) == 0:
+            self.speak_dialog('no.channel', data={'title':channel_query},
+                              expect_response=False,
+                              wait=False)
+            return False
+        play_channel_number(self.kodi_path, int(channels[0]['channelid']))
 
     # user wants to open something from their favourites
     @intent_handler(IntentBuilder('OpenFavorite').require("FavouritesKeyword").require("FavouriteTitle").build())
