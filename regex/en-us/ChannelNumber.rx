@@ -1,0 +1,2 @@
+.*channel (?P<ChannelNumber>\d+)
+.*channel number (?P<ChannelNumber>\d+)
