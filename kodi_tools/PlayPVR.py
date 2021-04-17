@@ -70,7 +70,6 @@ def find_channel(kodi_path, query):
         return None
     channel_list = channel_list['result']['channels']
     if len(channel_list) > 0:
-        LOG.info(channel_list)
         channel_list = [channel for channel in channel_list
                         if any(term in channel['label'] for term in search_filter)]
         def sortkey(channel):
