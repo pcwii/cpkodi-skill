@@ -1144,18 +1144,18 @@ class CPKodiSkill(CommonPlaySkill):
         if data['type'] == 'media':
             play_path(self.kodi_path, data['path'])
 
-    @intent_handler(IntentBuilder('WatchPVRChannelNumber').require("WatchKeyword")
-                    .require("PVRKeyword").optionally("ChannelNumber").build())
+    @intent_handler(IntentBuilder('').require("WatchKeyword").require("PVRKeyword").optionally("ChannelNumber"))
     def handle_channel(self, message):
         if 'ChannelNumber' in message.data:
             play_channel_number(self.kodi_path, int(message.data['ChannelNumber']))
             return
-        self.dLOG(str(dir(message)))
-        self.dLOG(str(message.data.keys()))
-        self.dLOG(str(message.data))
+        if channel_no := self._match_adapt_regex(message.data['utterance'], "ChannelNumber") is not None:
+            self.dLOG("Adapt failed to recognize an optional regex.")
+            play_channel_number(self.kodi_path, int(channel_no))
+            return
+        self.dLOG("Channel number not matched. Trying to find a channel name.")
         channel_query = message.utterance_remainder()
         channels = find_channel(self.kodi_path, channel_query)
-        self.dLOG(str(channels))
         if len(channels) == 0:
             self.speak_dialog('no.channel', data={'title':channel_query},
                               expect_response=False,
@@ -1164,7 +1164,7 @@ class CPKodiSkill(CommonPlaySkill):
         play_channel_number(self.kodi_path, int(channels[0]['channelid']))
 
     # user wants to open something from their favourites
-    @intent_handler(IntentBuilder('OpenFavorite').require("FavouritesKeyword").require("FavouriteTitle").build())
+    @intent_handler(IntentBuilder('').require("FavouritesKeyword").require("FavouriteTitle"))
     def handle_open_favourites_intent(self, message):
         favourite_query = message.data['FavouriteTitle']
 
