@@ -48,6 +48,13 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 - [x] "play some Elton John using youtube"
 ## Examples -TV Shows-
 - [x] "play the outer limits season 1 episode 2”
+## Examples -Favourites-
+- [x] "play starred item german news"
+- [x] "Open Kirby Super Star from my favorites"
+## Examples -PVR-
+- [x] "play channel 2"
+- [x] "watch channel Heart TV"
+  - Note that if your channel name is in a different language from your Mycroft interface, this won't work.
 ## Examples -Miscellaneous-
 - [x] "pause kodi"
 - [x] "re-start kodi"
@@ -57,7 +64,7 @@ The Kodi Skill uses conversational dialog to help you to control your KODI insta
 - [x] "set kodi volume to 25"
 - [x] "turn kodi notifications on"
 - [x] "turn kodi notifications off"
-- [ ] "move the kodi cursor up / down / left / right / back / select / cancel"
+- [x] "move the kodi cursor up / down / left / right / back / select / cancel"
   - After the first cursor command just say the direction "up / down / left / right / back / select / cancel"
 - [x] "move the kodi cursor right 3 times"
 - [x] "move the kodi cursor down twice"
