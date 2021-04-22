@@ -376,7 +376,8 @@ class CPKodiSkill(CommonPlaySkill):
                     return favourite_check
 
             if self.voc_match(phrase, "PVRKeyword"):
-                if channel_no := self._match_adapt_regex(phrase, "ChannelNumber") is not None:
+                channel_no = self._match_adapt_regex(phrase, "ChannelNumber")
+                if channel_no is not None:
                     if check_channel_number(self.kodi_path, channel_no) is not None:
                         return (phrase, CPSMatchLevel.EXACT, {'channel': channel_no})
                 # there's no great way to ask for a remainder from voc_match
@@ -1149,7 +1150,8 @@ class CPKodiSkill(CommonPlaySkill):
         if 'ChannelNumber' in message.data:
             play_channel_number(self.kodi_path, int(message.data['ChannelNumber']))
             return
-        if channel_no := self._match_adapt_regex(message.data['utterance'], "ChannelNumber") is not None:
+        channel_no = self._match_adapt_regex(message.data['utterance'], "ChannelNumber")
+        if channel_no is not None:
             self.dLOG("Adapt failed to recognize an optional regex.")
             play_channel_number(self.kodi_path, int(channel_no))
             return
