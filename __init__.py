@@ -1158,7 +1158,7 @@ class CPKodiSkill(CommonPlaySkill):
         self.dLOG("Channel number not matched. Trying to find a channel name.")
         channel_query = message.utterance_remainder()
         channels = find_channel(self.kodi_path, channel_query)
-        if len(channels) == 0:
+        if channels is None or len(channels) == 0:
             self.speak_dialog('no.channel', data={'title':channel_query},
                               expect_response=False,
                               wait=False)
