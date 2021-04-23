@@ -378,8 +378,9 @@ class CPKodiSkill(CommonPlaySkill):
             if self.voc_match(phrase, "PVRKeyword"):
                 channel_no = self._match_adapt_regex(phrase, "ChannelNumber")
                 if channel_no is not None:
-                    if check_channel_number(self.kodi_path, channel_no) is not None:
-                        return (phrase, CPSMatchLevel.EXACT, {'channel': channel_no})
+                    channel_by_number = check_channel_number(self.kodi_path, channel_no)
+                    if channel_by_number is not None:
+                        return (phrase, CPSMatchLevel.EXACT, {'channel': channel_by_number['channelid']})
                 # there's no great way to ask for a remainder from voc_match
                 query = " ".join([word for word in phrase.split(" ") if not self.voc_match(word, "PVRKeyword")])
                 channel_list = find_channel(self.kodi_path, query)
@@ -455,7 +456,7 @@ class CPKodiSkill(CommonPlaySkill):
             }
         """
         if 'channel' in data:
-            play_channel_number(self.kodi_path, int(data['channel']))
+            play_channel_id(self.kodi_path, int(data['channel']))
             return
         if 'type' in data:
             return self._run_favourite(data)
@@ -1163,7 +1164,7 @@ class CPKodiSkill(CommonPlaySkill):
                               expect_response=False,
                               wait=False)
             return False
-        play_channel_number(self.kodi_path, int(channels[0]['channelid']))
+        play_channel_id(self.kodi_path, int(channels[0]['channelid']))
 
     # user wants to open something from their favourites
     @intent_handler(IntentBuilder('').require("FavouritesKeyword").require("FavouriteTitle"))
