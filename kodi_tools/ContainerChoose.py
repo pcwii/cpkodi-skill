@@ -2,7 +2,6 @@ from mycroft.util.log import LOG
 import requests
 import json
 from math import ceil
-#from mycroft.util.log import LOG
 
 
 # Based on pause_player
@@ -37,7 +36,6 @@ def get_widelist_screen_options(kodi_path):
     num_items = int(data['Container().NumAllItems'])
     num_pages = int(data['Container().NumPages'])
     cur_pos_on_screen = int(data['Container().Position'])
-    #cur_pos_in_list = int(data['Container().CurrentItem'])
 
     # use the number of pages and number of items to get an upper bound on the number of items per page
     #DIRTY HACK: I couldn't find the number of items per page, so guess high if there's one page.
@@ -80,7 +78,7 @@ def select_list_item_by_tuple(kodi_path, item_tuple):
     Input: kodi_path and (x_offset, y_offset, label) tuple."""
     (x, y, _) = item_tuple
     # Move left or up before right or down in case we're in the last row of a grid
-    # (Not currently implemented)
+    # (Not currently implemented due to JSONRPC limitations)
     batch = []
     if x < 0:
         batch.extend(["Left"]* -x)
