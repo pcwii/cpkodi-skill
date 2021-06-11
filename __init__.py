@@ -11,6 +11,8 @@ from importlib import reload
 
 from .cast_tools import *
 from .kodi_tools import *
+from .misc_tools import filter_by_string
+
 from youtube_searcher import search_youtube
 
 from websocket import create_connection
@@ -628,6 +630,40 @@ class CPKodiSkill(CommonPlaySkill):
             self.cc_status = cc_cast_file(self.cast_device, url_path)
             self.dLOG(self.cc_status)
 
+    def choose_list_item(self, choice_query):
+        # make sure we're in a supported viewtype
+        viewtype = info_labels(self.kodi_path, ["Container.Viewmode"])['Container.Viewmode']
+        # get the list of items we need
+        if viewtype == "WideList" or viewtype == "List":
+            items = get_widelist_screen_options(self.kodi_path)
+        elif viewtype == "Shift":
+            items = get_horizontal_options(self.kodi_path)
+        else:
+            self.speak_dialog('bad.viewtype')
+            self.dLOG("Bad viewtype: " + str(viewtype))
+            return 0
+        # wake the screen so that Kodi knows we know what we are clicking
+        noop(self.kodi_path)
+        # ask the user which item they wanted
+        self.dLOG(items)
+        chosen = filter_by_string(choice_query, items, key=lambda x: x[2])
+        if len(chosen) == 0:
+            # todo: check for numbers
+            self.speak_dialog('no.choice',
+                              data={'query': choice_query})
+            return False
+        else:
+            # ask_selection is bad for long and potentially similar things,
+            # such as youtube search result titles.
+            for choice in chosen:
+                if self.ask_yesno('confirm.select',
+                                  data={'item': choice[2]}) == 'yes':
+                    select_list_item_by_tuple(self.kodi_path, choice)
+                    return True
+            self.speak_dialog('no.choice',
+                              data={'query': choice_query})
+            return False
+
     """
         All vocal intents appear here
     """
@@ -1047,6 +1083,13 @@ class CPKodiSkill(CommonPlaySkill):
                           data={"result": sort_kw},
                           expect_response=False,
                           wait=True)
+    
+    @intent_handler(IntentBuilder('').require("KodiKeyword").
+                    require("ListQuery"))
+    def handle_container_choose(self, message):
+        choice_query = message.data.get("ListQuery")
+        self.choose_list_item(choice_query)
+
 
     # user has requested to show the movies listed all movies
     @intent_handler(IntentBuilder('').require("ListKeyword").require('AllKeyword').require('FilmKeyword'))
