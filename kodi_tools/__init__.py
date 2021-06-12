@@ -28,4 +28,6 @@ from .UpdateLibrary import update_library
 from .AnyWindow import any_window
 from .PlayPath import play_path
 from .GetRequestedFavourites import get_requested_favourites
-from .PlayPVR import play_channel_number, check_channel_number, find_channel
+from .PlayPVR import play_channel_number, check_channel_number, find_channel, play_channel_id
+from .ContainerChoose import get_horizontal_options, get_widelist_screen_options, info_labels, select_list_item_by_tuple
+from .Noop import noop
